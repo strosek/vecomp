@@ -1,0 +1,34 @@
+Errores Lexicos a verificar:
+
+1) Simbolo ilegal.
+2) Patron Incorrecto se esperaba: simbolo en secuencia.
+3) Fin de Archivo Inesperado en Comentarios
+    
+Restricción:
+    No devolver ni Lexema ni Token en 
+    Comentarios sean linea o multilinea
+
+
+      Indicar la linea y renglon lo mas preciso posible y 
+describir el Error de manera clara.
+
+Formato de Lexemas y Tokens
+---------------------------------------------------------
+Token	Lexema
+---------------------------------------------------------
+ide	a
+asi	:=
+rea	23.
+opa	+
+rea	0.5e
+opa	*
+ent	4
+del	;
+
+Formato de Errores (Max. de 5 errores)
+_________________________________________________________________________________
+Linea 	Col	Error 	Descripcion 				Linea de Error
+---------------------------------------------------------------------------------------------------------------------------------
+07	10	23.	Patron incompleto se esperaba digito		a:=23.+0.5e*4;
+07	14	0.5e	Patron incompleto se esperaba +,- o digito	a:=23.+0.5e*4;
+

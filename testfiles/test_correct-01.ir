@@ -1,0 +1,31 @@
+// commentario de linea
+paquete principal
+
+importar "fmt"
+
+/* Hola perro 
+ este es un comentario
+ multi linea*/
+
+funcion principal() {/* multiline
+comment */
+  fmt.Println()
+  a := 15
+  b = 12.4
+  c = 15.2e23
+  d = 0123
+  e = 0x2f12a; ;;
+  f = .12
+  g := 12e+3
+  unaBooleana := verdadero
+  otra = falso;
+  unChar = '\a';
+  i = 34.
+  j = a + b / 3 % 2 - 234 * 2;
+  h = "un string con cosas !@#$%^&*()_+ raras"
+  if a < b || b >= c && a != f {
+    perro = 14.23e-23
+  }
+  ;
+}
+

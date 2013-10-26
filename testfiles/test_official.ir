@@ -1,0 +1,149 @@
+paquete principal
+importar ( "fmt" "con" )
+
+const (PI = 3.141592
+           MAX = 30)
+
+var ( i, j, k, n, vector[MAX] entero
+      r, s, t real
+      alfa, beta alfabetico
+      log1, log2 logico ) 
+
+var matriz[MAX][MAX] entero
+//Factoriai Recursivo
+funcion  FacRec(n entero) entero {
+   si  n < 2  { regresa 1 }
+   sino { regresa n * FacRec( n - 1) }
+}
+
+/*** Factorial Ieterativo
+para 
+prueba ***/
+
+funcion FacIter( n entero) entero {
+  var facto entero;
+  facto := 1;
+  desde i := n ; i > 2 ; i := i - 1 {
+     facto := facto * i
+  } 
+  regresa facto
+}
+
+funcion Concat(a, b alfabetico) alfabetico {
+   regresa a + " " + b
+}
+
+funcion Selecciona( ) {
+    var opc entero;
+    desde ; ; {
+         fmt.Imprime("Dame un numero: ");
+         con.Lee( n );
+         fmt.Imprime("Factorial 1]Recursivo 2]Iterativo 3]Salir: ");
+         con.Lee( opc )
+         si opc == 3 { interrumpe }
+         caso opc {
+             valor 1: fmt.Imprimenl("Factorial Recursivo de ", n, " es= ", FacRec( n ) );
+                        interrumpe;
+
+             valor 2: fmt.Imprimenl("Factorial Iterativo de ", n, " es= ", FacIter( n ) );
+                        interrumpe;
+             valor 3: interrumpe;
+             defecto: fmt.Imprimenl("Opcion No valida");
+         }
+    }
+}
+
+funcion VolCil(radio, altura real) real {
+   regresa PI * radio * radio * altura
+}
+
+funcion Test() {
+   desde i := 1; i <= 10; i := i + 1 {
+     si i == 5 {  continua }
+     fmt.Imprimenl("i= ", i)
+   }
+   i:=1;
+   desde ; ; i := i + 1 {
+      fmt.Imprimnl("i= ", i);
+      Si (i = 7) { interrumpe }
+   }
+}
+
+funcion LeeVec(k entero) {
+   desde i:=1; i <= k; i := i + 1 {
+      fmt.Imprime("Vector[", i, "]: ");
+      con.Lee(Vector[i]);
+   }
+}
+
+funcion OrdVec(k entero) {
+var temp entero;
+   desde i := 1; i < k ; i := i + 1 {
+      desde j := i + 1; i <= k; j := j + 1 {
+         si vector[i] > vector[j] {
+                Temp := Vector[i];
+                Vector[i] := Vector[j];
+                Vector[j] := Temp;
+         }
+       }
+    }
+}
+
+funcion ImpVec(k entero) {
+   desde i:=1; i <= k; i := i + 1 {
+      fmt.Imprimenl("Vector[",i,"]= ", vector[i])
+   }
+}
+
+funcion LeeMat(k entero) {
+    desde i := 1; i <= k; i := i + 1 {
+        desde j:=1; j <= k; j := j + 1 {
+           fmt.Imprime("Matriz[", i, "][", j, "]: ");
+           con.Lee(Matriz[i][j])
+         }
+    }
+}
+
+funcion MulMat(k,v entero) {
+   desde i:=1; i <= k; i:= i + 1 {
+         desde j:=1; j <= k; j:= j + 1 {
+              Matriz[i][j] := Matriz[i][j] * v
+         }
+   }
+}
+
+funcion ImpMat(k entero) {
+     desde i:=1; i <= k; i := i + 1 {
+           desde j:=1; i <= k; j := j + 1 {
+                 fmt.Imprimenl( "Matriz[", i, "][", j, "]= ", Matriz[i][j] )
+            }
+     }
+}
+
+funcion  Compara( a, b real) logico {
+     regresa a > b;
+}
+
+funcion principal() {
+    Selecciona();
+    fmt.Imprime("Dame Radio: ");
+    con.Lee( r );
+    fmt.Imprime("Dame Altura: ");
+    con.Lee( s );
+    fmt.Imprimenl("El Volumen del Cilindro= ", VolCil( r, s ));
+    fmt.Imprimenl("Es el radio= ", r, " mayor que la Altura= ", s, "? ", Compara( r, s ) );
+    LeeVec( 10 );
+    OrdVec( 10 );
+    ImpVec( 10 );
+    fmt.Imprime("Dame elementos de Matriz NxN: ");
+    con.Lee( n );
+    LeeMat( n );
+    MulMat( n, 100 );
+    ImpMat( n );
+    Test();
+    fmt.Imprime("Dame tu nombre: ");
+    fmt.Lee(alfa);
+    fmt.Imprime("Dame tu Apellido: ");
+    fmt.Lee(beta);
+    fmt.Imprimenl("Hola ", Concat(alfa, beta), " ya pasaste!!!");
+}
