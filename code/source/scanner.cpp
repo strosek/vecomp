@@ -1,7 +1,5 @@
 /* Definition of member functions of class Scanner */
 
-//#define DEBUG 1
-
 #include "../headers/scanner.hpp"
 
 #include <utility>
@@ -22,7 +20,8 @@ Scanner::Scanner() :
   m_currentToken(0),
   m_nTokens(0),
   m_tokensLexemes(),
-  m_keywordsMap()
+  m_keywordsMap(),
+  m_errorOut()
 {
   m_keywordsMap["alfanumerico"] = KEYWORD_ALPHANUM;
   m_keywordsMap["canal"] =        KEYWORD_CHANNEL;
@@ -63,7 +62,10 @@ Scanner::Scanner() :
 void Scanner::scan(const string& fileName) { 
   m_sourceFile.open(fileName.c_str());
 
-  if (m_sourceFile.is_open()) {
+  if (m_sourceFile.is_open())
+  {
+    m_errorOut.open("errores.out", ios::app);
+
     char currentChar;
     int nextState = 0, currentState = 0;
     TokenType_t token;
@@ -80,13 +82,12 @@ void Scanner::scan(const string& fileName) {
       m_column = 1;
       while (m_column <= lineLength && m_errors <= ERRORS_MAX_LIMIT) {
         currentChar = line.at(m_column - 1);
-        nextState = automata[currentState][
-                             getTransitionIndex(currentChar, currentState)];
+        nextState = automata[currentState][getTransitionIndex(currentChar)];
 
 #ifdef DEBUG
         cout << "CState: " << setw(2) << currentState << "  NState: " << 
                 setw(2) << nextState << "  TIndex: " << 
-                setw(2) << getTransitionIndex(currentChar, currentState) << 
+                setw(2) << getTransitionIndex(currentChar) << 
                 " Char: ";
         if (!isspace(currentChar))
             cout << currentChar;
@@ -161,7 +162,7 @@ void Scanner::scan(const string& fileName) {
               token = TOKEN_CHARCONST;
               break;
             default :
-              cerr << "icomp: error de estado siguiente" << endl;
+              cerr << "vecomp: error de estado siguiente" << endl;
               break;
           }
 
@@ -185,7 +186,6 @@ void Scanner::scan(const string& fileName) {
           token = TOKEN_INVALID;
           lexeme = "";
           nextState = 0;
-          --m_column;
         }
         else if ( isspace(currentChar) && 
                  (currentState == 12 || currentState == 15 || 
@@ -211,9 +211,14 @@ void Scanner::scan(const string& fileName) {
     }
 
     m_nTokens = m_tokensLexemes.size();
+
+    if (m_tokensLexemes.empty())
+      lexicalError("archivo vacio");
+
+    m_errorOut.close();
   }
   else {
-    cerr << "irc: error al abrir archivo fuente" << endl;
+    lexicalError("error al abrir codigo fuente");
     ++m_errors;
   }
 }
@@ -227,7 +232,7 @@ TokenLexeme Scanner::getNextTokenLexeme() {
   return temporal;
 }
 
-Transition_t Scanner::getTransitionIndex(char character, int currentState) {
+Transition_t Scanner::getTransitionIndex(char character) {
   Transition_t transitionIndex = TRANS_ANY; 
 
   if (isdigit(character)) {
@@ -318,15 +323,7 @@ Transition_t Scanner::getTransitionIndex(char character, int currentState) {
         transitionIndex = TRANS_DOT;
         break;
       default :
-        if (currentState != 12 && currentState != 15 && currentState != 17 &&
-            currentState != 30) {
-          cerr << "icomp: error: " << m_lineNo << ", " << 
-              m_column << ": caracter invalido: " << "'" << 
-              character  << "' " << endl;
-          ++m_errors;
-        }
-        else
-          transitionIndex = TRANS_ANY;
+        transitionIndex = TRANS_ANY;
         break;
     }
   }
@@ -344,32 +341,26 @@ int Scanner::getErrors() const {
 
 void Scanner::lexicalError(int state, char currentChar, const string& line, 
                            const string& lexeme) {
-  const int numberWidth =   8;
-  const int lexemeWidth =  15;
-  const int messageWidth = 80;
-  const int lineWidth =   100;
-
-  const string invalidSymbolMessage = "Simbolo ilegal, se esperaba: '";
-
-  ofstream errorOut("errores.out", ios_base::app);
   static bool isHeaderWritten = false;
   if (!isHeaderWritten) {
     for (int i = 0; 
-         i < (numberWidth * 2 + lexemeWidth + messageWidth + lineWidth); ++i)
-      errorOut << '-';
-    errorOut << endl;
+         i < (WIDTH_NUMBER * 2 + WIDTH_LEXEME + WIDTH_LEXEME + WIDTH_LINE); ++i)
+      m_errorOut << '-';
+    m_errorOut << endl;
 
-    errorOut << setw(numberWidth) << "Linea" <<
-        setw(numberWidth) << "Columna" <<
-        setw(lexemeWidth) << "Lexema" << 
-        setw(messageWidth) << "Mensaje de error" <<
-        setw(lineWidth) << "Linea" << endl;
+    m_errorOut << setw(WIDTH_NUMBER) << "Linea" <<
+        setw(WIDTH_NUMBER) << "Columna" <<
+        setw(WIDTH_LEXEME) << "Lexema" << 
+        setw(WIDTH_MESSAGE) << "Mensaje de error" <<
+        setw(WIDTH_LINE) << "Linea" << endl;
 
     for (int i = 0;
-         i < (numberWidth * 2 + lexemeWidth + messageWidth + lineWidth); ++i) {
-      errorOut << '-';
+         i < (WIDTH_NUMBER * 2 + WIDTH_LEXEME + WIDTH_MESSAGE + WIDTH_LINE);
+         ++i)
+    {
+      m_errorOut << '-';
     }
-    errorOut << endl;
+    m_errorOut << endl;
     
     isHeaderWritten = true;
   }
@@ -457,11 +448,11 @@ void Scanner::lexicalError(int state, char currentChar, const string& line,
   }
   
   string errorMessage = messageBuilder.str();
-  errorOut << setw(numberWidth) << m_lineNo <<
-      setw(numberWidth) << m_column <<
-      setw(lexemeWidth) << lexeme << 
-      setw(messageWidth) << errorMessage <<
-      setw(lineWidth) << line;
+  m_errorOut << setw(WIDTH_NUMBER) << m_lineNo <<
+      setw(WIDTH_NUMBER) << m_column <<
+      setw(WIDTH_LEXEME) << lexeme << 
+      setw(WIDTH_MESSAGE) << errorMessage <<
+      setw(WIDTH_LINE) << line;
 }
 
 bool Scanner::isTerminalState(int state) {
@@ -495,5 +486,14 @@ bool Scanner::isTerminalState(int state) {
   }
 
   return false;
+}
+
+void Scanner::lexicalError(const string& message)
+{
+  m_errorOut << setw(WIDTH_NUMBER) << ' ' <<
+      setw(WIDTH_NUMBER) << ' ' <<
+      setw(WIDTH_LEXEME) << ' ' << 
+      setw(WIDTH_MESSAGE) << message <<
+      setw(WIDTH_LINE) << ' ';
 }
 
