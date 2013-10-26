@@ -1,4 +1,4 @@
-/* Main function definition for lexical analyzer program */
+/* Main function definition for vecomp program */
 
 #include <iostream>
 #include <cstdlib>

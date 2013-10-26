@@ -1,4 +1,4 @@
-/* Definition of class TokenLexeme */
+/* Declaration of class TokenLexeme */
 
 #ifndef TOKENLEXEME_HPP
 #define TOKENLEXEME_HPP

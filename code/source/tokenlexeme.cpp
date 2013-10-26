@@ -1,4 +1,4 @@
-// Definition of member functions of class TokenLexeme
+/* Definition of member functions of class TokenLexeme */
 
 #include "../headers/tokenlexeme.hpp"
 

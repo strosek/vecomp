@@ -1,6 +1,6 @@
 /* Definition of member functions of class Scanner */
 
-#define DEBUG 1
+//#define DEBUG 1
 
 #include "../headers/scanner.hpp"
 

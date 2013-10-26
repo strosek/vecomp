@@ -1,4 +1,4 @@
-/* Scanner class declaration */
+/* Scanner class definition */
 
 #ifndef SCANNER_HPP
 #define SCANNER_HPP
