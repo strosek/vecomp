@@ -153,6 +153,7 @@ private:
                             const std::string& line,
                             const std::string& lexeme);
   void         lexicalError(const std::string& message);
+  void         writeErrorsFileHeader();
   bool         isTerminalState(int state);
 
   int                               m_lineNo;

@@ -64,7 +64,6 @@ void Scanner::scan(const string& fileName) {
 
   if (m_sourceFile.is_open())
   {
-    m_errorOut.open("errores.out", ios::app);
 
     char currentChar;
     int nextState = 0, currentState = 0;
@@ -339,32 +338,53 @@ int Scanner::getErrors() const {
   return m_errors;
 }
 
-void Scanner::lexicalError(int state, char currentChar, const string& line, 
-                           const string& lexeme) {
-  static bool isHeaderWritten = false;
-  if (!isHeaderWritten) {
-    for (int i = 0; 
-         i < (WIDTH_NUMBER * 2 + WIDTH_LEXEME + WIDTH_LEXEME + WIDTH_LINE); ++i)
-      m_errorOut << '-';
-    m_errorOut << endl;
-
-    m_errorOut << setw(WIDTH_NUMBER) << "Linea" <<
-        setw(WIDTH_NUMBER) << "Columna" <<
-        setw(WIDTH_LEXEME) << "Lexema" << 
-        setw(WIDTH_MESSAGE) << "Mensaje de error" <<
-        setw(WIDTH_LINE) << "Linea" << endl;
-
-    for (int i = 0;
-         i < (WIDTH_NUMBER * 2 + WIDTH_LEXEME + WIDTH_MESSAGE + WIDTH_LINE);
-         ++i)
-    {
-      m_errorOut << '-';
-    }
-    m_errorOut << endl;
-    
-    isHeaderWritten = true;
+bool Scanner::isTerminalState(int state) {
+  switch (state) {
+    case 1 :
+    case 2 :
+    case 4 :
+    case 5 :
+    case 6 :
+    case 7 :
+    case 8 :
+    case 11 :
+    case 13 :
+    case 14 :
+    case 16 :
+    case 18 :
+    case 19 :
+    case 22 :
+    case 23 :
+    case 24 :
+    case 25 :
+    case 26 :
+    case 27 :
+    case 28 :
+    case 29 :
+    case 33 :
+    case 35 :
+    case 36 :
+      return true;
+      break;
   }
 
+  return false;
+}
+
+void Scanner::lexicalError(const string& message)
+{
+  writeErrorsFileHeader();
+
+  m_errorOut << setw(WIDTH_NUMBER) << ' ' <<
+      setw(WIDTH_NUMBER) << ' ' <<
+      setw(WIDTH_LEXEME) << ' ' << 
+      setw(WIDTH_MESSAGE) << message <<
+      setw(WIDTH_LINE) << ' ';
+}
+
+void Scanner::lexicalError(int state, char currentChar, const string& line, 
+                           const string& lexeme) {
+  writeErrorsFileHeader();
   ostringstream messageBuilder;
   switch (state) {
     case 0 :
@@ -455,45 +475,33 @@ void Scanner::lexicalError(int state, char currentChar, const string& line,
       setw(WIDTH_LINE) << line;
 }
 
-bool Scanner::isTerminalState(int state) {
-  switch (state) {
-    case 1 :
-    case 2 :
-    case 4 :
-    case 5 :
-    case 6 :
-    case 7 :
-    case 8 :
-    case 11 :
-    case 13 :
-    case 14 :
-    case 16 :
-    case 18 :
-    case 19 :
-    case 22 :
-    case 23 :
-    case 24 :
-    case 25 :
-    case 26 :
-    case 27 :
-    case 28 :
-    case 29 :
-    case 33 :
-    case 35 :
-    case 36 :
-      return true;
-      break;
+void Scanner::writeErrorsFileHeader() {
+  if (!m_errorOut.is_open()) {
+    m_errorOut.open("errores.out", ios::app);
+
+    static bool isHeaderWritten = false;
+    if (!isHeaderWritten) {
+      for (int i = 0; 
+           i < (WIDTH_NUMBER * 2 + WIDTH_LEXEME + WIDTH_LEXEME + WIDTH_LINE); ++i)
+        m_errorOut << '-';
+      m_errorOut << endl;
+
+      m_errorOut << setw(WIDTH_NUMBER) << "Linea" <<
+          setw(WIDTH_NUMBER) << "Columna" <<
+          setw(WIDTH_LEXEME) << "Lexema" << 
+          setw(WIDTH_MESSAGE) << "Mensaje de error" <<
+          setw(WIDTH_LINE) << "Linea" << endl;
+
+      for (int i = 0;
+           i < (WIDTH_NUMBER * 2 + WIDTH_LEXEME + WIDTH_MESSAGE + WIDTH_LINE);
+           ++i)
+      {
+        m_errorOut << '-';
+      }
+      m_errorOut << endl;
+      
+      isHeaderWritten = true;
+    }
   }
-
-  return false;
-}
-
-void Scanner::lexicalError(const string& message)
-{
-  m_errorOut << setw(WIDTH_NUMBER) << ' ' <<
-      setw(WIDTH_NUMBER) << ' ' <<
-      setw(WIDTH_LEXEME) << ' ' << 
-      setw(WIDTH_MESSAGE) << message <<
-      setw(WIDTH_LINE) << ' ';
 }
 
