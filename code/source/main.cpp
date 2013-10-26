@@ -15,11 +15,12 @@ int main(int argc, char** argv) {
   int errors = 0, warnings = 0;
 
   if (argc == 2) {
+#ifdef DEBUG
     cout << argc << " "  << argv[0] << " " << argv[1] << endl;
+#endif
     scanner.scan(argv[1]);
 
     TokenLexeme tokenLexeme;
-    cout << "\n\n" << endl;
     size_t nTokens = scanner.getMaxTokens();
     if (nTokens > 0) {
       for (size_t i = 0; i < nTokens; ++i) {
@@ -28,10 +29,6 @@ int main(int argc, char** argv) {
             setw(15) << tokenLexeme.getTokenString(tokenLexeme.getToken()) <<
             "  Lexema:   " << tokenLexeme.getLexeme() << endl;
       }
-    }
-    else {
-      cerr << "ircomp: error: archivo vacio" << endl;
-      ++errors;
     }
   }
 
