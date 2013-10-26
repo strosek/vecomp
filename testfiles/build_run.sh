@@ -1,19 +1,32 @@
 #!/bin/bash
 
-clear
+# Script for building vecomp project and execute a given test
 
-if [ -e errores.out ]; then
-  rm errores.out
-fi
+clear
 
 flags='-Wall -Wextra -Wc++11-compat -Wswitch -Wshadow -Weffc++ -g -std=c++11'
 
-g++ $flags -o binaries/vecomp code/source/main.cpp code/source/parser.cpp \
-    code/source/scanner.cpp \
-    code/source/tokenlexeme.cpp
+binary_dir='../binaries'
+source_dir='../code/source'
+
+source_files="$source_dir/main.cpp
+              $source_dir/parser.cpp
+              $source_dir/scanner.cpp
+              $source_dir/tokenlexeme.cpp"
+
+
+if [ ! -d $binary_dir ]; then
+  mkdir $binary_dir
+fi
+
+g++ $flags -o $binary_dir/vecomp $source_files
 
 if [ $? -eq 0 ]; then
-  binaries/vecomp $1 
+  if [ -e errores.out ]; then
+    rm errores.out
+  fi
+
+  $binary_dir/vecomp $1 
 fi
 
 if [ $? -eq 0 ]; then
