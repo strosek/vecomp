@@ -132,6 +132,10 @@ static const int STATE_ACCEPT_ERROR = -2;
 
 static const int ERRORS_MAX_LIMIT   =  5;
 
+static const int WIDTH_NUMBER =   8;
+static const int WIDTH_LEXEME =  15;
+static const int WIDTH_MESSAGE = 80;
+static const int WIDTH_LINE =   100;
 
 class Scanner
 {
@@ -144,10 +148,11 @@ public:
   TokenLexeme getNextTokenLexeme();
 
 private:
-  Transition_t getTransitionIndex(char character, int currentState);
+  Transition_t getTransitionIndex(char character);
   void         lexicalError(int state, char currentChar, 
                             const std::string& line,
                             const std::string& lexeme);
+  void         lexicalError(const std::string& message);
   bool         isTerminalState(int state);
 
   int                               m_lineNo;
@@ -158,6 +163,7 @@ private:
   int                               m_nTokens;
   std::queue<TokenLexeme>           m_tokensLexemes;
   std::map<std::string, Keyword_t>  m_keywordsMap;
+  std::ofstream                     m_errorOut;
 };
 
 #endif // SCANNER_HPP
