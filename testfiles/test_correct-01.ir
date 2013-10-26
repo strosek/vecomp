@@ -20,7 +20,7 @@ comment */
   unaBooleana := verdadero
   otra = falso;
   unChar = '\a';
-  i = 34.
+  i = 34
   j = a + b / 3 % 2 - 234 * 2;
   h = "un string con cosas !@#$%^&*()_+ raras"
   if a < b || b >= c && a != f {
