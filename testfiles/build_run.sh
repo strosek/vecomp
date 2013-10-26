@@ -4,7 +4,7 @@
 
 clear
 
-flags='-Wall -Wextra -Wc++11-compat -Wswitch -Wshadow -Weffc++ -g -std=c++11'
+flags='-Wall -Wextra -Wc++11-compat -Wswitch -Wshadow -Weffc++ -g -std=c++11 -D DEBUG'
 
 binary_dir='../binaries'
 source_dir='../code/source'
