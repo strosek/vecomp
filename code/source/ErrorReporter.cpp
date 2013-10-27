@@ -27,7 +27,7 @@ void ErrorReporter::writeError(const string& message)
       setw(WIDTH_NUMBER) << ' ' <<
       setw(WIDTH_LEXEME) << ' ' << 
       setw(WIDTH_MESSAGE) << message <<
-      setw(WIDTH_LINE) << ' ';
+      setw(WIDTH_LINE) << ' ' << endl;
 }
 
 void ErrorReporter::writeLexicalError(int state, char currentChar,
@@ -130,7 +130,7 @@ void ErrorReporter::writeErrorsFileHeader() {
     m_errorOut.open(m_outFileName, ios::app);
 
     for (int i = 0; 
-         i < (WIDTH_NUMBER * 2 + WIDTH_LEXEME + WIDTH_LEXEME + WIDTH_LINE);
+         i < (WIDTH_NUMBER * 2 + WIDTH_LEXEME + WIDTH_MESSAGE + WIDTH_LINE);
          ++i)
       m_errorOut << '-';
     m_errorOut << endl;
@@ -144,9 +144,7 @@ void ErrorReporter::writeErrorsFileHeader() {
     for (int i = 0;
          i < (WIDTH_NUMBER * 2 + WIDTH_LEXEME + WIDTH_MESSAGE + WIDTH_LINE);
          ++i)
-    {
       m_errorOut << '-';
-    }
     m_errorOut << endl;
   }
 }
