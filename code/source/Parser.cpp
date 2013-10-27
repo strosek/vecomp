@@ -2,8 +2,13 @@
 
 #include "../headers/Parser.hpp"
 
+#include "../headers/Scanner.hpp"
+
 #include <string>
 #include <cstdlib>
+#ifdef DEBUG
+# include <iostream>
+#endif
 
 using namespace std;
 
@@ -11,8 +16,8 @@ Parser::Parser() :
   m_errors(0),
   m_warnings(0),
   m_tokenNo(0),
-  m_scanner(),
   m_currentToken(),
+  m_scanner(),
   m_errorReporter()
 {
 }
@@ -31,8 +36,14 @@ int Parser::parse(const string& fileName) {
   if ((m_errors = m_scanner.getErrors()) == 0) {
     if (program() == EXIT_FAILURE)
       return EXIT_FAILURE;                     
+
+#ifdef DEBUG
+    cout << "expected tokens: " << m_tokenNo << ", got: " <<
+        m_scanner.getMaxTokens() << endl;
+#endif
     if (m_tokenNo != m_scanner.getMaxTokens()) {
-      m_errorReporter.writeError("njavac: error: codigo incompleto");
+      m_errorReporter.writeError(
+          "codigo incompleto, cantidad de tokens incongruente");
       ++m_errors;
       return EXIT_FAILURE;
     }

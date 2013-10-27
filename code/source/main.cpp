@@ -5,7 +5,7 @@
 #include <iomanip>
 
 #include "../headers/main.hpp"
-#include "../headers/Scanner.hpp"
+#include "../headers/Parser.hpp"
 
 using namespace std;
 
@@ -18,25 +18,23 @@ int main(int argc, char** argv) {
 #ifdef DEBUG
     cout << argc << " "  << argv[0] << " " << argv[1] << endl;
 #endif
-    scanner.scan(argv[1]);
 
-    TokenLexeme tokenLexeme;
-    size_t nTokens = scanner.getMaxTokens();
-    if (nTokens > 0) {
-      for (size_t i = 0; i < nTokens; ++i) {
-        tokenLexeme = scanner.getNextTokenLexeme();
-        cout << "Token: " << 
-            setw(15) << tokenLexeme.getTokenString(tokenLexeme.getToken()) <<
-            "  Lexema:   " << tokenLexeme.getLexeme() << endl;
-      }
-    }
+    Parser parser;
+    parser.parse(argv[1]);
+
+    errors += parser.getErrors();
+    warnings += parser.getWarnings();
+
+    if (errors > 0 || warnings > 0)
+      cout << "\nCompilacion terminada con " << errors << 
+          " errores, " << warnings << " advertencias" << endl;
+
   }
-
-  errors += scanner.getErrors();
-
-  if (errors > 0 || warnings > 0)
-    cout << "\nCompilacion terminada con " << errors << 
-        " errores, " << warnings << " advertencias" << endl;
+  else {
+    cerr << "error: se esperaba un nombre de archivo a compilar" << endl;
+    cerr << "uso:   vecomp <filename>" << endl;
+    errors++;
+  }
 
   return errors == 0 ? EXIT_SUCCESS : EXIT_FAILURE;
 }

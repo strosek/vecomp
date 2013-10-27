@@ -53,8 +53,8 @@ private:
   int           m_errors;
   int           m_warnings;
   int           m_tokenNo;
-  Scanner       m_scanner;
   TokenLexeme   m_currentToken;
+  Scanner       m_scanner;
   ErrorReporter m_errorReporter;
 };
 
