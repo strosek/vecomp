@@ -10,9 +10,9 @@ binary_dir='../binaries'
 source_dir='../code/source'
 
 source_files="$source_dir/main.cpp
-              $source_dir/parser.cpp
-              $source_dir/scanner.cpp
-              $source_dir/tokenlexeme.cpp"
+              $source_dir/Parser.cpp
+              $source_dir/Scanner.cpp
+              $source_dir/TokenLexeme.cpp"
 
 
 if [ ! -d $binary_dir ]; then

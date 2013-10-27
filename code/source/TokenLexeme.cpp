@@ -1,6 +1,6 @@
 /* Definition of member functions of class TokenLexeme */
 
-#include "../headers/tokenlexeme.hpp"
+#include "../headers/TokenLexeme.hpp"
 
 #include <string>
 #include <map>

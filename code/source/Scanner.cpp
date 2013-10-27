@@ -1,6 +1,6 @@
 /* Definition of member functions of class Scanner */
 
-#include "../headers/scanner.hpp"
+#include "../headers/Scanner.hpp"
 
 #include <utility>
 #include <string>

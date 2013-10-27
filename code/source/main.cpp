@@ -5,7 +5,7 @@
 #include <iomanip>
 
 #include "../headers/main.hpp"
-#include "../headers/scanner.hpp"
+#include "../headers/Scanner.hpp"
 
 using namespace std;
 

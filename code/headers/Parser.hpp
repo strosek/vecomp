@@ -5,8 +5,8 @@
 
 #include <string>
 
-#include "../headers/scanner.hpp"
-#include "../headers/tokenlexeme.hpp"
+#include "../headers/Scanner.hpp"
+#include "../headers/TokenLexeme.hpp"
 
 class Parser
 {

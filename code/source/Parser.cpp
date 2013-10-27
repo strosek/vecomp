@@ -1,6 +1,6 @@
 /* Definition of member functions of class Parser */
 
-#include "../headers/parser.hpp"
+#include "../headers/Parser.hpp"
 
 #include <string>
 #include <cstdlib>
