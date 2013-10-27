@@ -12,7 +12,8 @@ Parser::Parser() :
   m_warnings(0),
   m_tokenNo(0),
   m_scanner(),
-  m_currentToken()
+  m_currentToken(),
+  m_errorReporter()
 {
 }
 
@@ -31,7 +32,7 @@ int Parser::parse(const string& fileName) {
     if (program() == EXIT_FAILURE)
       return EXIT_FAILURE;                     
     if (m_tokenNo != m_scanner.getMaxTokens()) {
-      cerr << "njavac: error: codigo incompleto" << endl;
+      m_errorReporter.writeError("njavac: error: codigo incompleto");
       ++m_errors;
       return EXIT_FAILURE;
     }

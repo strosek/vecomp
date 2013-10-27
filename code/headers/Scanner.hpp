@@ -10,6 +10,7 @@
 #include <map>
 
 #include "TokenLexeme.hpp"
+#include "ErrorReporter.hpp"
 
 #define N_KEYWORDS    20
 
@@ -164,7 +165,8 @@ private:
   int                               m_nTokens;
   std::queue<TokenLexeme>           m_tokensLexemes;
   std::map<std::string, Keyword_t>  m_keywordsMap;
-  std::ofstream                     m_errorOut;
+
+  ErrorReporter m_errorReporter;
 };
 
 #endif // SCANNER_HPP

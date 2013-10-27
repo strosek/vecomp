@@ -12,6 +12,7 @@ source_dir='../code/source'
 source_files="$source_dir/main.cpp
               $source_dir/Parser.cpp
               $source_dir/Scanner.cpp
+              $source_dir/ErrorReporter.cpp
               $source_dir/TokenLexeme.cpp"
 
 

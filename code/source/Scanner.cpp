@@ -21,7 +21,7 @@ Scanner::Scanner() :
   m_nTokens(0),
   m_tokensLexemes(),
   m_keywordsMap(),
-  m_errorOut()
+  m_errorReporter()
 {
   m_keywordsMap["alfanumerico"] = KEYWORD_ALPHANUM;
   m_keywordsMap["canal"] =        KEYWORD_CHANNEL;
@@ -179,7 +179,8 @@ void Scanner::scan(const string& fileName) {
           cout << "calling lexicalerror" << currentState << " " <<
               currentChar << endl;
 #endif
-          lexicalError(currentState, currentChar, line, lexeme);
+          m_errorReporter.writeLexicalError(currentState, currentChar, line,
+                                            lexeme, m_lineNo, m_column);
           ++m_errors;
 
           token = TOKEN_INVALID;
@@ -206,18 +207,17 @@ void Scanner::scan(const string& fileName) {
       cout << "final state: " << currentState << endl;
 #endif
       if (currentState != 0 && !isTerminalState(currentState))
-        lexicalError(currentState, currentChar, line, lexeme);
+        m_errorReporter.writeLexicalError(currentState, currentChar, line,
+                                          lexeme, m_lineNo, m_column);
     }
 
     m_nTokens = m_tokensLexemes.size();
 
     if (m_tokensLexemes.empty())
-      lexicalError("archivo vacio");
-
-    m_errorOut.close();
+      m_errorReporter.writeError("archivo vacio");
   }
   else {
-    lexicalError("error al abrir codigo fuente");
+    m_errorReporter.writeError("error al abrir codigo fuente");
     ++m_errors;
   }
 }
@@ -369,139 +369,5 @@ bool Scanner::isTerminalState(int state) {
   }
 
   return false;
-}
-
-void Scanner::lexicalError(const string& message)
-{
-  writeErrorsFileHeader();
-
-  m_errorOut << setw(WIDTH_NUMBER) << ' ' <<
-      setw(WIDTH_NUMBER) << ' ' <<
-      setw(WIDTH_LEXEME) << ' ' << 
-      setw(WIDTH_MESSAGE) << message <<
-      setw(WIDTH_LINE) << ' ';
-}
-
-void Scanner::lexicalError(int state, char currentChar, const string& line, 
-                           const string& lexeme) {
-  writeErrorsFileHeader();
-  ostringstream messageBuilder;
-  switch (state) {
-    case 0 :
-      messageBuilder << "simbolo ilegal: '" << currentChar << "'";
-      break;
-    case 3 :
-      messageBuilder << "constante hexadecimal incompleta, se encontro : '";
-      if (!isspace(currentChar))
-        messageBuilder << currentChar;
-      else
-        messageBuilder << ' ';
-      messageBuilder << "', se esperaba digito";
-      break;
-    case 6 :
-    case 10 :
-      messageBuilder << "constante flotante incompleta, se encontro : '";
-      if (!isspace(currentChar))
-        messageBuilder << currentChar;
-      else
-        messageBuilder << ' ';
-      messageBuilder << "', se esperaba digito";
-      break;
-    case 9 :
-      messageBuilder << 
-          "constante flotante incompleta, se encontro : '";
-      if (!isspace(currentChar))
-        messageBuilder << currentChar;
-      else
-        messageBuilder << ' ';
-      messageBuilder << "', se esperaba digito o signo";
-      break;
-    case 17 :
-      messageBuilder << "comentario multilinea sin cerrar";
-      break;
-    case 20 :
-      messageBuilder << "operador logico incompleto, se encontro: '";
-      if (!isspace(currentChar))
-        messageBuilder << currentChar;
-      else
-        messageBuilder << ' ';
-      messageBuilder << "', se esperaba '|'";
-      break;
-    case 21 :
-      messageBuilder << "operador logico incompleto, se encontro: '";
-      if (!isspace(currentChar))
-        messageBuilder << currentChar;
-      else
-        messageBuilder << ' ';
-      messageBuilder << "', se esperaba '&'";
-      break;
-    case 30 :
-      messageBuilder << "constante caracter incompleta, se encontro: '";
-      if (!isspace(currentChar))
-        messageBuilder << currentChar;
-      else
-        messageBuilder << ' ';
-      messageBuilder << "', se esperaba '\\' o letra";
-      break;
-    case 31 :
-      messageBuilder << "constante caracter incompleta, se encontro: '";
-      if (!isspace(currentChar))
-        messageBuilder << currentChar;
-      else
-        messageBuilder << ' ';
-      messageBuilder << "', se esperaba letra";
-      break;
-    case 32 :
-      messageBuilder << "constante caracter incompleta, se encontro: '";
-      if (!isspace(currentChar))
-        messageBuilder << currentChar;
-      else
-        messageBuilder << ' ';
-      messageBuilder << "', se esperaba '''";
-      break;
-    case 34 :
-      messageBuilder << "comentario multilinea sin cerrar";
-      break;
-    default :
-      messageBuilder << "error desconocido";
-      break;
-  }
-  
-  string errorMessage = messageBuilder.str();
-  m_errorOut << setw(WIDTH_NUMBER) << m_lineNo <<
-      setw(WIDTH_NUMBER) << m_column <<
-      setw(WIDTH_LEXEME) << lexeme << 
-      setw(WIDTH_MESSAGE) << errorMessage <<
-      setw(WIDTH_LINE) << line;
-}
-
-void Scanner::writeErrorsFileHeader() {
-  if (!m_errorOut.is_open()) {
-    m_errorOut.open("errores.out", ios::app);
-
-    static bool isHeaderWritten = false;
-    if (!isHeaderWritten) {
-      for (int i = 0; 
-           i < (WIDTH_NUMBER * 2 + WIDTH_LEXEME + WIDTH_LEXEME + WIDTH_LINE); ++i)
-        m_errorOut << '-';
-      m_errorOut << endl;
-
-      m_errorOut << setw(WIDTH_NUMBER) << "Linea" <<
-          setw(WIDTH_NUMBER) << "Columna" <<
-          setw(WIDTH_LEXEME) << "Lexema" << 
-          setw(WIDTH_MESSAGE) << "Mensaje de error" <<
-          setw(WIDTH_LINE) << "Linea" << endl;
-
-      for (int i = 0;
-           i < (WIDTH_NUMBER * 2 + WIDTH_LEXEME + WIDTH_MESSAGE + WIDTH_LINE);
-           ++i)
-      {
-        m_errorOut << '-';
-      }
-      m_errorOut << endl;
-      
-      isHeaderWritten = true;
-    }
-  }
 }
 

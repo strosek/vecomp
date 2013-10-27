@@ -5,8 +5,9 @@
 
 #include <string>
 
-#include "../headers/Scanner.hpp"
-#include "../headers/TokenLexeme.hpp"
+#include "Scanner.hpp"
+#include "TokenLexeme.hpp"
+#include "ErrorReporter.hpp"
 
 class Parser
 {
@@ -49,11 +50,12 @@ private:
   int useParameters();
   int variables();
 
-  int         m_errors;
-  int         m_warnings;
-  int         m_tokenNo;
-  Scanner     m_scanner;
-  TokenLexeme m_currentToken;
+  int           m_errors;
+  int           m_warnings;
+  int           m_tokenNo;
+  Scanner       m_scanner;
+  TokenLexeme   m_currentToken;
+  ErrorReporter m_errorReporter;
 };
 
 #endif /* PARSER_HPP */
