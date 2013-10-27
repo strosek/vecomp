@@ -213,8 +213,10 @@ void Scanner::scan(const string& fileName) {
 
     m_nTokens = m_tokensLexemes.size();
 
-    if (m_tokensLexemes.empty())
+    if (m_tokensLexemes.empty()) {
       m_errorReporter.writeError("archivo vacio");
+      ++m_errors;
+    }
   }
   else {
     m_errorReporter.writeError("error al abrir codigo fuente");
