@@ -8,8 +8,7 @@
 class ErrorReporter
 {
 public:
-  ErrorReporter();
-  ErrorReporter(const std::string& outFileName);
+  ErrorReporter* getInstance(const std::string& outFileName);
 
   void writeError(const std::string& message);
   void writeLexicalError(int state, char currentChar, const std::string& line,
@@ -20,10 +19,16 @@ private:
   static const int WIDTH_MESSAGE = 80;
   static const int WIDTH_LINE =   100;
 
+  ErrorReporter();
+  ErrorReporter(const std::string& outFileName);
+  ~ErrorReporter();
+
   void writeErrorsFileHeader();
 
   std::ofstream m_errorOut;
   std::string   m_outFileName;
+
+  ErrorReporter* m_instance;
 };
 
 #endif /* ERROR_REPORTER_HPP */

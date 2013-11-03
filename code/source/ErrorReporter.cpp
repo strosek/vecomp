@@ -4,19 +4,40 @@
 
 #include <iomanip>
 #include <sstream>
+#include <string>
 
 using namespace std;
 
 ErrorReporter::ErrorReporter() :
   m_errorOut(),
-  m_outFileName("errores.out")
+  m_outFileName(),
+  m_instance(nullptr)
 {
 }
 
 ErrorReporter::ErrorReporter(const string& outFileName) :
   m_errorOut(),
-  m_outFileName(outFileName)
+  m_outFileName(outFileName),
+  m_instance(nullptr)
 {
+}
+
+ErrorReporter::~ErrorReporter()
+{
+  delete m_instance;
+}
+
+ErrorReporter* ErrorReporter::getInstance(const string& outFileName)
+{
+  if (m_instance == nullptr)
+  {
+    m_instance = new ErrorReporter(outFileName);
+    return m_instance; 
+  }
+  else
+  {
+    return nullptr;
+  }
 }
 
 void ErrorReporter::writeError(const string& message)
