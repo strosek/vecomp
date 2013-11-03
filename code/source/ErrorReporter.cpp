@@ -10,7 +10,7 @@ using namespace std;
 
 ErrorReporter::ErrorReporter() :
   m_errorOut(),
-  m_outFileName(),
+  m_outFileName("errores.out"),
   m_instance(nullptr)
 {
 }
@@ -22,9 +22,28 @@ ErrorReporter::ErrorReporter(const string& outFileName) :
 {
 }
 
+// Singleton, so this should not be used. Written for removing EffC++ warnings.
+ErrorReporter::ErrorReporter(const ErrorReporter& source) :
+  m_errorOut(),
+  m_outFileName(),
+  m_instance(nullptr)
+{
+  m_instance = source.m_instance;
+}
+
 ErrorReporter::~ErrorReporter()
 {
   delete m_instance;
+}
+
+ErrorReporter* ErrorReporter::getInstance()
+{
+  if (m_instance == nullptr)
+  {
+    m_instance = new ErrorReporter();
+    return m_instance; 
+  }
+  return m_instance;
 }
 
 ErrorReporter* ErrorReporter::getInstance(const string& outFileName)
@@ -34,10 +53,7 @@ ErrorReporter* ErrorReporter::getInstance(const string& outFileName)
     m_instance = new ErrorReporter(outFileName);
     return m_instance; 
   }
-  else
-  {
-    return nullptr;
-  }
+  return m_instance;
 }
 
 void ErrorReporter::writeError(const string& message)
@@ -168,5 +184,12 @@ void ErrorReporter::writeErrorsFileHeader() {
       m_errorOut << '-';
     m_errorOut << endl;
   }
+}
+
+ErrorReporter& ErrorReporter::operator=(const ErrorReporter& rhs)
+{
+  m_instance = rhs.m_instance;
+
+  return *this;
 }
 

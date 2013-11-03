@@ -8,6 +8,7 @@
 class ErrorReporter
 {
 public:
+  ErrorReporter* getInstance();
   ErrorReporter* getInstance(const std::string& outFileName);
 
   void writeError(const std::string& message);
@@ -21,7 +22,9 @@ private:
 
   ErrorReporter();
   ErrorReporter(const std::string& outFileName);
+  ErrorReporter(const ErrorReporter& source);
   ~ErrorReporter();
+  ErrorReporter& operator=(const ErrorReporter& rhs);
 
   void writeErrorsFileHeader();
 
