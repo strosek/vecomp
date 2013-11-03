@@ -50,6 +50,9 @@ private:
   int useParameters();
   int variables();
 
+  bool isLexemeCorrect(const std::string& lexeme);
+  bool isTokenCorrect(TokenType_t token);
+
   int           m_errors;
   int           m_warnings;
   int           m_tokenNo;

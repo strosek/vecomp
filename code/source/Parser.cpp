@@ -131,6 +131,28 @@ int Parser::print() {
 }
 
 int Parser::program() {
+  if (!isLexemeCorrect("paquete"))
+    return EXIT_FAILURE;
+
+  if (!isLexemeCorrect("principal"))
+    return EXIT_FAILURE;
+
+  m_currentToken = m_scanner.getNextTokenLexeme();
+  ++m_tokenNo;
+  if (m_currentToken.getLexeme().compare("var") == 0)
+  {
+    if (variables(true) == EXIT_FAILURE)
+  }
+  else if (m_currentToken.getLexeme().compare("const") == 0)
+  {
+    constantDeclaration(true);
+  }
+  else if (m_currentToken.getLexeme().compare("funcion") == 0)
+  {
+    functionDeclaration(true);
+  }
+
+
   return EXIT_SUCCESS;
 }
 
@@ -176,5 +198,35 @@ int Parser::useParameters() {
 
 int Parser::variables() {
   return EXIT_SUCCESS;
+}
+
+bool Parser::isTokenCorrect(TokenType_t expectedToken)
+{
+  m_currentToken = m_scanner.getNextTokenLexeme();
+  ++m_tokenNo;
+  if (m_currentToken.getToken() != expectedToken)
+  {
+    m_errorReporter->writeSyntaxError(expectedToken,
+                                      m_currentToken.getToken());
+    ++m_errors;
+    return false;
+  }
+
+  return true;
+}
+
+bool Parser::isLexemeCorrect(const string& expectedLexeme)
+{
+  m_currentToken = m_scanner.getNextTokenLexeme();
+  ++m_tokenNo;
+  if (m_currentToken.getLexeme().compare(expectedLexeme) != 0)
+  {
+    m_errorReporter->writeSyntaxError(expectedLexeme,
+                                      m_currentToken.getLexeme());
+    ++m_errors;
+    return false;
+  }
+
+  return true;
 }
 
