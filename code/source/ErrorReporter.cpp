@@ -11,6 +11,9 @@ using namespace std;
 ErrorReporter::ErrorReporter() :
   m_errorOut(),
   m_outFileName("errores.out"),
+  m_warnings(0),
+  m_errors(0),
+  m_maxErrors(5),
   m_instance(nullptr)
 {
 }
@@ -18,7 +21,11 @@ ErrorReporter::ErrorReporter() :
 ErrorReporter::ErrorReporter(const string& outFileName) :
   m_errorOut(),
   m_outFileName(outFileName),
+  m_warnings(0),
+  m_errors(0),
+  m_maxErrors(5),
   m_instance(nullptr)
+
 {
 }
 
@@ -26,7 +33,11 @@ ErrorReporter::ErrorReporter(const string& outFileName) :
 ErrorReporter::ErrorReporter(const ErrorReporter& source) :
   m_errorOut(),
   m_outFileName(),
+  m_warnings(0),
+  m_errors(0),
+  m_maxErrors(5),
   m_instance(nullptr)
+
 {
   m_instance = source.m_instance;
 }
@@ -191,5 +202,26 @@ ErrorReporter& ErrorReporter::operator=(const ErrorReporter& rhs)
   m_instance = rhs.m_instance;
 
   return *this;
+}
+
+
+void ErrorReporter::setMaxErrors(int maxErrors)
+{
+  m_maxErrors = maxErrors;
+}
+
+int  ErrorReporter::getMaxErrors() const
+{
+  return m_maxErrors;
+}
+
+int  ErrorReporter::getErrors() const
+{
+  return m_errors;
+}
+
+int  ErrorReporter::getWarnings() const
+{
+  return m_warnings;
 }
 

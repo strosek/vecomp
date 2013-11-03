@@ -14,6 +14,10 @@ public:
   void writeError(const std::string& message);
   void writeLexicalError(int state, char currentChar, const std::string& line,
                          const std::string& lexeme, int lineNo, int columnNo);
+  void setMaxErrors(int maxErrors);
+  int  getMaxErrors() const;
+  int  getErrors() const;
+  int  getWarnings() const;
 private:
   static const int WIDTH_NUMBER =   8;
   static const int WIDTH_LEXEME =  15;
@@ -30,6 +34,9 @@ private:
 
   std::ofstream m_errorOut;
   std::string   m_outFileName;
+  int           m_warnings;
+  int           m_errors;
+  int           m_maxErrors;
 
   ErrorReporter* m_instance;
 };
