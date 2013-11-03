@@ -53,12 +53,12 @@ private:
   bool isLexemeCorrect(const std::string& lexeme);
   bool isTokenCorrect(TokenType_t token);
 
-  int           m_errors;
-  int           m_warnings;
-  int           m_tokenNo;
-  TokenLexeme   m_currentToken;
-  Scanner       m_scanner;
-  ErrorReporter m_errorReporter;
+  int            m_errors;
+  int            m_warnings;
+  int            m_tokenNo;
+  TokenLexeme    m_currentToken;
+  Scanner        m_scanner;
+  ErrorReporter* m_errorReporter;
 };
 
 #endif /* PARSER_HPP */

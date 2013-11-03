@@ -142,16 +142,22 @@ int Parser::program() {
   if (m_currentToken.getLexeme().compare("var") == 0)
   {
     if (variables(true) == EXIT_FAILURE)
+      return EXIT_FAILURE;
   }
   else if (m_currentToken.getLexeme().compare("const") == 0)
   {
-    constantDeclaration(true);
+    if (constantDeclaration(true) == EXIT_FAILURE)
+      return EXIT_FAILURE;
   }
   else if (m_currentToken.getLexeme().compare("funcion") == 0)
   {
-    functionDeclaration(true);
+    if (functionDeclaration(true) == EXIT_FAILURE)
+      return EXIT_FAILURE;
   }
-
+  else
+  {
+    return EXIT_FAILURE;
+  }
 
   return EXIT_SUCCESS;
 }
@@ -202,13 +208,20 @@ int Parser::variables() {
 
 bool Parser::isTokenCorrect(TokenType_t expectedToken)
 {
-  m_currentToken = m_scanner.getNextTokenLexeme();
-  ++m_tokenNo;
-  if (m_currentToken.getToken() != expectedToken)
+  if (m_errors < m_errorsLimit)
   {
-    m_errorReporter->writeSyntaxError(expectedToken,
-                                      m_currentToken.getToken());
-    ++m_errors;
+    m_currentToken = m_scanner.getNextTokenLexeme();
+    ++m_tokenNo;
+    if (m_currentToken.getToken() != expectedToken)
+    {
+      m_errorReporter->writeSyntaxError(expectedToken,
+                                        m_currentToken.getToken());
+      ++m_errors;
+      return false;
+    }
+  }
+  else
+  {
     return false;
   }
 
@@ -217,13 +230,20 @@ bool Parser::isTokenCorrect(TokenType_t expectedToken)
 
 bool Parser::isLexemeCorrect(const string& expectedLexeme)
 {
-  m_currentToken = m_scanner.getNextTokenLexeme();
-  ++m_tokenNo;
-  if (m_currentToken.getLexeme().compare(expectedLexeme) != 0)
+  if (m_errors < m_errorsLimit)
   {
-    m_errorReporter->writeSyntaxError(expectedLexeme,
-                                      m_currentToken.getLexeme());
-    ++m_errors;
+    m_currentToken = m_scanner.getNextTokenLexeme();
+    ++m_tokenNo;
+    if (m_currentToken.getLexeme().compare(expectedLexeme) != 0)
+    {
+      m_errorReporter->writeSyntaxError(expectedLexeme,
+                                        m_currentToken.getLexeme());
+      ++m_errors;
+      return false;
+    }
+  }
+  else
+  {
     return false;
   }
 
