@@ -76,6 +76,7 @@ void ErrorReporter::writeError(const string& message)
       setw(WIDTH_LEXEME) << ' ' << 
       setw(WIDTH_MESSAGE) << message <<
       setw(WIDTH_LINE) << ' ' << endl;
+  ++m_errors;
 }
 
 void ErrorReporter::writeLexicalError(int state, char currentChar,
@@ -171,6 +172,8 @@ void ErrorReporter::writeLexicalError(int state, char currentChar,
       setw(WIDTH_LEXEME) << lexeme << 
       setw(WIDTH_MESSAGE) << errorMessage <<
       setw(WIDTH_LINE) << line;
+
+  ++m_errors;
 }
 
 void ErrorReporter::writeErrorsFileHeader() {
