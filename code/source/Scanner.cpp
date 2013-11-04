@@ -2,69 +2,46 @@
 
 #include "../headers/Scanner.hpp"
 
-#include <utility>
 #include <string>
-#include <iostream>
 #include <sstream>
-#include <fstream>
+#include <iostream>
 #include <iomanip>
 
 using namespace std;
 
 
-Scanner::Scanner() :
+Scanner::Scanner(FileReader* fileReader, ErrorReporter* errorReporter) :
   m_lineNo(1),
   m_column(1),
-  m_errors(0),
-  m_sourceFile(),
   m_currentToken(0),
   m_nTokens(0),
   m_tokensLexemes(),
   m_keywordsMap(),
-  m_errorReporter()
+  m_errorReporter(errorReporter),
+  m_fileReader(fileReader)
 {
-  m_keywordsMap["alfanumerico"] = KEYWORD_ALPHANUM;
-  m_keywordsMap["canal"] =        KEYWORD_CHANNEL;
-  m_keywordsMap["caracter"] =     KEYWORD_CHAR;
-  m_keywordsMap["caso"] =         KEYWORD_CASE;
-  m_keywordsMap["const"] =        KEYWORD_CONST;
-  m_keywordsMap["continua"] =     KEYWORD_CONTINUE;
-  m_keywordsMap["defecto"] =      KEYWORD_DEFAULT;
-  m_keywordsMap["desde"] =        KEYWORD_FOR;
-  m_keywordsMap["diferir"] =      KEYWORD_DIFFER;
-  m_keywordsMap["div"] =          KEYWORD_DIV;
-  m_keywordsMap["entero"] =       KEYWORD_INT;
-  m_keywordsMap["enteros"] =      KEYWORD_UINT;
-  m_keywordsMap["estructura"] =   KEYWORD_STRUCT;
-  m_keywordsMap["funcion"] =      KEYWORD_FUNCTION;
-  m_keywordsMap["importar"] =     KEYWORD_IMPORT;
-  m_keywordsMap["interfaz"] =     KEYWORD_INTERFACE;
-  m_keywordsMap["interrumpe"] =   KEYWORD_BREAK;
-  m_keywordsMap["ir"] =           KEYWORD_GO;
-  m_keywordsMap["ir_a"] =         KEYWORD_GOTO;
-  m_keywordsMap["logico"] =       KEYWORD_LOGIC;
-  m_keywordsMap["mapa"] =         KEYWORD_MAP;
-  m_keywordsMap["mod"] =          KEYWORD_MOD;
-  m_keywordsMap["paquete"] =      KEYWORD_PACKET;
-  m_keywordsMap["principal"] =    KEYWORD_MAIN;
-  m_keywordsMap["rango"] =        KEYWORD_RANGE;
-  m_keywordsMap["real"] =         KEYWORD_REAL;
-  m_keywordsMap["regresa"] =      KEYWORD_RETURN;
-  m_keywordsMap["si"] =           KEYWORD_IF;
-  m_keywordsMap["sino"] =         KEYWORD_ELSE;
-  m_keywordsMap["selecciona"] =   KEYWORD_SELECT;
-  m_keywordsMap["tipo"] =         KEYWORD_TYPE;
-  m_keywordsMap["valor"] =        KEYWORD_SWITCH;
-  m_keywordsMap["variable"] =     KEYWORD_VAR;
+  buildKeywordsMap();
 }
 
+// Not to be used, written for removing EffC++ warnings.
+Scanner::Scanner(const Scanner& source) :
+  m_lineNo(1),
+  m_column(1),
+  m_currentToken(0),
+  m_nTokens(0),
+  m_tokensLexemes(),
+  m_keywordsMap(),
+  m_errorReporter(),
+  m_fileReader()
+{
+  buildKeywordsMap();
+  m_errorReporter = source.m_errorReporter;
+  m_fileReader = source.m_fileReader;
+}
 
-void Scanner::scan(const string& fileName) { 
-  m_sourceFile.open(fileName.c_str());
-
-  if (m_sourceFile.is_open())
+void Scanner::scan() { 
+  if (m_fileReader->getTotalLines() > 0)
   {
-
     char currentChar;
     int nextState = 0, currentState = 0;
     TokenType_t token;
@@ -73,13 +50,14 @@ void Scanner::scan(const string& fileName) {
     string line;
     size_t lineLength;
     m_lineNo = 1;
-    while (m_sourceFile.good() && m_errors < ERRORS_MAX_LIMIT) {
-      getline(m_sourceFile, line);
-      line += "\n";
+    while (m_lineNo <= m_fileReader->getTotalLines() &&
+           m_errorReporter->getErrors() < m_errorReporter->getMaxErrors()) {
+      line = m_fileReader->getTextAtLine(m_lineNo - 1);
 
       lineLength = line.length();
       m_column = 1;
-      while (m_column <= lineLength && m_errors <= ERRORS_MAX_LIMIT) {
+      while (m_column <= lineLength &&
+             m_errorReporter->getErrors() <= m_errorReporter->getMaxErrors()) {
         currentChar = line.at(m_column - 1);
         nextState = automata[currentState][getTransitionIndex(currentChar)];
 
@@ -179,9 +157,8 @@ void Scanner::scan(const string& fileName) {
           cout << "calling lexicalerror" << currentState << " " <<
               currentChar << endl;
 #endif
-          m_errorReporter.writeLexicalError(currentState, currentChar, line,
+          m_errorReporter->writeLexicalError(currentState, currentChar, line,
                                             lexeme, m_lineNo, m_column);
-          ++m_errors;
 
           token = TOKEN_INVALID;
           lexeme = "";
@@ -202,25 +179,18 @@ void Scanner::scan(const string& fileName) {
       line = "";
     }
 
-    if (!m_sourceFile.good()) {
 #ifdef DEBUG
-      cout << "final state: " << currentState << endl;
+    cout << "final state: " << currentState << endl;
 #endif
-      if (currentState != 0 && !isTerminalState(currentState))
-        m_errorReporter.writeLexicalError(currentState, currentChar, line,
-                                          lexeme, m_lineNo, m_column);
-    }
+    if (currentState != 0 && !isTerminalState(currentState))
+      m_errorReporter->writeLexicalError(currentState, currentChar, line,
+                                        lexeme, m_lineNo, m_column);
 
     m_nTokens = m_tokensLexemes.size();
 
     if (m_tokensLexemes.empty()) {
-      m_errorReporter.writeError("archivo vacio");
-      ++m_errors;
+      m_errorReporter->writeError("archivo vacio");
     }
-  }
-  else {
-    m_errorReporter.writeError("error al abrir codigo fuente");
-    ++m_errors;
   }
 }
 
@@ -336,10 +306,6 @@ int Scanner::getMaxTokens() const {
   return m_nTokens;
 }
 
-int Scanner::getErrors() const {
-  return m_errors;
-}
-
 bool Scanner::isTerminalState(int state) {
   switch (state) {
     case 1 :
@@ -371,5 +337,42 @@ bool Scanner::isTerminalState(int state) {
   }
 
   return false;
+}
+
+void Scanner::buildKeywordsMap()
+{
+  m_keywordsMap["alfanumerico"] = KEYWORD_ALPHANUM;
+  m_keywordsMap["canal"] =        KEYWORD_CHANNEL;
+  m_keywordsMap["caracter"] =     KEYWORD_CHAR;
+  m_keywordsMap["caso"] =         KEYWORD_CASE;
+  m_keywordsMap["const"] =        KEYWORD_CONST;
+  m_keywordsMap["continua"] =     KEYWORD_CONTINUE;
+  m_keywordsMap["defecto"] =      KEYWORD_DEFAULT;
+  m_keywordsMap["desde"] =        KEYWORD_FOR;
+  m_keywordsMap["diferir"] =      KEYWORD_DIFFER;
+  m_keywordsMap["div"] =          KEYWORD_DIV;
+  m_keywordsMap["entero"] =       KEYWORD_INT;
+  m_keywordsMap["enteros"] =      KEYWORD_UINT;
+  m_keywordsMap["estructura"] =   KEYWORD_STRUCT;
+  m_keywordsMap["funcion"] =      KEYWORD_FUNCTION;
+  m_keywordsMap["importar"] =     KEYWORD_IMPORT;
+  m_keywordsMap["interfaz"] =     KEYWORD_INTERFACE;
+  m_keywordsMap["interrumpe"] =   KEYWORD_BREAK;
+  m_keywordsMap["ir"] =           KEYWORD_GO;
+  m_keywordsMap["ir_a"] =         KEYWORD_GOTO;
+  m_keywordsMap["logico"] =       KEYWORD_LOGIC;
+  m_keywordsMap["mapa"] =         KEYWORD_MAP;
+  m_keywordsMap["mod"] =          KEYWORD_MOD;
+  m_keywordsMap["paquete"] =      KEYWORD_PACKET;
+  m_keywordsMap["principal"] =    KEYWORD_MAIN;
+  m_keywordsMap["rango"] =        KEYWORD_RANGE;
+  m_keywordsMap["real"] =         KEYWORD_REAL;
+  m_keywordsMap["regresa"] =      KEYWORD_RETURN;
+  m_keywordsMap["si"] =           KEYWORD_IF;
+  m_keywordsMap["sino"] =         KEYWORD_ELSE;
+  m_keywordsMap["selecciona"] =   KEYWORD_SELECT;
+  m_keywordsMap["tipo"] =         KEYWORD_TYPE;
+  m_keywordsMap["valor"] =        KEYWORD_SWITCH;
+  m_keywordsMap["variable"] =     KEYWORD_VAR;
 }
 

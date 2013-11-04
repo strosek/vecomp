@@ -4,13 +4,12 @@
 #define SCANNER_HPP
 
 #include <string>
-#include <utility>
-#include <fstream>
 #include <queue>
 #include <map>
 
 #include "TokenLexeme.hpp"
 #include "ErrorReporter.hpp"
+#include "FileReader.hpp"
 
 #define N_KEYWORDS    20
 
@@ -131,42 +130,32 @@ static const int automata[N_STATES][N_TRANSITIONS] {
 static const int STATE_ERROR        = -1;
 static const int STATE_ACCEPT_ERROR = -2;
 
-static const int ERRORS_MAX_LIMIT   =  5;
-
-static const int WIDTH_NUMBER =   8;
-static const int WIDTH_LEXEME =  15;
-static const int WIDTH_MESSAGE = 80;
-static const int WIDTH_LINE =   100;
 
 class Scanner
 {
 public:
-  Scanner();
+  Scanner(FileReader* fileReader, ErrorReporter* errorReporter);
+  Scanner(const Scanner& source);
 
-  void        scan(const std::string& fileName);
+  void        scan();
   int         getMaxTokens() const;
-  int         getErrors() const;
   TokenLexeme getNextTokenLexeme();
 
 private:
   Transition_t getTransitionIndex(char character);
-  void         lexicalError(int state, char currentChar, 
-                            const std::string& line,
-                            const std::string& lexeme);
-  void         lexicalError(const std::string& message);
-  void         writeErrorsFileHeader();
   bool         isTerminalState(int state);
+  void         buildKeywordsMap();
 
-  int                               m_lineNo;
+  size_t                            m_lineNo;
   size_t                            m_column;
-  int                               m_errors;
-  std::ifstream                     m_sourceFile;
   int                               m_currentToken;
   int                               m_nTokens;
   std::queue<TokenLexeme>           m_tokensLexemes;
   std::map<std::string, Keyword_t>  m_keywordsMap;
+  ErrorReporter*                    m_errorReporter;
+  FileReader*                       m_fileReader;
 
-  ErrorReporter m_errorReporter;
+  Scanner& operator=(const Scanner& rhs);
 };
 
 #endif // SCANNER_HPP
