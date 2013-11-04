@@ -10,6 +10,7 @@ using namespace std;
 
 
 FileReader::FileReader(ErrorReporter* errorReporter) :
+  m_nLines(0),
   m_linesText(),
   m_errorReporter(errorReporter),
   m_instance(nullptr)
@@ -17,6 +18,7 @@ FileReader::FileReader(ErrorReporter* errorReporter) :
 }
 
 FileReader::FileReader(const FileReader& source) :
+  m_nLines(0),
   m_linesText(),
   m_errorReporter(),
   m_instance()
@@ -54,12 +56,19 @@ void FileReader::readFile(const std::string& fileName)
       line += "\n";
 
       m_linesText.push_back(line);
+      ++m_nLines;
     }
+    file.close();
   }
   else
   {
     m_errorReporter->writeError("error al abrir archivo");
   }
+}
+
+size_t FileReader::getTotalLines() const
+{
+  return m_nLines;
 }
 
 string FileReader::getTextAtLine(int line)

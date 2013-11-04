@@ -16,6 +16,7 @@ public:
   FileReader* getInstance(ErrorReporter* errorReporter);
 
   void        readFile(const std::string& fileName);
+  size_t      getTotalLines() const;
   std::string getTextAtLine(int line);
 
 private:
@@ -23,6 +24,7 @@ private:
   FileReader(const FileReader& source);
   ~FileReader();
 
+  size_t                   m_nLines;
   std::vector<std::string> m_linesText;
   ErrorReporter*           m_errorReporter;
 
