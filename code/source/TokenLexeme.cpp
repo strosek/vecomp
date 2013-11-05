@@ -56,26 +56,30 @@ unsigned int TokenLexeme::getRow() const {
   return m_row;
 }
 
-string TokenLexeme::getTokenString(TokenType_t token) const {
+string TokenLexeme::getTokenString(TokenType_t token)
+{
   static map<TokenType_t, string> tokensMap;
   
-  tokensMap[TOKEN_INVALID] = "invalido";
-  tokensMap[TOKEN_IDEN] = "identificador";
-  tokensMap[TOKEN_KEYWORD] = "pal_reservada";
-  tokensMap[TOKEN_ARITHOP] = "op_aritmetico";
-  tokensMap[TOKEN_LOGICOP] = "op_logico";
-  tokensMap[TOKEN_RELOP] = "op_relac";
-  tokensMap[TOKEN_DEC] = "entero_dec";
-  tokensMap[TOKEN_OCT] = "entero_oct";
-  tokensMap[TOKEN_HEX] = "entero_hex";
-  tokensMap[TOKEN_FLOAT] = "real";
-  tokensMap[TOKEN_STRING] = "cte_alpha";
-  tokensMap[TOKEN_LOGICCONST] = "cte_logica";
-  tokensMap[TOKEN_DELIMITER] = "delimitador";
-  tokensMap[TOKEN_LINECOMMENT] = "comentariolinea";
-  tokensMap[TOKEN_MULTICOMMENT] = "multicomentario";
-  tokensMap[TOKEN_CHARCONST] = "cte_caracter";
-  tokensMap[TOKEN_ASSIGNOP] = "ope_asignacion";
+  if (tokensMap.size() <= 0)
+  {
+    tokensMap[TOKEN_INVALID] = "invalido";
+    tokensMap[TOKEN_IDEN] = "identificador";
+    tokensMap[TOKEN_KEYWORD] = "pal_reservada";
+    tokensMap[TOKEN_ARITHOP] = "op_aritmetico";
+    tokensMap[TOKEN_LOGICOP] = "op_logico";
+    tokensMap[TOKEN_RELOP] = "op_relac";
+    tokensMap[TOKEN_DEC] = "entero_dec";
+    tokensMap[TOKEN_OCT] = "entero_oct";
+    tokensMap[TOKEN_HEX] = "entero_hex";
+    tokensMap[TOKEN_FLOAT] = "real";
+    tokensMap[TOKEN_STRING] = "cte_alpha";
+    tokensMap[TOKEN_LOGICCONST] = "cte_logica";
+    tokensMap[TOKEN_DELIMITER] = "delimitador";
+    tokensMap[TOKEN_LINECOMMENT] = "comentariolinea";
+    tokensMap[TOKEN_MULTICOMMENT] = "multicomentario";
+    tokensMap[TOKEN_CHARCONST] = "cte_caracter";
+    tokensMap[TOKEN_ASSIGNOP] = "ope_asignacion";
+  }
 
   return tokensMap.at(token);
 }

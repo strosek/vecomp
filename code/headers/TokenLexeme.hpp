@@ -43,7 +43,8 @@ public:
   std::string  getLexeme() const;
   unsigned int getLine() const;
   unsigned int getRow() const;
-  std::string  getTokenString(TokenType_t token) const;
+
+  static std::string  getTokenString(TokenType_t token);
 private:
   TokenType_t  m_token;
   std::string  m_lexeme;
