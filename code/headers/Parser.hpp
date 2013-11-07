@@ -8,53 +8,53 @@
 #include "Scanner.hpp"
 #include "TokenLexeme.hpp"
 #include "ErrorReporter.hpp"
+#include "FileReader.hpp"
 
 class Parser
 {
 public:
-  Parser();
+  Parser(FileReader* fileReader, ErrorReporter* errorReporter);
+  Parser(const Parser& source);
 
-  int getErrors() const;
-  int getWarnings() const;
-  int parse(const std::string& fileName);
+  int parse();
+
+  Parser& operator=(const Parser& rhs);
 private:
-  int andoperator();
-  int assign();
-  int block();
-  int caseStatement();
-  int command();
-  int constant();
-  int dimension();
-  int exponent();
-  int expression();
-  int forStatement();
-  int function();
-  int functionSign();
-  int ifStatement();
-  int import();
-  int multiplication();
-  int notOperator();
-  int parameterList();
-  int parameters();
-  int print();
+  int andoperator(bool isLookedForward);
+  int assign(bool isLookedForward);
+  int block(bool isLookedForward);
+  int caseStatement(bool isLookedForward);
+  int command(bool isLookedForward);
+  int constantDeclaration(bool isLookedForward);
+  int dimension(bool isLookedForward);
+  int exponent(bool isLookedForward);
+  int expression(bool isLookedForward);
+  int forStatement(bool isLookedForward);
+  int functionDeclaration(bool isLookedForward);
+  int functionSign(bool isLookedForward);
+  int ifStatement(bool isLookedForward);
+  int import(bool isLookedForward);
+  int multiplication(bool isLookedForward);
+  int notOperator(bool isLookedForward);
+  int parameterList(bool isLookedForward);
+  int parameters(bool isLookedForward);
+  int print(bool isLookedForward);
   int program();
-  int useDimenison();
-  int read();
-  int relational();
-  int returnExpression();
-  int returnType();
-  int sign();
-  int statement();
-  int term();
-  int type();
-  int useParameters();
-  int variables();
+  int useDimenison(bool isLookedForward);
+  int read(bool isLookedForward);
+  int relational(bool isLookedForward);
+  int returnExpression(bool isLookedForward);
+  int returnType(bool isLookedForward);
+  int sign(bool isLookedForward);
+  int statement(bool isLookedForward);
+  int term(bool isLookedForward);
+  int type(bool isLookedForward);
+  int useParameters(bool isLookedForward);
+  int variables(bool isLookedForward);
 
   bool isLexemeCorrect(const std::string& lexeme);
   bool isTokenCorrect(TokenType_t token);
 
-  int            m_errors;
-  int            m_warnings;
   int            m_tokenNo;
   TokenLexeme    m_currentToken;
   Scanner        m_scanner;
