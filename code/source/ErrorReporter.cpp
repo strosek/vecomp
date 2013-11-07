@@ -8,60 +8,50 @@
 
 using namespace std;
 
-ErrorReporter::ErrorReporter() :
+ErrorReporter::ErrorReporter(FileReader* fileReader) :
   m_errorOut(),
   m_outFileName("errores.out"),
   m_warnings(0),
   m_errors(0),
   m_maxErrors(5),
-  m_instance(nullptr)
+  m_fileReader(fileReader)
 {
 }
 
-ErrorReporter::ErrorReporter(const string& outFileName) :
+ErrorReporter::ErrorReporter(FileReader* fileReader,
+                             const string& outFileName) :
   m_errorOut(),
   m_outFileName(outFileName),
   m_warnings(0),
   m_errors(0),
   m_maxErrors(5),
-  m_instance(nullptr)
-
+  m_fileReader(fileReader)
 {
 }
 
-// Singleton, so this should not be used. Written for removing EffC++ warnings.
-ErrorReporter::ErrorReporter(const ErrorReporter& source) :
-  m_errorOut(),
-  m_outFileName(),
-  m_warnings(0),
-  m_errors(0),
-  m_maxErrors(5),
-  m_instance(nullptr)
-
-{
-  m_instance = source.m_instance;
-}
+ErrorReporter* ErrorReporter::m_instance = nullptr;
 
 ErrorReporter::~ErrorReporter()
 {
   delete m_instance;
 }
 
-ErrorReporter* ErrorReporter::getInstance()
+ErrorReporter* ErrorReporter::getInstance(FileReader* fileReader)
 {
   if (m_instance == nullptr)
   {
-    m_instance = new ErrorReporter();
+    m_instance = new ErrorReporter(fileReader);
     return m_instance; 
   }
   return m_instance;
 }
 
-ErrorReporter* ErrorReporter::getInstance(const string& outFileName)
+ErrorReporter* ErrorReporter::getInstance(FileReader* fileReader,
+                                          const string& outFileName)
 {
   if (m_instance == nullptr)
   {
-    m_instance = new ErrorReporter(outFileName);
+    m_instance = new ErrorReporter(fileReader, outFileName);
     return m_instance; 
   }
   return m_instance;
@@ -176,6 +166,44 @@ void ErrorReporter::writeLexicalError(int state, char currentChar,
   ++m_errors;
 }
 
+void ErrorReporter::writeSyntaxError(const std::string& expectedLexeme,
+    const std::string& actualLexeme, int line, int column)
+{
+  writeErrorsFileHeader();
+
+  ostringstream messageBuilder;
+
+  messageBuilder << "se esperaba lexema: \"" << expectedLexeme <<
+                    "\" se recibio: \"" << actualLexeme << "\"";
+
+  m_errorOut << setw(WIDTH_NUMBER) << line <<
+      setw(WIDTH_NUMBER) << column <<
+      setw(WIDTH_LEXEME) << actualLexeme << 
+      setw(WIDTH_MESSAGE) << messageBuilder.str() <<
+      setw(WIDTH_LINE) << m_fileReader->getTextAtLine(line - 1) << endl;
+  ++m_errors;
+}
+
+void ErrorReporter::writeSyntaxError(TokenType_t expectedToken,
+    TokenType_t actualToken, int line, int column)
+{
+  writeErrorsFileHeader();
+
+  ostringstream messageBuilder;
+
+  messageBuilder << "se esperaba token: \"" <<
+                    TokenLexeme::getTokenString(expectedToken) <<
+                    "\" se recibio: \"" <<
+                    TokenLexeme::getTokenString(actualToken) << "\"";
+
+  m_errorOut << setw(WIDTH_NUMBER) << line <<
+      setw(WIDTH_NUMBER) << column <<
+      setw(WIDTH_LEXEME) << TokenLexeme::getTokenString(actualToken) << 
+      setw(WIDTH_MESSAGE) << messageBuilder.str() <<
+      setw(WIDTH_LINE) << m_fileReader->getTextAtLine(line - 1) << endl;
+  ++m_errors;
+}
+
 void ErrorReporter::writeErrorsFileHeader() {
   if (!m_errorOut.is_open()) {
     m_errorOut.open(m_outFileName, ios::app);
@@ -199,14 +227,6 @@ void ErrorReporter::writeErrorsFileHeader() {
     m_errorOut << endl;
   }
 }
-
-ErrorReporter& ErrorReporter::operator=(const ErrorReporter& rhs)
-{
-  m_instance = rhs.m_instance;
-
-  return *this;
-}
-
 
 void ErrorReporter::setMaxErrors(int maxErrors)
 {
