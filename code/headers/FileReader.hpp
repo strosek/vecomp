@@ -7,13 +7,15 @@
 #include <fstream>
 #include <vector>
 
+// Forward declaration for avoind dependency problems.
+class ErrorReporter;
 #include "ErrorReporter.hpp"
 
 
 class FileReader
 {
 public:
-  FileReader* getInstance(ErrorReporter* errorReporter);
+  static FileReader* getInstance(ErrorReporter* errorReporter);
 
   void        readFile(const std::string& fileName);
   size_t      getTotalLines() const;
@@ -28,7 +30,7 @@ private:
   std::vector<std::string> m_linesText;
   ErrorReporter*           m_errorReporter;
 
-  FileReader*              m_instance;
+  static FileReader* m_instance;
 
   FileReader&              operator=(const FileReader& rhs);
 };

@@ -12,19 +12,19 @@ using namespace std;
 FileReader::FileReader(ErrorReporter* errorReporter) :
   m_nLines(0),
   m_linesText(),
-  m_errorReporter(errorReporter),
-  m_instance(nullptr)
+  m_errorReporter(errorReporter)
 {
 }
 
 FileReader::FileReader(const FileReader& source) :
   m_nLines(0),
   m_linesText(),
-  m_errorReporter(),
-  m_instance()
+  m_errorReporter()
 {
   m_instance = source.m_instance;
 }
+
+FileReader* FileReader::m_instance = nullptr;
 
 FileReader::~FileReader()
 {
