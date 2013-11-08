@@ -1,0 +1,71 @@
+Classfile /home/edcg/Documents/school/tcompiladores/go_compiler/resources/class/AnArray.class
+  Last modified Nov 8, 2013; size 340 bytes
+  MD5 checksum 99df0e614326f097c41895db9a60c7e9
+  Compiled from "AnArray.java"
+public class AnArray
+  SourceFile: "AnArray.java"
+  minor version: 0
+  major version: 51
+  flags: ACC_PUBLIC, ACC_SUPER
+Constant pool:
+   #1 = Methodref          #3.#14         //  java/lang/Object."<init>":()V
+   #2 = Class              #15            //  AnArray
+   #3 = Class              #16            //  java/lang/Object
+   #4 = Utf8               <init>
+   #5 = Utf8               ()V
+   #6 = Utf8               Code
+   #7 = Utf8               LineNumberTable
+   #8 = Utf8               main
+   #9 = Utf8               ([Ljava/lang/String;)V
+  #10 = Utf8               StackMapTable
+  #11 = Class              #17            //  "[I"
+  #12 = Utf8               SourceFile
+  #13 = Utf8               AnArray.java
+  #14 = NameAndType        #4:#5          //  "<init>":()V
+  #15 = Utf8               AnArray
+  #16 = Utf8               java/lang/Object
+  #17 = Utf8               [I
+{
+  public AnArray();
+    flags: ACC_PUBLIC
+    Code:
+      stack=1, locals=1, args_size=1
+         0: aload_0       
+         1: invokespecial #1                  // Method java/lang/Object."<init>":()V
+         4: return        
+      LineNumberTable:
+        line 1: 0
+
+  public static void main(java.lang.String[]);
+    flags: ACC_PUBLIC, ACC_STATIC
+    Code:
+      stack=3, locals=3, args_size=1
+         0: bipush        10
+         2: newarray       int
+         4: astore_1      
+         5: iconst_0      
+         6: istore_2      
+         7: iload_2       
+         8: bipush        10
+        10: if_icmpge     23
+        13: aload_1       
+        14: iload_2       
+        15: iload_2       
+        16: iastore       
+        17: iinc          2, 1
+        20: goto          7
+        23: return        
+      LineNumberTable:
+        line 5: 0
+        line 6: 5
+        line 7: 13
+        line 6: 17
+        line 8: 23
+      StackMapTable: number_of_entries = 2
+           frame_type = 253 /* append */
+             offset_delta = 7
+        locals = [ class "[I", int ]
+           frame_type = 250 /* chop */
+          offset_delta = 15
+
+}
