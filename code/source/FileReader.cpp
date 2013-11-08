@@ -25,9 +25,10 @@ FileReader::~FileReader()
 
 FileReader* FileReader::getInstance()
 {
-  if (m_instance != nullptr)
+  if (m_instance == nullptr)
   {
-    return new FileReader();
+    m_instance = new FileReader();
+    return m_instance;
   }
   
   return m_instance;
@@ -71,12 +72,5 @@ size_t FileReader::getTotalLines() const
 string FileReader::getTextAtLine(int line)
 {
   return m_linesText.at(line);
-}
-
-ErrorReporter& ErrorReporter::operator=(const ErrorReporter& rhs)
-{
-  m_instance = rhs.m_instance;
-
-  return *this;
 }
 

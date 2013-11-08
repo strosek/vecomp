@@ -14,7 +14,7 @@ Parser::Parser(FileReader* fileReader, ErrorReporter* errorReporter) :
   m_tokenNo(0),
   m_currentToken(),
   m_scanner(Scanner(fileReader, errorReporter)),
-  m_errorReporter()
+  m_errorReporter(errorReporter)
 {
 }
 

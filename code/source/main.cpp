@@ -1,6 +1,7 @@
 /* Main function definition for vecomp program */
 
 #include <iostream>
+#include <cstdio>
 #include <cstdlib>
 #include <iomanip>
 
@@ -22,6 +23,11 @@ int main(int argc, char** argv) {
 #endif
     errorReporter = ErrorReporter::getInstance();
     FileReader* fileReader = FileReader::getInstance();
+
+#ifdef DEBUG
+    printf("ERPtr: %p, FRPtr: %p", errorReporter, fileReader);
+#endif
+
     errorReporter->setFileReader(fileReader);
     fileReader->setErrorReporter(errorReporter);
 
