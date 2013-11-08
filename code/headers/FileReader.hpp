@@ -15,14 +15,16 @@ class ErrorReporter;
 class FileReader
 {
 public:
-  static FileReader* getInstance(ErrorReporter* errorReporter);
+  static FileReader* getInstance();
 
   void        readFile(const std::string& fileName);
   size_t      getTotalLines() const;
   std::string getTextAtLine(int line);
+  void        setErrorReporter(ErrorReporter* errorRepoter);
 
+  FileReader&              operator=(const FileReader& rhs);
 private:
-  FileReader(ErrorReporter* errorReporter);
+  FileReader();
   FileReader(const FileReader& source);
   ~FileReader();
 
@@ -31,8 +33,6 @@ private:
   ErrorReporter*           m_errorReporter;
 
   static FileReader* m_instance;
-
-  FileReader&              operator=(const FileReader& rhs);
 };
 
 #endif /* FILEREADER_HPP */

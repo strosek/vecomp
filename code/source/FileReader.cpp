@@ -9,19 +9,11 @@
 using namespace std;
 
 
-FileReader::FileReader(ErrorReporter* errorReporter) :
+FileReader::FileReader() :
   m_nLines(0),
   m_linesText(),
-  m_errorReporter(errorReporter)
+  m_errorReporter(nullptr)
 {
-}
-
-FileReader::FileReader(const FileReader& source) :
-  m_nLines(0),
-  m_linesText(),
-  m_errorReporter()
-{
-  m_instance = source.m_instance;
 }
 
 FileReader* FileReader::m_instance = nullptr;
@@ -31,11 +23,11 @@ FileReader::~FileReader()
   delete m_instance;
 }
 
-FileReader* FileReader::getInstance(ErrorReporter* errorReporter)
+FileReader* FileReader::getInstance()
 {
   if (m_instance != nullptr)
   {
-    return new FileReader(errorReporter);
+    return new FileReader();
   }
   
   return m_instance;
@@ -64,6 +56,11 @@ void FileReader::readFile(const std::string& fileName)
   {
     m_errorReporter->writeError("error al abrir archivo");
   }
+}
+
+void FileReader::setErrorReporter(ErrorReporter* errorReporter)
+{
+  m_errorReporter = errorReporter;
 }
 
 size_t FileReader::getTotalLines() const

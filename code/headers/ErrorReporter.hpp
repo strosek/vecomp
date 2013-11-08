@@ -14,9 +14,8 @@ class FileReader;
 class ErrorReporter
 {
 public:
-  static ErrorReporter* getInstance(FileReader* fileReader);
-  static ErrorReporter* getInstance(FileReader* fileReader,
-                                    const std::string& outFileName);
+  static ErrorReporter* getInstance();
+  static ErrorReporter* getInstance(const std::string& outFileName);
 
   void writeError(const std::string& message);
   void writeLexicalError(int state, char currentChar, const std::string& line,
@@ -26,21 +25,23 @@ public:
   void writeSyntaxError(TokenType_t expectedToken, TokenType_t actualToken,
                         int line, int column);
 
+  void setFileReader(FileReader* fileReader);
   void setMaxErrors(int maxErrors);
   int  getMaxErrors() const;
   int  getErrors() const;
   int  getWarnings() const;
+
+  ErrorReporter& operator=(const ErrorReporter& rhs);
 private:
   static const int WIDTH_NUMBER =   8;
   static const int WIDTH_LEXEME =  15;
   static const int WIDTH_MESSAGE = 80;
   static const int WIDTH_LINE =   100;
 
-  ErrorReporter(FileReader* fileReader);
-  ErrorReporter(FileReader* fileReader, const std::string& outFileName);
+  ErrorReporter();
+  ErrorReporter(const std::string& outFileName);
   ErrorReporter(const ErrorReporter& source);
   ~ErrorReporter();
-  ErrorReporter& operator=(const ErrorReporter& rhs);
 
   void writeErrorsFileHeader();
 

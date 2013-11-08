@@ -8,24 +8,23 @@
 
 using namespace std;
 
-ErrorReporter::ErrorReporter(FileReader* fileReader) :
+ErrorReporter::ErrorReporter() :
   m_errorOut(),
   m_outFileName("errores.out"),
   m_warnings(0),
   m_errors(0),
   m_maxErrors(5),
-  m_fileReader(fileReader)
+  m_fileReader(nullptr)
 {
 }
 
-ErrorReporter::ErrorReporter(FileReader* fileReader,
-                             const string& outFileName) :
+ErrorReporter::ErrorReporter(const string& outFileName) :
   m_errorOut(),
   m_outFileName(outFileName),
   m_warnings(0),
   m_errors(0),
   m_maxErrors(5),
-  m_fileReader(fileReader)
+  m_fileReader(nullptr)
 {
 }
 
@@ -36,22 +35,21 @@ ErrorReporter::~ErrorReporter()
   delete m_instance;
 }
 
-ErrorReporter* ErrorReporter::getInstance(FileReader* fileReader)
+ErrorReporter* ErrorReporter::getInstance()
 {
   if (m_instance == nullptr)
   {
-    m_instance = new ErrorReporter(fileReader);
+    m_instance = new ErrorReporter();
     return m_instance; 
   }
   return m_instance;
 }
 
-ErrorReporter* ErrorReporter::getInstance(FileReader* fileReader,
-                                          const string& outFileName)
+ErrorReporter* ErrorReporter::getInstance(const string& outFileName)
 {
   if (m_instance == nullptr)
   {
-    m_instance = new ErrorReporter(fileReader, outFileName);
+    m_instance = new ErrorReporter(outFileName);
     return m_instance; 
   }
   return m_instance;
@@ -226,6 +224,11 @@ void ErrorReporter::writeErrorsFileHeader() {
       m_errorOut << '-';
     m_errorOut << endl;
   }
+}
+
+void ErrorReporter::setFileReader(FileReader* fileReader)
+{
+  m_fileReader = fileReader;
 }
 
 void ErrorReporter::setMaxErrors(int maxErrors)
