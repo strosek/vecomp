@@ -79,6 +79,7 @@ string TokenLexeme::getTokenString(TokenType_t token)
     tokensMap[TOKEN_MULTICOMMENT] = "multicomentario";
     tokensMap[TOKEN_CHARCONST] = "cte_caracter";
     tokensMap[TOKEN_ASSIGNOP] = "ope_asignacion";
+    tokensMap[TOKEN_NEWLINE] = "salto_linea";
   }
 
   return tokensMap.at(token);
