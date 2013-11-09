@@ -6,6 +6,10 @@
 #include <sstream>
 #include <string>
 
+#ifdef DEBUG
+# include <iostream>
+#endif
+
 using namespace std;
 
 ErrorReporter::ErrorReporter() :
@@ -154,11 +158,14 @@ void ErrorReporter::writeLexicalError(int state, char currentChar,
       break;
   }
   
-  string errorMessage = messageBuilder.str();
+#ifdef DEBUG
+  cout << "inside call of weird function: errorOutOpen? " <<
+      m_errorOut.is_open() << endl;
+#endif
   m_errorOut << setw(WIDTH_NUMBER) << lineNo <<
       setw(WIDTH_NUMBER) << columnNo <<
       setw(WIDTH_LEXEME) << lexeme << 
-      setw(WIDTH_MESSAGE) << errorMessage <<
+      setw(WIDTH_MESSAGE) << messageBuilder.str() <<
       setw(WIDTH_LINE) << line;
 
   ++m_errors;
@@ -172,7 +179,7 @@ void ErrorReporter::writeSyntaxError(const std::string& expectedLexeme,
   ostringstream messageBuilder;
 
   messageBuilder << "se esperaba lexema: \"" << expectedLexeme <<
-                    "\" se recibio: \"" << actualLexeme << "\"";
+                    "\", se recibio: \"" << actualLexeme << "\"";
 
   m_errorOut << setw(WIDTH_NUMBER) << line <<
       setw(WIDTH_NUMBER) << column <<
@@ -191,7 +198,7 @@ void ErrorReporter::writeSyntaxError(TokenType_t expectedToken,
 
   messageBuilder << "se esperaba token: \"" <<
                     TokenLexeme::getTokenString(expectedToken) <<
-                    "\" se recibio: \"" <<
+                    "\", se recibio: \"" <<
                     TokenLexeme::getTokenString(actualToken) << "\"";
 
   m_errorOut << setw(WIDTH_NUMBER) << line <<
@@ -203,8 +210,11 @@ void ErrorReporter::writeSyntaxError(TokenType_t expectedToken,
 }
 
 void ErrorReporter::writeErrorsFileHeader() {
+#ifdef DEBUG
+  cout << "errorOutOpen? " << m_errorOut.is_open() << endl;
+#endif
   if (!m_errorOut.is_open()) {
-    m_errorOut.open(m_outFileName, ios::app);
+    m_errorOut.open(m_outFileName, ios::trunc);
 
     for (int i = 0; 
          i < (WIDTH_NUMBER * 2 + WIDTH_LEXEME + WIDTH_MESSAGE + WIDTH_LINE);
