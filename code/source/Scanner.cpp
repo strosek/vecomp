@@ -51,13 +51,15 @@ void Scanner::scan() {
     size_t lineLength;
     m_lineNo = 1;
     while (m_lineNo <= m_fileReader->getTotalLines() &&
-           m_errorReporter->getErrors() < m_errorReporter->getMaxErrors()) {
+           m_errorReporter->getErrors() < m_errorReporter->getMaxErrors())
+    {
       line = m_fileReader->getTextAtLine(m_lineNo - 1);
 
       lineLength = line.length();
       m_column = 1;
       while (m_column <= lineLength &&
-             m_errorReporter->getErrors() <= m_errorReporter->getMaxErrors()) {
+             m_errorReporter->getErrors() <= m_errorReporter->getMaxErrors())
+      {
         currentChar = line.at(m_column - 1);
         nextState = automata[currentState][getTransitionIndex(currentChar)];
 
@@ -138,14 +140,25 @@ void Scanner::scan() {
             case 33 :
               token = TOKEN_CHARCONST;
               break;
+            case 37 :
+              token = TOKEN_NEWLINE;
+              break;
             default :
               cerr << "vecomp: error de estado siguiente" << endl;
               break;
           }
 
           if (token != TOKEN_LINECOMMENT && token != TOKEN_MULTICOMMENT)
+          {
+#ifdef DEBUG
+            cout << "pushed element: \"" <<
+                TokenLexeme::getTokenString(token) << ": " << lexeme <<
+                "\" at: " << m_lineNo << ", " << m_column - lexeme.length() <<
+                endl;
+#endif
             m_tokensLexemes.push(TokenLexeme(token, lexeme, m_lineNo, 
                                              m_column - lexeme.length()));
+          }
 
           token = TOKEN_INVALID;
           lexeme = "";
@@ -332,6 +345,7 @@ bool Scanner::isTerminalState(int state) {
     case 33 :
     case 35 :
     case 36 :
+    case 37 :
       return true;
       break;
   }
