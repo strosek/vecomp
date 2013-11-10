@@ -40,115 +40,115 @@ void Parser::parse()
   }
 }
 
-void Parser::andoperator()
+void Parser::andoperator(bool isLookedForward)
 {
   if (m_errorReporter->getErrors() >= m_maxErrors)
     return;
 }
 
-void Parser::assign()
+void Parser::assign(bool isLookedForward)
 {
   if (m_errorReporter->getErrors() >= m_maxErrors)
     return;
 }
 
-void Parser::block()
+void Parser::block(bool isLookedForward)
 {
   if (m_errorReporter->getErrors() >= m_maxErrors)
     return;
 }
 
-void Parser::caseStatement()
+void Parser::caseStatement(bool isLookedForward)
 {
   if (m_errorReporter->getErrors() >= m_maxErrors)
     return;
 }
 
-void Parser::command()
+void Parser::command(bool isLookedForward)
 {
   if (m_errorReporter->getErrors() >= m_maxErrors)
     return;
 }
 
-void Parser::constantDeclaration()
+void Parser::constantsDeclaration(bool isLookedForward)
 {
   if (m_errorReporter->getErrors() >= m_maxErrors)
     return;
 }
 
-void Parser::dimension()
+void Parser::dimension(bool isLookedForward)
 {
   if (m_errorReporter->getErrors() >= m_maxErrors)
     return;
 }
 
-void Parser::exponent()
+void Parser::exponent(bool isLookedForward)
 {
   if (m_errorReporter->getErrors() >= m_maxErrors)
     return;
 }
 
-void Parser::expression()
+void Parser::expression(bool isLookedForward)
 {
   if (m_errorReporter->getErrors() >= m_maxErrors)
     return;
 }
 
-void Parser::forStatement()
+void Parser::forStatement(bool isLookedForward)
 {
   if (m_errorReporter->getErrors() >= m_maxErrors)
     return;
 }
 
-void Parser::functionDeclaration()
+void Parser::functionDeclaration(bool isLookedForward)
 {
   if (m_errorReporter->getErrors() >= m_maxErrors)
     return;
 }
 
-void Parser::functionSign()
+void Parser::functionSign(bool isLookedForward)
 {
   if (m_errorReporter->getErrors() >= m_maxErrors)
     return;
 }
 
-void Parser::ifStatement()
+void Parser::ifStatement(bool isLookedForward)
 {
   if (m_errorReporter->getErrors() >= m_maxErrors)
     return;
 }
 
-void Parser::import()
+void Parser::import(bool isLookedForward)
 {
   if (m_errorReporter->getErrors() >= m_maxErrors)
     return;
 }
 
-void Parser::multiplication()
+void Parser::multiplication(bool isLookedForward)
 {
   if (m_errorReporter->getErrors() >= m_maxErrors)
     return;
 }
 
-void Parser::notOperator()
+void Parser::notOperator(bool isLookedForward)
 {
   if (m_errorReporter->getErrors() >= m_maxErrors)
     return;
 }
 
-void Parser::parameterList()
+void Parser::parameterList(bool isLookedForward)
 {
   if (m_errorReporter->getErrors() >= m_maxErrors)
     return;
 }
 
-void Parser::parameters()
+void Parser::parameters(bool isLookedForward)
 {
   if (m_errorReporter->getErrors() >= m_maxErrors)
     return;
 }
 
-void Parser::print()
+void Parser::print(bool isLookedForward)
 {
   if (m_errorReporter->getErrors() >= m_maxErrors)
     return;
@@ -168,15 +168,15 @@ void Parser::program()
     m_currentToken = m_scanner.getNextTokenLexeme();
     if (m_currentToken.getLexeme().compare("var") == 0)
     {
-      variables();
+      variablesDeclaration(true);
     }
     else if (m_currentToken.getLexeme().compare("const") == 0)
     {
-      constantDeclaration();
+      constantsDeclaration(true);
     }
     else if (m_currentToken.getLexeme().compare("funcion") == 0)
     {
-      functionDeclaration();
+      functionDeclaration(true);
     }
   } while ((m_currentToken.getLexeme().compare("var")   ||
             m_currentToken.getLexeme().compare("const") ||
@@ -184,76 +184,97 @@ void Parser::program()
             m_scanner.getTokensProcessed() < m_scanner.getMaxTokens());
 }
 
-void Parser::useDimenison()
+void Parser::useDimenison(bool isLookedForward)
 {
   if (m_errorReporter->getErrors() >= m_maxErrors)
     return;
 }
 
-void Parser::read()
+void Parser::read(bool isLookedForward)
 {
   if (m_errorReporter->getErrors() >= m_maxErrors)
     return;
 }
 
-void Parser::relational()
+void Parser::relational(bool isLookedForward)
 {
   if (m_errorReporter->getErrors() >= m_maxErrors)
     return;
 }
 
-void Parser::returnExpression()
+void Parser::returnExpression(bool isLookedForward)
 {
   if (m_errorReporter->getErrors() >= m_maxErrors)
     return;
 }
 
-void Parser::returnType()
+void Parser::returnType(bool isLookedForward)
 {
   if (m_errorReporter->getErrors() >= m_maxErrors)
     return;
 }
 
-void Parser::sign()
+void Parser::sign(bool isLookedForward)
 {
   if (m_errorReporter->getErrors() >= m_maxErrors)
     return;
 }
 
-void Parser::statement()
+void Parser::statement(bool isLookedForward)
 {
   if (m_errorReporter->getErrors() >= m_maxErrors)
     return;
 }
 
-void Parser::term()
+void Parser::term(bool isLookedForward)
 {
   if (m_errorReporter->getErrors() >= m_maxErrors)
     return;
 }
 
-void Parser::type()
+void Parser::type(bool isLookedForward)
 {
   if (m_errorReporter->getErrors() >= m_maxErrors)
     return;
 }
 
-void Parser::useParameters()
+void Parser::useParameters(bool isLookedForward)
 {
   if (m_errorReporter->getErrors() >= m_maxErrors)
     return;
 }
 
-void Parser::variables()
+void Parser::variablesDeclaration(bool isLookedForward)
 {
   if (m_errorReporter->getErrors() >= m_maxErrors)
     return;
+
+  checkLexeme("var", true);
 
   m_currentToken = m_scanner.getNextTokenLexeme();
   if (m_currentToken.getLexeme().compare("("))
   {
-    checkToken(TOKEN_IDEN, false);
+    do
+    {
+      variablesList(false);
+      m_currentToken = m_scanner.getNextTokenLexeme();
+    } while (m_currentToken.getToken() == TOKEN_NEWLINE);
+    checkLexeme(")", true);
   }
+  else
+  {
+    variablesList(true);
+  }
+}
+
+void Parser::variablesList(bool isLookedForward)
+{
+  do
+  {
+    checkToken(TOKEN_IDEN, isLookedForward);
+    m_currentToken = m_scanner.getNextTokenLexeme();
+  } while (m_currentToken.getLexeme().compare(","));
+  
 }
 
 void Parser::checkToken(TokenType_t expectedToken, bool isLookedForward)
@@ -286,6 +307,27 @@ void Parser::checkLexeme(const string& expectedLexeme, bool isLookedForward)
     if (m_currentToken.getLexeme().compare(expectedLexeme) != 0)
     {
       m_errorReporter->writeSyntaxError(expectedLexeme,
+          m_currentToken.getLexeme(), m_currentToken.getLine(),
+          m_currentToken.getRow());
+    }
+  }
+}
+
+void Parser::checkNativeDataType(bool isLookedForward)
+{
+  if (m_errorReporter->getErrors() < m_maxErrors)
+  {
+    if (!isLookedForward)
+    {
+      m_currentToken = m_scanner.getNextTokenLexeme();
+    }
+
+    if (m_currentToken.getLexeme().compare("entero") != 0 &&
+        m_currentToken.getLexeme().compare("real") != 0   &&
+        m_currentToken.getLexeme().compare("logico") != 0 &&
+        m_currentToken.getLexeme().compare("alfabetico") != 0)
+    {
+      m_errorReporter->writeSyntaxError("tipo_dato",
           m_currentToken.getLexeme(), m_currentToken.getLine(),
           m_currentToken.getRow());
     }
