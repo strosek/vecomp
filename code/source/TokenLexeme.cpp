@@ -24,35 +24,43 @@ TokenLexeme::TokenLexeme(const TokenType_t token, const string& lexeme,
 {
 }
 
-void TokenLexeme::setToken(const TokenType_t token) {
+void TokenLexeme::setToken(const TokenType_t token)
+{
   m_token = token;
 }
 
-void TokenLexeme::setLexeme(const string& lexeme) {
+void TokenLexeme::setLexeme(const string& lexeme)
+{
   m_lexeme = lexeme;
 }
 
-void TokenLexeme::setLine(unsigned int line) {
+void TokenLexeme::setLine(unsigned int line)
+{
   m_line = line;
 }
 
-void TokenLexeme::setRow(unsigned int row) {
+void TokenLexeme::setRow(unsigned int row)
+{
   m_row = row;
 }
 
-TokenType_t TokenLexeme::getToken() const {
+TokenType_t TokenLexeme::getToken() const
+{
   return m_token;
 }
 
-string TokenLexeme::getLexeme() const {
+string TokenLexeme::getLexeme() const
+{
   return m_lexeme;
 }
 
-unsigned int TokenLexeme::getLine() const {
+unsigned int TokenLexeme::getLine() const
+{
   return m_line;
 }
 
-unsigned int TokenLexeme::getRow() const {
+unsigned int TokenLexeme::getRow() const
+{
   return m_row;
 }
 

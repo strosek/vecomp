@@ -64,78 +64,82 @@ void Scanner::scan()
 #endif
    
         
-        if (nextState == STATE_ACCEPT_ERROR) {
-          switch (currentState) {
-            case 1 :
-            case 2 : token = TOKEN_OCT;
-              break;
-            case 4 :
-              token = TOKEN_HEX;
-              break;
-            case 5 :
-              token = TOKEN_DEC;
-              break;
-            case 6 :
-            case 11 :
-              token = TOKEN_FLOAT;
-              break;
-            case 7 :
-            case 26 :
-              token = TOKEN_DELIMITER;
-              break;
-            case 8 :
-              token = TOKEN_FLOAT;
-              break;
-            case 13 :
-              token = TOKEN_STRING;
-              break;
-            case 14 :
-            case 19 :
-              token = TOKEN_ARITHOP;
-              break;
-            case 16 :
-              token = TOKEN_LINECOMMENT;
-              break;
-            case 18 :
-              token = TOKEN_MULTICOMMENT;
-              break;
-            case 22 :
-            case 24 :
-              token = TOKEN_LOGICOP;
-              break;
-            case 23 :
-            case 27 :
-              token = TOKEN_ASSIGNOP;
-              break;
-            case 25 :
-            case 35 :
-            case 36 :
-              token = TOKEN_RELOP;
-              break;
-            case 28 : 
-              token = TOKEN_IDEN;
-              if (m_keywordsMap.find(lexeme) != m_keywordsMap.end()) {
-                token = TOKEN_KEYWORD;
-              }
-              else if (lexeme.compare("verdadero") == 0 ||
-                       lexeme.compare("falso") == 0) {
-                token = TOKEN_LOGICCONST;
-              }
-              break;
-            case 29 :
-              token = TOKEN_DELIMITER;
-              break;
-            case 33 :
-              token = TOKEN_CHARCONST;
-              break;
-            case 37 :
-              token = TOKEN_NEWLINE;
-              break;
-            default :
+        if (nextState == STATE_ACCEPT_ERROR)
+        {
+          switch (currentState)
+          {
+          case 1 :
+          case 2 : token = TOKEN_OCT;
+            break;
+          case 4 :
+            token = TOKEN_HEX;
+            break;
+          case 5 :
+            token = TOKEN_DEC;
+            break;
+          case 6 :
+          case 11 :
+            token = TOKEN_FLOAT;
+            break;
+          case 7 :
+          case 26 :
+            token = TOKEN_DELIMITER;
+            break;
+          case 8 :
+            token = TOKEN_FLOAT;
+            break;
+          case 13 :
+            token = TOKEN_STRING;
+            break;
+          case 14 :
+          case 19 :
+            token = TOKEN_ARITHOP;
+            break;
+          case 16 :
+            token = TOKEN_LINECOMMENT;
+            break;
+          case 18 :
+            token = TOKEN_MULTICOMMENT;
+            break;
+          case 22 :
+          case 24 :
+            token = TOKEN_LOGICOP;
+            break;
+          case 23 :
+          case 27 :
+            token = TOKEN_ASSIGNOP;
+            break;
+          case 25 :
+          case 35 :
+          case 36 :
+            token = TOKEN_RELOP;
+            break;
+          case 28 : 
+            token = TOKEN_IDEN;
+            if (m_keywordsMap.find(lexeme) != m_keywordsMap.end())
+            {
+              token = TOKEN_KEYWORD;
+            }
+            else if (lexeme.compare("verdadero") == 0 ||
+                     lexeme.compare("falso") == 0)
+            {
+              token = TOKEN_LOGICCONST;
+            }
+            break;
+          case 29 :
+            token = TOKEN_DELIMITER;
+            break;
+          case 33 :
+            token = TOKEN_CHARCONST;
+            break;
+          case 37 :
+            token = TOKEN_NEWLINE;
+            break;
+          default :
 #ifdef DEBUG
-              cerr << "vecomp: error de estado siguiente" << endl;
+            cerr << "vecomp: error de estado siguiente" << endl;
 #endif
-              break;
+            break;
           }
 
           if (token != TOKEN_LINECOMMENT && token != TOKEN_MULTICOMMENT)
@@ -155,7 +159,8 @@ void Scanner::scan()
           nextState = 0;
           --m_column;
         }
-        else if (nextState == STATE_ERROR) {
+        else if (nextState == STATE_ERROR)
+        {
 #ifdef DEBUG
           cout << "calling lexicalerror" << currentState << " " <<
               currentChar << endl;
@@ -191,7 +196,8 @@ void Scanner::scan()
 
     m_nTokens = m_tokensLexemes.size();
 
-    if (m_tokensLexemes.empty()) {
+    if (m_tokensLexemes.empty())
+    {
       m_errorReporter->writeError("archivo vacio");
     }
   }
@@ -200,7 +206,8 @@ void Scanner::scan()
 TokenLexeme Scanner::getNextTokenLexeme()
 {
   TokenLexeme temporal;
-  if (!m_tokensLexemes.empty()) {
+  if (!m_tokensLexemes.empty())
+  {
     temporal = m_tokensLexemes.front();
     m_tokensLexemes.pop();
   }
@@ -209,10 +216,12 @@ TokenLexeme Scanner::getNextTokenLexeme()
   return temporal;
 }
 
-Transition_t Scanner::getTransitionIndex(char character) {
+Transition_t Scanner::getTransitionIndex(char character)
+{
   Transition_t transitionIndex = TRANS_ANY; 
 
-  if (isdigit(character)) {
+  if (isdigit(character))
+  {
     if (character == '0')
       transitionIndex = TRANS_ZERO;
     else if (character <= '7')
@@ -220,7 +229,8 @@ Transition_t Scanner::getTransitionIndex(char character) {
     else
       transitionIndex = TRANS_DEC;
   }
-  else if (isalpha(character)) {
+  else if (isalpha(character))
+  {
     if (tolower(character) == 'e')
       transitionIndex = TRANS_E;
     else if (tolower(character) == 'x')
@@ -230,78 +240,80 @@ Transition_t Scanner::getTransitionIndex(char character) {
     else
       transitionIndex = TRANS_LETTER;
   }
-  else {
-    switch (character) {
-      case '|' :
-        transitionIndex = TRANS_PIPE;
-        break;
-      case '&' :
-        transitionIndex = TRANS_AMPERS;
-        break;
-      case '!' :
-        transitionIndex = TRANS_EXCLAMATION;
-        break;
-      case ' ' :
-      case '\t' :
-      case '\r' :
-        transitionIndex = TRANS_SPACE;
-        break;
-      case '\n' :
-        transitionIndex = TRANS_NEWLINE;
-        break;
-      case ',' :
-      case ';' :
-      case '(' :
-      case ')' :
-      case '[' :
-      case ']' :
-      case '{' :
-      case '}' :
-        transitionIndex = TRANS_DELIMITER;
-        break;
-      case '+' :
-      case '-' :
-        transitionIndex = TRANS_SIGN;
-        break;
-      case '*' :
-        transitionIndex = TRANS_ASTERISK;
-        break;
-      case '/' :
-        transitionIndex = TRANS_SLASH;
-        break;
-      case '%' :
-      case '^' :
-        transitionIndex = TRANS_ARITHMETIC;
-        break;
-      case ':' :
-        transitionIndex = TRANS_COLON;
-        break;
-      case '=' :
-        transitionIndex = TRANS_EQUAL;
-        break;
-      case '<' :
-        transitionIndex = TRANS_LESSER;
-        break;
-      case '>' :
-        transitionIndex = TRANS_GREATER;
-        break;
-      case '_' :
-        transitionIndex = TRANS_UNDERSCORE;
-        break;
-      case '\'' :
-        transitionIndex = TRANS_SQUOTE;
-        break;
-      case '\\' :
-        transitionIndex = TRANS_BACKSLASH;
-      case '"' :
-        transitionIndex = TRANS_DQUOTE;
-        break;
-      case '.' :
-        transitionIndex = TRANS_DOT;
-        break;
-      default :
-        transitionIndex = TRANS_ANY;
-        break;
+  else
+  {
+    switch (character)
+    {
+    case '|' :
+      transitionIndex = TRANS_PIPE;
+      break;
+    case '&' :
+      transitionIndex = TRANS_AMPERS;
+      break;
+    case '!' :
+      transitionIndex = TRANS_EXCLAMATION;
+      break;
+    case ' ' :
+    case '\t' :
+    case '\r' :
+      transitionIndex = TRANS_SPACE;
+      break;
+    case '\n' :
+      transitionIndex = TRANS_NEWLINE;
+      break;
+    case ',' :
+    case ';' :
+    case '(' :
+    case ')' :
+    case '[' :
+    case ']' :
+    case '{' :
+    case '}' :
+      transitionIndex = TRANS_DELIMITER;
+      break;
+    case '+' :
+    case '-' :
+      transitionIndex = TRANS_SIGN;
+      break;
+    case '*' :
+      transitionIndex = TRANS_ASTERISK;
+      break;
+    case '/' :
+      transitionIndex = TRANS_SLASH;
+      break;
+    case '%' :
+    case '^' :
+      transitionIndex = TRANS_ARITHMETIC;
+      break;
+    case ':' :
+      transitionIndex = TRANS_COLON;
+      break;
+    case '=' :
+      transitionIndex = TRANS_EQUAL;
+      break;
+    case '<' :
+      transitionIndex = TRANS_LESSER;
+      break;
+    case '>' :
+      transitionIndex = TRANS_GREATER;
+      break;
+    case '_' :
+      transitionIndex = TRANS_UNDERSCORE;
+      break;
+    case '\'' :
+      transitionIndex = TRANS_SQUOTE;
+      break;
+    case '\\' :
+      transitionIndex = TRANS_BACKSLASH;
+    case '"' :
+      transitionIndex = TRANS_DQUOTE;
+      break;
+    case '.' :
+      transitionIndex = TRANS_DOT;
+      break;
+    default :
+      transitionIndex = TRANS_ANY;
+      break;
     }
   }
   
@@ -320,34 +332,35 @@ int Scanner::getTokensProcessed() const
 
 bool Scanner::isTerminalState(int state)
 {
-  switch (state) {
-    case 1 :
-    case 2 :
-    case 4 :
-    case 5 :
-    case 6 :
-    case 7 :
-    case 8 :
-    case 11 :
-    case 13 :
-    case 14 :
-    case 16 :
-    case 18 :
-    case 19 :
-    case 22 :
-    case 23 :
-    case 24 :
-    case 25 :
-    case 26 :
-    case 27 :
-    case 28 :
-    case 29 :
-    case 33 :
-    case 35 :
-    case 36 :
-    case 37 :
-      return true;
-      break;
+  switch (state)
+  {
+  case 1 :
+  case 2 :
+  case 4 :
+  case 5 :
+  case 6 :
+  case 7 :
+  case 8 :
+  case 11 :
+  case 13 :
+  case 14 :
+  case 16 :
+  case 18 :
+  case 19 :
+  case 22 :
+  case 23 :
+  case 24 :
+  case 25 :
+  case 26 :
+  case 27 :
+  case 28 :
+  case 29 :
+  case 33 :
+  case 35 :
+  case 36 :
+  case 37 :
+    return true;
+    break;
   }
 
   return false;
