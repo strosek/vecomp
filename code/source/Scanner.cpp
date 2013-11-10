@@ -4,8 +4,10 @@
 
 #include <string>
 #include <sstream>
-#include <iostream>
-#include <iomanip>
+#ifdef DEBUG
+# include <iostream>
+# include <iomanip>
+#endif
 
 using namespace std;
 
@@ -15,6 +17,7 @@ Scanner::Scanner(FileReader* fileReader, ErrorReporter* errorReporter) :
   m_column(1),
   m_currentToken(0),
   m_nTokens(0),
+  m_nTokensProcessed(0),
   m_tokensLexemes(),
   m_keywordsMap(),
   m_errorReporter(errorReporter),
@@ -23,23 +26,8 @@ Scanner::Scanner(FileReader* fileReader, ErrorReporter* errorReporter) :
   buildKeywordsMap();
 }
 
-// Not to be used, written for removing EffC++ warnings.
-Scanner::Scanner(const Scanner& source) :
-  m_lineNo(1),
-  m_column(1),
-  m_currentToken(0),
-  m_nTokens(0),
-  m_tokensLexemes(),
-  m_keywordsMap(),
-  m_errorReporter(),
-  m_fileReader()
+void Scanner::scan()
 {
-  buildKeywordsMap();
-  m_errorReporter = source.m_errorReporter;
-  m_fileReader = source.m_fileReader;
-}
-
-void Scanner::scan() { 
   if (m_fileReader->getTotalLines() > 0)
   {
     char currentChar;
@@ -144,20 +132,22 @@ void Scanner::scan() {
               token = TOKEN_NEWLINE;
               break;
             default :
+#ifdef DEBUG
               cerr << "vecomp: error de estado siguiente" << endl;
+#endif
               break;
           }
 
           if (token != TOKEN_LINECOMMENT && token != TOKEN_MULTICOMMENT)
           {
-#ifdef DEBUG
-            cout << "pushed element: \"" <<
-                TokenLexeme::getTokenString(token) << ": " << lexeme <<
-                "\" at: " << m_lineNo << ", " << m_column - lexeme.length() <<
-                endl;
-#endif
             m_tokensLexemes.push(TokenLexeme(token, lexeme, m_lineNo, 
                                              m_column - lexeme.length()));
+#ifdef DEBUG
+            cout << "pushed element: " << setw(20) <<
+                TokenLexeme::getTokenString(token) << ": " << setw(20) <<
+                lexeme << "    at: " << m_lineNo << ", " <<
+                m_column - lexeme.length() << endl;
+#endif
           }
 
           token = TOKEN_INVALID;
@@ -170,8 +160,8 @@ void Scanner::scan() {
           cout << "calling lexicalerror" << currentState << " " <<
               currentChar << endl;
 #endif
-          m_errorReporter->writeLexicalError(currentState, currentChar, line,
-                                            lexeme, m_lineNo, m_column);
+          m_errorReporter->writeLexicalError(currentState, currentChar, lexeme,
+                                             m_lineNo, m_column);
 
           token = TOKEN_INVALID;
           lexeme = "";
@@ -196,8 +186,8 @@ void Scanner::scan() {
     cout << "final state: " << currentState << endl;
 #endif
     if (currentState != 0 && !isTerminalState(currentState))
-      m_errorReporter->writeLexicalError(currentState, currentChar, line,
-                                        lexeme, m_lineNo, m_column);
+      m_errorReporter->writeLexicalError(currentState, currentChar, lexeme,
+                                         m_lineNo, m_column);
 
     m_nTokens = m_tokensLexemes.size();
 
@@ -207,12 +197,15 @@ void Scanner::scan() {
   }
 }
 
-TokenLexeme Scanner::getNextTokenLexeme() {
+TokenLexeme Scanner::getNextTokenLexeme()
+{
   TokenLexeme temporal;
   if (!m_tokensLexemes.empty()) {
     temporal = m_tokensLexemes.front();
     m_tokensLexemes.pop();
   }
+  ++m_nTokensProcessed;
+
   return temporal;
 }
 
@@ -315,11 +308,18 @@ Transition_t Scanner::getTransitionIndex(char character) {
   return transitionIndex;
 }
 
-int Scanner::getMaxTokens() const {
+int Scanner::getMaxTokens() const
+{
   return m_nTokens;
 }
 
-bool Scanner::isTerminalState(int state) {
+int Scanner::getTokensProcessed() const
+{
+  return m_nTokensProcessed;
+}
+
+bool Scanner::isTerminalState(int state)
+{
   switch (state) {
     case 1 :
     case 2 :

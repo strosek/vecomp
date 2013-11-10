@@ -140,6 +140,7 @@ public:
 
   void        scan();
   int         getMaxTokens() const;
+  int         getTokensProcessed() const;
   TokenLexeme getNextTokenLexeme();
 
 private:
@@ -151,6 +152,7 @@ private:
   size_t                            m_column;
   int                               m_currentToken;
   int                               m_nTokens;
+  int                               m_nTokensProcessed;
   std::queue<TokenLexeme>           m_tokensLexemes;
   std::map<std::string, Keyword_t>  m_keywordsMap;
   ErrorReporter*                    m_errorReporter;

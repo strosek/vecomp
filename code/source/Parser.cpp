@@ -12,7 +12,6 @@
 using namespace std;
 
 Parser::Parser(FileReader* fileReader, ErrorReporter* errorReporter) :
-  m_tokenNo(0),
   m_currentToken(),
   m_scanner(Scanner(fileReader, errorReporter)),
   m_errorReporter(errorReporter),
@@ -31,10 +30,10 @@ void Parser::parse()
   program();
 
 #ifdef DEBUG
-    cout << "expected tokens: " << m_tokenNo << ", got: " <<
-        m_scanner.getMaxTokens() << endl;
+    cout << "expected tokens: " << m_scanner.getTokensProcessed() <<
+        ", got: " << m_scanner.getMaxTokens() << endl;
 #endif
-  if (m_tokenNo != m_scanner.getMaxTokens())
+  if (m_scanner.getTokensProcessed() != m_scanner.getMaxTokens())
   {
     m_errorReporter->writeError(
         "codigo incompleto, cantidad de tokens incongruente");
@@ -160,14 +159,13 @@ void Parser::program()
   if (m_errorReporter->getErrors() >= m_maxErrors)
     return;
 
-  checkLexeme("paquete");
+  checkLexeme("paquete", false);
 
-  checkLexeme("principal");
+  checkLexeme("principal", false);
 
   do
   {
     m_currentToken = m_scanner.getNextTokenLexeme();
-    ++m_tokenNo;
     if (m_currentToken.getLexeme().compare("var") == 0)
     {
       variables();
@@ -183,7 +181,7 @@ void Parser::program()
   } while ((m_currentToken.getLexeme().compare("var")   ||
             m_currentToken.getLexeme().compare("const") ||
             m_currentToken.getLexeme().compare("funcion")) &&
-            m_tokenNo < m_scanner.getMaxTokens());
+            m_scanner.getTokensProcessed() < m_scanner.getMaxTokens());
 }
 
 void Parser::useDimenison()
@@ -251,15 +249,22 @@ void Parser::variables()
   if (m_errorReporter->getErrors() >= m_maxErrors)
     return;
 
-  checkToken(TOKEN_IDEN);
+  m_currentToken = m_scanner.getNextTokenLexeme();
+  if (m_currentToken.getLexeme().compare("("))
+  {
+    checkToken(TOKEN_IDEN, false);
+  }
 }
 
-void Parser::checkToken(TokenType_t expectedToken)
+void Parser::checkToken(TokenType_t expectedToken, bool isLookedForward)
 {
   if (m_errorReporter->getErrors() < m_maxErrors)
   {
-    m_currentToken = m_scanner.getNextTokenLexeme();
-    ++m_tokenNo;
+    if (!isLookedForward)
+    {
+      m_currentToken = m_scanner.getNextTokenLexeme();
+    }
+
     if (m_currentToken.getToken() != expectedToken)
     {
       m_errorReporter->writeSyntaxError(expectedToken,
@@ -269,12 +274,15 @@ void Parser::checkToken(TokenType_t expectedToken)
   }
 }
 
-void Parser::checkLexeme(const string& expectedLexeme)
+void Parser::checkLexeme(const string& expectedLexeme, bool isLookedForward)
 {
   if (m_errorReporter->getErrors() < m_maxErrors)
   {
-    m_currentToken = m_scanner.getNextTokenLexeme();
-    ++m_tokenNo;
+    if (!isLookedForward)
+    {
+      m_currentToken = m_scanner.getNextTokenLexeme();
+    }
+
     if (m_currentToken.getLexeme().compare(expectedLexeme) != 0)
     {
       m_errorReporter->writeSyntaxError(expectedLexeme,

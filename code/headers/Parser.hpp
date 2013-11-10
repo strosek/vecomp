@@ -52,10 +52,9 @@ private:
   void useParameters();
   void variables();
 
-  void checkToken(TokenType_t token);
-  void checkLexeme(const std::string& lexeme);
+  void checkToken(TokenType_t token, bool isLookedForward);
+  void checkLexeme(const std::string& lexeme, bool isLookedForward);
 
-  int            m_tokenNo;
   TokenLexeme    m_currentToken;
   Scanner        m_scanner;
   ErrorReporter* m_errorReporter;
