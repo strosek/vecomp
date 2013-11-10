@@ -72,101 +72,100 @@ void ErrorReporter::writeError(const string& message)
 }
 
 void ErrorReporter::writeLexicalError(int state, char currentChar,
-                                      const string& line, const string& lexeme,
-                                      int lineNo, int columnNo) {
+                                      const string& lexeme, int line,
+                                      int column)
+{
   writeErrorsFileHeader();
 
   ostringstream messageBuilder;
-  switch (state) {
-    case 0 :
-      messageBuilder << "simbolo ilegal: '" << currentChar << "'";
-      break;
-    case 3 :
-      messageBuilder << "constante hexadecimal incompleta, se encontro : '";
-      if (!isspace(currentChar))
-        messageBuilder << currentChar;
-      else
-        messageBuilder << ' ';
-      messageBuilder << "', se esperaba digito";
-      break;
-    case 6 :
-    case 10 :
-      messageBuilder << "constante flotante incompleta, se encontro : '";
-      if (!isspace(currentChar))
-        messageBuilder << currentChar;
-      else
-        messageBuilder << ' ';
-      messageBuilder << "', se esperaba digito";
-      break;
-    case 9 :
-      messageBuilder << 
-          "constante flotante incompleta, se encontro : '";
-      if (!isspace(currentChar))
-        messageBuilder << currentChar;
-      else
-        messageBuilder << ' ';
-      messageBuilder << "', se esperaba digito o signo";
-      break;
-    case 17 :
-      messageBuilder << "comentario multilinea sin cerrar";
-      break;
-    case 20 :
-      messageBuilder << "operador logico incompleto, se encontro: '";
-      if (!isspace(currentChar))
-        messageBuilder << currentChar;
-      else
-        messageBuilder << ' ';
-      messageBuilder << "', se esperaba '|'";
-      break;
-    case 21 :
-      messageBuilder << "operador logico incompleto, se encontro: '";
-      if (!isspace(currentChar))
-        messageBuilder << currentChar;
-      else
-        messageBuilder << ' ';
-      messageBuilder << "', se esperaba '&'";
-      break;
-    case 30 :
-      messageBuilder << "constante caracter incompleta, se encontro: '";
-      if (!isspace(currentChar))
-        messageBuilder << currentChar;
-      else
-        messageBuilder << ' ';
-      messageBuilder << "', se esperaba '\\' o letra";
-      break;
-    case 31 :
-      messageBuilder << "constante caracter incompleta, se encontro: '";
-      if (!isspace(currentChar))
-        messageBuilder << currentChar;
-      else
-        messageBuilder << ' ';
-      messageBuilder << "', se esperaba letra";
-      break;
-    case 32 :
-      messageBuilder << "constante caracter incompleta, se encontro: '";
-      if (!isspace(currentChar))
-        messageBuilder << currentChar;
-      else
-        messageBuilder << ' ';
-      messageBuilder << "', se esperaba '''";
-      break;
-    case 34 :
-      messageBuilder << "comentario multilinea sin cerrar";
-      break;
-    default :
-      messageBuilder << "error desconocido";
-      break;
+  switch (state)
+  {
+  case 0 :
+    messageBuilder << "simbolo ilegal: '" << currentChar << "'";
+    break;
+  case 3 :
+    messageBuilder << "constante hexadecimal incompleta, se encontro : '";
+    if (!isspace(currentChar))
+      messageBuilder << currentChar;
+    else
+      messageBuilder << ' ';
+    messageBuilder << "', se esperaba digito";
+    break;
+  case 6 :
+  case 10 :
+    messageBuilder << "constante flotante incompleta, se encontro : '";
+    if (!isspace(currentChar))
+      messageBuilder << currentChar;
+    else
+      messageBuilder << ' ';
+    messageBuilder << "', se esperaba digito";
+    break;
+  case 9 :
+    messageBuilder << 
+        "constante flotante incompleta, se encontro : '";
+    if (!isspace(currentChar))
+      messageBuilder << currentChar;
+    else
+      messageBuilder << ' ';
+    messageBuilder << "', se esperaba digito o signo";
+    break;
+  case 17 :
+    messageBuilder << "comentario multilinea sin cerrar";
+    break;
+  case 20 :
+    messageBuilder << "operador logico incompleto, se encontro: '";
+    if (!isspace(currentChar))
+      messageBuilder << currentChar;
+    else
+      messageBuilder << ' ';
+    messageBuilder << "', se esperaba '|'";
+    break;
+  case 21 :
+    messageBuilder << "operador logico incompleto, se encontro: '";
+    if (!isspace(currentChar))
+      messageBuilder << currentChar;
+    else
+      messageBuilder << ' ';
+    messageBuilder << "', se esperaba '&'";
+    break;
+  case 30 :
+    messageBuilder << "constante caracter incompleta, se encontro: '";
+    if (!isspace(currentChar))
+      messageBuilder << currentChar;
+    else
+      messageBuilder << ' ';
+    messageBuilder << "', se esperaba '\\' o letra";
+    break;
+  case 31 :
+    messageBuilder << "constante caracter incompleta, se encontro: '";
+    if (!isspace(currentChar))
+      messageBuilder << currentChar;
+    else
+      messageBuilder << ' ';
+    messageBuilder << "', se esperaba letra";
+    break;
+  case 32 :
+    messageBuilder << "constante caracter incompleta, se encontro: '";
+    if (!isspace(currentChar))
+      messageBuilder << currentChar;
+    else
+      messageBuilder << ' ';
+    messageBuilder << "', se esperaba '''";
+    break;
+  case 34 :
+    messageBuilder << "comentario multilinea sin cerrar";
+    break;
+  default :
+    messageBuilder << "error desconocido";
+    break;
   }
   
-#ifdef DEBUG
-  cout << "inside call of weird function: errorOutOpen? " <<
-      m_errorOut.is_open() << endl;
-#endif
-  m_errorOut << setw(WIDTH_NUMBER) << lineNo <<
-      setw(WIDTH_NUMBER) << columnNo <<
+  m_errorOut << setw(WIDTH_NUMBER) << line <<
+      setw(WIDTH_NUMBER) << column <<
       setw(WIDTH_LEXEME) << lexeme << 
       setw(WIDTH_MESSAGE) << messageBuilder.str() <<
-      setw(WIDTH_LINE) << line;
+      setw(WIDTH_LINE) << m_fileReader->getTextAtLine(line - 1);
+  m_errorOut.flush();
 
   ++m_errors;
 }
@@ -185,7 +184,8 @@ void ErrorReporter::writeSyntaxError(const std::string& expectedLexeme,
       setw(WIDTH_NUMBER) << column <<
       setw(WIDTH_LEXEME) << actualLexeme << 
       setw(WIDTH_MESSAGE) << messageBuilder.str() <<
-      setw(WIDTH_LINE) << m_fileReader->getTextAtLine(line - 1) << endl;
+      setw(WIDTH_LINE) << m_fileReader->getTextAtLine(line - 1);
+  m_errorOut.flush();
   ++m_errors;
 }
 
@@ -205,15 +205,15 @@ void ErrorReporter::writeSyntaxError(TokenType_t expectedToken,
       setw(WIDTH_NUMBER) << column <<
       setw(WIDTH_LEXEME) << TokenLexeme::getTokenString(actualToken) << 
       setw(WIDTH_MESSAGE) << messageBuilder.str() <<
-      setw(WIDTH_LINE) << m_fileReader->getTextAtLine(line - 1) << endl;
+      setw(WIDTH_LINE) << m_fileReader->getTextAtLine(line - 1);
+  m_errorOut.flush();
   ++m_errors;
 }
 
-void ErrorReporter::writeErrorsFileHeader() {
-#ifdef DEBUG
-  cout << "errorOutOpen? " << m_errorOut.is_open() << endl;
-#endif
-  if (!m_errorOut.is_open()) {
+void ErrorReporter::writeErrorsFileHeader()
+{
+  if (!m_errorOut.is_open())
+  {
     m_errorOut.open(m_outFileName, ios::trunc);
 
     for (int i = 0; 

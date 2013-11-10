@@ -18,7 +18,7 @@ public:
   static ErrorReporter* getInstance(const std::string& outFileName);
 
   void writeError(const std::string& message);
-  void writeLexicalError(int state, char currentChar, const std::string& line,
+  void writeLexicalError(int state, char currentChar,
                          const std::string& lexeme, int lineNo, int columnNo);
   void writeSyntaxError(const std::string& expectedLexeme,
                         const std::string& actualLexeme, int line, int column);
