@@ -25,6 +25,7 @@ private:
   void block(bool isLookedForward);
   void caseStatement(bool isLookedForward);
   void command(bool isLookedForward);
+  void constant(bool isLookedForward);
   void constantsDeclaration(bool isLookedForward);
   void dimension(bool isLookedForward);
   void exponent(bool isLookedForward);
@@ -56,6 +57,7 @@ private:
   void checkToken(TokenType_t token, bool isLookedForward);
   void checkLexeme(const std::string& lexeme, bool isLookedForward);
   void checkNativeDataType(bool isLookedForward);
+  void checkLiteral(bool isLookedForward);
 
   TokenLexeme    m_currentToken;
   Scanner        m_scanner;

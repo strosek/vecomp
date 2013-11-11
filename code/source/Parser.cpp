@@ -3,7 +3,6 @@
 
 #include "../headers/Parser.hpp"
 
-#include <string>
 #include <cstdlib>
 #ifdef DEBUG
 # include <iostream>
@@ -74,6 +73,36 @@ void Parser::constantsDeclaration(bool isLookedForward)
 {
   if (m_errorReporter->getErrors() >= m_maxErrors)
     return;
+
+  checkLexeme("const", true);
+
+  m_currentToken = m_scanner.getNextTokenLexeme();
+  if (m_currentToken.getLexeme().compare("("))
+  {
+    do
+    {
+      constant(false);
+      m_currentToken = m_scanner.getNextTokenLexeme();
+    } while (m_currentToken.getToken() == TOKEN_NEWLINE);
+
+    checkLexeme(")", true);
+  }
+  else
+  {
+    constant(true);
+  }
+}
+
+void Parser::constant()
+{
+  if (m_errorReporter->getErrors() >= m_maxErrors)
+    return;
+
+  checkToken(TOKEN_IDEN, true);
+
+  checkToken(TOKEN_ASSIGNOP, false);
+
+  checkLiteral(false);
 }
 
 void Parser::dimension(bool isLookedForward)
@@ -273,8 +302,9 @@ void Parser::variablesList(bool isLookedForward)
   {
     checkToken(TOKEN_IDEN, isLookedForward);
     m_currentToken = m_scanner.getNextTokenLexeme();
-  } while (m_currentToken.getLexeme().compare(","));
-  
+  } while (m_currentToken.getLexeme().compare(",") == 0);
+
+  checkNativeDataType(true);
 }
 
 void Parser::checkToken(TokenType_t expectedToken, bool isLookedForward)
@@ -328,6 +358,29 @@ void Parser::checkNativeDataType(bool isLookedForward)
         m_currentToken.getLexeme().compare("alfabetico") != 0)
     {
       m_errorReporter->writeSyntaxError("tipo_dato",
+          m_currentToken.getLexeme(), m_currentToken.getLine(),
+          m_currentToken.getRow());
+    }
+  }
+}
+
+void Parser::checkLiteral(bool isLookedForward)
+{
+  if (m_errorReporter->getErrors() < m_maxErrors)
+  {
+    if (!isLookedForward)
+    {
+      m_currentToken = m_scanner.getNextTokenLexeme();
+    }
+
+    if (m_currentToken.getToken() != TOKEN_DEC &&
+        m_currentToken.getToken() != TOKEN_OCT &&
+        m_currentToken.getToken() != TOKEN_HEX &&
+        m_currentToken.getToken() != TOKEN_FLOAT &&
+        m_currentToken.getToken() != TOKEN_STRING &&
+        m_currentToken.getToken() != TOKEN_CHARCONST)
+    {
+      m_errorReporter->writeSyntaxError("constante",
           m_currentToken.getLexeme(), m_currentToken.getLine(),
           m_currentToken.getRow());
     }
