@@ -190,7 +190,7 @@ void ErrorReporter::writeSyntaxError(const std::string& expectedLexeme,
 }
 
 void ErrorReporter::writeSyntaxError(TokenType_t expectedToken,
-    TokenType_t actualToken, int line, int column)
+    TokenType_t actualToken, const string& actualLexeme, int line, int column)
 {
   writeErrorsFileHeader();
 
@@ -203,7 +203,7 @@ void ErrorReporter::writeSyntaxError(TokenType_t expectedToken,
 
   m_errorOut << setw(WIDTH_NUMBER) << line <<
       setw(WIDTH_NUMBER) << column <<
-      setw(WIDTH_LEXEME) << TokenLexeme::getTokenString(actualToken) << 
+      setw(WIDTH_LEXEME) << actualLexeme << 
       setw(WIDTH_MESSAGE) << messageBuilder.str() <<
       setw(WIDTH_LINE) << m_fileReader->getTextAtLine(line - 1);
   m_errorOut.flush();

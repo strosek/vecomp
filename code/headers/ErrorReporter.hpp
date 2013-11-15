@@ -4,6 +4,7 @@
 #define ERROR_REPORTER_HPP
 
 #include <fstream>
+#include <string>
 
 // Forward declaration to avoid class dependency problems
 class FileReader;
@@ -23,7 +24,7 @@ public:
   void writeSyntaxError(const std::string& expectedLexeme,
                         const std::string& actualLexeme, int line, int column);
   void writeSyntaxError(TokenType_t expectedToken, TokenType_t actualToken,
-                        int line, int column);
+                        const std::string& actualLexeme, int line, int column);
 
   void setFileReader(FileReader* fileReader);
   void setMaxErrors(int maxErrors);
