@@ -1,6 +1,6 @@
-Classfile /home/edcg/Documents/school/tcompiladores/go_compiler/resources/class/Function.class
-  Last modified Nov 8, 2013; size 456 bytes
-  MD5 checksum d51500ab0a882efee7be8884b6c23fbf
+Classfile /home/edcg/Garbage/vecomp/resources/class/Function.class
+  Last modified Nov 15, 2013; size 694 bytes
+  MD5 checksum da06c61649070ae9791added7b152b15
   Compiled from "Function.java"
 public class Function
   SourceFile: "Function.java"
@@ -8,36 +8,50 @@ public class Function
   major version: 51
   flags: ACC_PUBLIC, ACC_SUPER
 Constant pool:
-   #1 = Methodref          #6.#17         //  java/lang/Object."<init>":()V
-   #2 = Fieldref           #18.#19        //  java/lang/System.out:Ljava/io/PrintStream;
-   #3 = Methodref          #5.#20         //  Function.function:()I
-   #4 = Methodref          #21.#22        //  java/io/PrintStream.println:(I)V
-   #5 = Class              #23            //  Function
-   #6 = Class              #24            //  java/lang/Object
-   #7 = Utf8               <init>
-   #8 = Utf8               ()V
-   #9 = Utf8               Code
-  #10 = Utf8               LineNumberTable
-  #11 = Utf8               function
-  #12 = Utf8               ()I
-  #13 = Utf8               main
-  #14 = Utf8               ([Ljava/lang/String;)V
-  #15 = Utf8               SourceFile
-  #16 = Utf8               Function.java
-  #17 = NameAndType        #7:#8          //  "<init>":()V
-  #18 = Class              #25            //  java/lang/System
-  #19 = NameAndType        #26:#27        //  out:Ljava/io/PrintStream;
-  #20 = NameAndType        #11:#12        //  function:()I
-  #21 = Class              #28            //  java/io/PrintStream
-  #22 = NameAndType        #29:#30        //  println:(I)V
-  #23 = Utf8               Function
-  #24 = Utf8               java/lang/Object
-  #25 = Utf8               java/lang/System
-  #26 = Utf8               out
-  #27 = Utf8               Ljava/io/PrintStream;
-  #28 = Utf8               java/io/PrintStream
-  #29 = Utf8               println
-  #30 = Utf8               (I)V
+   #1 = Methodref          #11.#25        //  java/lang/Object."<init>":()V
+   #2 = Fieldref           #26.#27        //  java/lang/System.out:Ljava/io/PrintStream;
+   #3 = String             #28            //  Hello
+   #4 = Methodref          #29.#30        //  java/io/PrintStream.println:(Ljava/lang/String;)V
+   #5 = String             #31            //  AnAnswer
+   #6 = Methodref          #10.#32        //  Function.giveAnswer:()Ljava/lang/String;
+   #7 = Methodref          #10.#33        //  Function.function:()I
+   #8 = Methodref          #29.#34        //  java/io/PrintStream.println:(I)V
+   #9 = Methodref          #10.#35        //  Function.sayHello:()V
+  #10 = Class              #36            //  Function
+  #11 = Class              #37            //  java/lang/Object
+  #12 = Utf8               <init>
+  #13 = Utf8               ()V
+  #14 = Utf8               Code
+  #15 = Utf8               LineNumberTable
+  #16 = Utf8               function
+  #17 = Utf8               ()I
+  #18 = Utf8               sayHello
+  #19 = Utf8               giveAnswer
+  #20 = Utf8               ()Ljava/lang/String;
+  #21 = Utf8               main
+  #22 = Utf8               ([Ljava/lang/String;)V
+  #23 = Utf8               SourceFile
+  #24 = Utf8               Function.java
+  #25 = NameAndType        #12:#13        //  "<init>":()V
+  #26 = Class              #38            //  java/lang/System
+  #27 = NameAndType        #39:#40        //  out:Ljava/io/PrintStream;
+  #28 = Utf8               Hello
+  #29 = Class              #41            //  java/io/PrintStream
+  #30 = NameAndType        #42:#43        //  println:(Ljava/lang/String;)V
+  #31 = Utf8               AnAnswer
+  #32 = NameAndType        #19:#20        //  giveAnswer:()Ljava/lang/String;
+  #33 = NameAndType        #16:#17        //  function:()I
+  #34 = NameAndType        #42:#44        //  println:(I)V
+  #35 = NameAndType        #18:#13        //  sayHello:()V
+  #36 = Utf8               Function
+  #37 = Utf8               java/lang/Object
+  #38 = Utf8               java/lang/System
+  #39 = Utf8               out
+  #40 = Utf8               Ljava/io/PrintStream;
+  #41 = Utf8               java/io/PrintStream
+  #42 = Utf8               println
+  #43 = Utf8               (Ljava/lang/String;)V
+  #44 = Utf8               (I)V
 {
   public Function();
     flags: ACC_PUBLIC
@@ -49,15 +63,42 @@ Constant pool:
       LineNumberTable:
         line 1: 0
 
+  public static void sayHello();
+    flags: ACC_PUBLIC, ACC_STATIC
+    Code:
+      stack=2, locals=0, args_size=0
+         0: getstatic     #2                  // Field java/lang/System.out:Ljava/io/PrintStream;
+         3: ldc           #3                  // String Hello
+         5: invokevirtual #4                  // Method java/io/PrintStream.println:(Ljava/lang/String;)V
+         8: return        
+      LineNumberTable:
+        line 10: 0
+        line 11: 8
+
+  protected static java.lang.String giveAnswer();
+    flags: ACC_PROTECTED, ACC_STATIC
+    Code:
+      stack=1, locals=0, args_size=0
+         0: ldc           #5                  // String AnAnswer
+         2: areturn       
+      LineNumberTable:
+        line 15: 0
+
   public static void main(java.lang.String[]);
     flags: ACC_PUBLIC, ACC_STATIC
     Code:
       stack=2, locals=1, args_size=1
          0: getstatic     #2                  // Field java/lang/System.out:Ljava/io/PrintStream;
-         3: invokestatic  #3                  // Method function:()I
-         6: invokevirtual #4                  // Method java/io/PrintStream.println:(I)V
-         9: return        
+         3: invokestatic  #6                  // Method giveAnswer:()Ljava/lang/String;
+         6: invokevirtual #4                  // Method java/io/PrintStream.println:(Ljava/lang/String;)V
+         9: getstatic     #2                  // Field java/lang/System.out:Ljava/io/PrintStream;
+        12: invokestatic  #7                  // Method function:()I
+        15: invokevirtual #8                  // Method java/io/PrintStream.println:(I)V
+        18: invokestatic  #9                  // Method sayHello:()V
+        21: return        
       LineNumberTable:
-        line 10: 0
-        line 11: 9
+        line 20: 0
+        line 21: 9
+        line 22: 18
+        line 23: 21
 }
