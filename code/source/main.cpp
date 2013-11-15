@@ -25,10 +25,6 @@ int main(int argc, char** argv)
     errorReporter = ErrorReporter::getInstance();
     FileReader* fileReader = FileReader::getInstance();
 
-#ifdef DEBUG
-    printf("ERPtr: %p, FRPtr: %p", errorReporter, fileReader);
-#endif
-
     errorReporter->setFileReader(fileReader);
     fileReader->setErrorReporter(errorReporter);
 
@@ -36,6 +32,11 @@ int main(int argc, char** argv)
 
     Parser parser(fileReader, errorReporter);
     parser.parse();
+
+#ifdef DEBUG
+    cout << "total errors: " << errorReporter->getErrors() <<
+        " total warnings: " << errorReporter->getWarnings() << endl;
+#endif
   }
   else
   {
