@@ -20,7 +20,8 @@ public:
 
   Parser& operator=(const Parser& rhs);
 private:
-  void andoperator(bool isLookedForward);
+  void andOperator(bool isLookedForward);
+  void argumentsList(bool isLookedForward);
   void assign(bool isLookedForward);
   void block(bool isLookedForward);
   void caseStatement(bool isLookedForward);
@@ -31,6 +32,7 @@ private:
   void exponent(bool isLookedForward);
   void expression(bool isLookedForward);
   void forStatement(bool isLookedForward);
+  void functionCall(bool isLookedForward);
   void functionDeclaration(bool isLookedForward);
   void functionSign(bool isLookedForward);
   void ifStatement(bool isLookedForward);
@@ -41,7 +43,7 @@ private:
   void parameters(bool isLookedForward);
   void print(bool isLookedForward);
   void program();
-  void useDimenison(bool isLookedForward);
+  void useDimension(bool isLookedForward);
   void read(bool isLookedForward);
   void relational(bool isLookedForward);
   void returnExpression(bool isLookedForward);
