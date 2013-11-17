@@ -47,13 +47,14 @@ private:
   void returnExpression(bool isLookedForward);
   void returnType(bool isLookedForward);
   void sign(bool isLookedForward);
-  void statement(bool isLookedForward);
+  void statements(bool isLookedForward);
   void term(bool isLookedForward);
   void type(bool isLookedForward);
   void useParameters(bool isLookedForward);
   void variablesDeclaration(bool isLookedForward);
   void variablesList(bool isLookedForward);
 
+  void advanceToken();
   void checkToken(TokenType_t token, bool isLookedForward);
   void checkLexeme(const std::string& lexeme, bool isLookedForward);
   void checkNativeDataType(bool isLookedForward);
