@@ -63,11 +63,15 @@ void ErrorReporter::writeError(const string& message)
 {
   writeErrorsFileHeader();
 
-  m_errorOut << setw(WIDTH_NUMBER) << ' ' <<
-      setw(WIDTH_NUMBER) << ' ' <<
-      setw(WIDTH_LEXEME) << ' ' << 
-      setw(WIDTH_MESSAGE) << message <<
-      setw(WIDTH_LINE) << ' ' << endl;
+  if (m_errors < m_maxErrors)
+  {
+    m_errorOut << setw(WIDTH_NUMBER) << ' ' <<
+        setw(WIDTH_NUMBER) << ' ' <<
+        setw(WIDTH_LEXEME) << ' ' << 
+        setw(WIDTH_MESSAGE) << message <<
+        setw(WIDTH_LINE) << ' ' << endl;
+  }
+
   ++m_errors;
 }
 
@@ -160,12 +164,15 @@ void ErrorReporter::writeLexicalError(int state, char currentChar,
     break;
   }
   
-  m_errorOut << setw(WIDTH_NUMBER) << line <<
-      setw(WIDTH_NUMBER) << column <<
-      setw(WIDTH_LEXEME) << lexeme << 
-      setw(WIDTH_MESSAGE) << messageBuilder.str() <<
-      setw(WIDTH_LINE) << m_fileReader->getTextAtLine(line - 1);
-  m_errorOut.flush();
+  if (m_errors < m_maxErrors)
+  {
+    m_errorOut << setw(WIDTH_NUMBER) << line <<
+        setw(WIDTH_NUMBER) << column <<
+        setw(WIDTH_LEXEME) << lexeme << 
+        setw(WIDTH_MESSAGE) << messageBuilder.str() <<
+        setw(WIDTH_LINE) << m_fileReader->getTextAtLine(line - 1);
+    m_errorOut.flush();
+  }
 
   ++m_errors;
 }
@@ -180,12 +187,16 @@ void ErrorReporter::writeSyntaxError(const std::string& expectedLexeme,
   messageBuilder << "se esperaba lexema: \"" << expectedLexeme <<
                     "\", se recibio: \"" << actualLexeme << "\"";
 
-  m_errorOut << setw(WIDTH_NUMBER) << line <<
-      setw(WIDTH_NUMBER) << column <<
-      setw(WIDTH_LEXEME) << actualLexeme << 
-      setw(WIDTH_MESSAGE) << messageBuilder.str() <<
-      setw(WIDTH_LINE) << m_fileReader->getTextAtLine(line - 1);
-  m_errorOut.flush();
+  if (m_errors < m_maxErrors)
+  {
+    m_errorOut << setw(WIDTH_NUMBER) << line <<
+        setw(WIDTH_NUMBER) << column <<
+        setw(WIDTH_LEXEME) << actualLexeme << 
+        setw(WIDTH_MESSAGE) << messageBuilder.str() <<
+        setw(WIDTH_LINE) << m_fileReader->getTextAtLine(line - 1);
+    m_errorOut.flush();
+  }
+
   ++m_errors;
 }
 
@@ -201,12 +212,16 @@ void ErrorReporter::writeSyntaxError(TokenType_t expectedToken,
                     "\", se recibio: \"" <<
                     TokenLexeme::getTokenString(actualToken) << "\"";
 
-  m_errorOut << setw(WIDTH_NUMBER) << line <<
-      setw(WIDTH_NUMBER) << column <<
-      setw(WIDTH_LEXEME) << actualLexeme << 
-      setw(WIDTH_MESSAGE) << messageBuilder.str() <<
-      setw(WIDTH_LINE) << m_fileReader->getTextAtLine(line - 1);
-  m_errorOut.flush();
+  if (m_errors < m_maxErrors)
+  {
+    m_errorOut << setw(WIDTH_NUMBER) << line <<
+        setw(WIDTH_NUMBER) << column <<
+        setw(WIDTH_LEXEME) << actualLexeme << 
+        setw(WIDTH_MESSAGE) << messageBuilder.str() <<
+        setw(WIDTH_LINE) << m_fileReader->getTextAtLine(line - 1);
+    m_errorOut.flush();
+  }
+
   ++m_errors;
 }
 
