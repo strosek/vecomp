@@ -20,7 +20,7 @@ public:
 
   Parser& operator=(const Parser& rhs);
 private:
-  void andOperator(bool isLookedForward);
+  void andOperation(bool isLookedForward);
   void argumentsList(bool isLookedForward);
   void assign(bool isLookedForward);
   void block(bool isLookedForward);
@@ -38,18 +38,19 @@ private:
   void ifStatement(bool isLookedForward);
   void import(bool isLookedForward);
   void multiplication(bool isLookedForward);
-  void notOperator(bool isLookedForward);
+  void notOperation(bool isLookedForward);
   void parameterList(bool isLookedForward);
   void parameters(bool isLookedForward);
   void print(bool isLookedForward);
   void program();
   void useDimension(bool isLookedForward);
   void read(bool isLookedForward);
-  void relational(bool isLookedForward);
+  void relationalOperation(bool isLookedForward);
   void returnExpression(bool isLookedForward);
   void returnType(bool isLookedForward);
   void sign(bool isLookedForward);
   void statements(bool isLookedForward);
+  void sumOperation(bool isLookedForward);
   void term(bool isLookedForward);
   void type(bool isLookedForward);
   void useParameters(bool isLookedForward);
