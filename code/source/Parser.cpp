@@ -155,14 +155,25 @@ void Parser::command(bool isLookedForward)
 
   if (m_currentToken.getToken() == TOKEN_IDEN)
   {
-    advanceToken();
-    if (m_currentToken.getToken() == TOKEN_ASSIGNOP)
+    if (m_currentToken.getLexeme().compare("con") == 0)
     {
-      assign(true);
+      read(true);
     }
-    else if (m_currentToken.getLexeme().compare("(") == 0)
+    else if (m_currentToken.getLexeme().compare("fmt") == 0)
     {
-      functionCall(true);
+      print(true);
+    }
+    else
+    {
+      advanceToken();
+      if (m_currentToken.getToken() == TOKEN_ASSIGNOP)
+      {
+        assign(true);
+      }
+      else if (m_currentToken.getLexeme().compare("(") == 0)
+      {
+        functionCall(true);
+      }
     }
   }
   else if (m_currentToken.getLexeme().compare("si") == 0)
@@ -302,6 +313,34 @@ void Parser::forStatement(bool isLookedForward)
 #endif
   if (m_errorReporter->getErrors() >= m_maxErrors)
     return;
+  
+  checkLexeme("desde", isLookedForward);
+  checkLexeme("(", false);
+
+  assign(false)
+  while (m_currentToken.getLexeme().compare(",") == 0)
+  {
+    assign(true);
+    advanceToken();
+  }
+  checkLexeme(";", true);
+
+  advanceToken();
+  if (m_currentToken.getLexeme().compare(";") != 0)
+  {
+    expression(true);
+  }
+  checkLexeme(";", false);
+
+  assign(false)
+  while (m_currentToken.getLexeme().compare(",") == 0)
+  {
+    assign(true);
+    advanceToken();
+  }
+  checkLexeme(")", true);
+  block(false);
+
 #ifdef DEBUG
   cout << "::: exit forStatement()" << endl;
 #endif
@@ -509,6 +548,23 @@ void Parser::print(bool isLookedForward)
 #endif
   if (m_errorReporter->getErrors() >= m_maxErrors)
     return;
+
+  checkLexeme("fmt", true);
+  checkLexeme(".", false);
+
+  advanceToken();
+  if (m_currentToken.getLexeme().compare("Imprime") != 0 ||
+      m_currentToken.getLexeme().compare("Imprimenl") != 0)
+  {
+    m_errorReporter->writeSyntaxError("Imprime o Imprimenl",
+        m_currentToken.getLexeme(), m_currentToken.getLine(),
+        m_currentToken.getRow()); 
+  }
+  
+  checkLexeme("(", false);
+  argumentsList();
+  checkLexeme(")", true);
+
 #ifdef DEBUG
   cout << "::: exit print()" << endl;
 #endif
@@ -579,6 +635,14 @@ void Parser::read(bool isLookedForward)
 #endif
   if (m_errorReporter->getErrors() >= m_maxErrors)
     return;
+
+  checkLexeme("fmt", true);
+  checkLexeme(".", true);
+  checkLexeme("Lee");
+  checkLexeme("(", false);
+  argumentsList(false);
+  checkLexeme(")", true);
+
 #ifdef DEBUG
   cout << "::: exit read()" << endl;
 #endif
@@ -715,7 +779,8 @@ void Parser::term(bool isLookedForward)
     }
     else if (m_currentToken.getLexeme().compare("(") == 0)
     {
-      useParameters(true);
+      argumentsList(true);
+      checkLexeme(")", true);
     }
   }
   else 
@@ -736,18 +801,6 @@ void Parser::type(bool isLookedForward)
     return;
 #ifdef DEBUG
   cout << "::: exit type()" << endl;
-#endif
-}
-
-void Parser::useParameters(bool isLookedForward)
-{
-#ifdef DEBUG
-  cout << "::: entering useParameters()" << endl;
-#endif
-  if (m_errorReporter->getErrors() >= m_maxErrors)
-    return;
-#ifdef DEBUG
-  cout << "::: exit useParameters()" << endl;
 #endif
 }
 

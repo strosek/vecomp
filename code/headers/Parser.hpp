@@ -53,7 +53,6 @@ private:
   void sumOperation(bool isLookedForward);
   void term(bool isLookedForward);
   void type(bool isLookedForward);
-  void useParameters(bool isLookedForward);
   void variablesDeclaration(bool isLookedForward);
   void variablesList(bool isLookedForward);
 
