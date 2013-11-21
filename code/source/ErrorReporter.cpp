@@ -231,23 +231,13 @@ void ErrorReporter::writeErrorsFileHeader()
   {
     m_errorOut.open(m_outFileName, ios::trunc);
 
-    for (int i = 0; 
-         i < (WIDTH_NUMBER * 2 + WIDTH_LEXEME + WIDTH_MESSAGE + WIDTH_LINE);
-         ++i)
-      m_errorOut << '-';
-    m_errorOut << endl;
-
+    writeErrorsFileSeparator();
     m_errorOut << setw(WIDTH_NUMBER) << "Linea" <<
         setw(WIDTH_NUMBER) << "Columna" <<
         setw(WIDTH_LEXEME) << "Lexema" << 
         setw(WIDTH_MESSAGE) << "Mensaje de error" <<
         setw(WIDTH_LINE) << "Linea" << endl;
-
-    for (int i = 0;
-         i < (WIDTH_NUMBER * 2 + WIDTH_LEXEME + WIDTH_MESSAGE + WIDTH_LINE);
-         ++i)
-      m_errorOut << '-';
-    m_errorOut << endl;
+    writeErrorsFileSeparator();
   }
 }
 
@@ -274,5 +264,35 @@ int  ErrorReporter::getErrors() const
 int  ErrorReporter::getWarnings() const
 {
   return m_warnings;
+}
+
+void ErrorReporter::endErrorsFile()
+{
+  m_errorOut << endl;
+  writeErrorsFileSeparator();
+
+  int totalErrors;
+  if (m_errors > m_maxErrors)
+  {
+    totalErrors = m_maxErrors;
+  }
+  else
+  {
+    totalErrors = m_errors;
+  }
+  m_errorOut << "errores: " << totalErrors << ", advertencias: " <<
+                m_warnings << endl;
+
+  m_errorOut.close();
+}
+
+void ErrorReporter::writeErrorsFileSeparator()
+{
+  for (int i = 0; 
+       i < (WIDTH_NUMBER * 2 + WIDTH_LEXEME + WIDTH_MESSAGE + WIDTH_LINE); ++i)
+  {
+    m_errorOut << '-';
+  }
+  m_errorOut << endl;
 }
 

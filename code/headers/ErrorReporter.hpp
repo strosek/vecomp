@@ -25,6 +25,7 @@ public:
                         const std::string& actualLexeme, int line, int column);
   void writeSyntaxError(TokenType_t expectedToken, TokenType_t actualToken,
                         const std::string& actualLexeme, int line, int column);
+  void endErrorsFile();
 
   void setFileReader(FileReader* fileReader);
   void setMaxErrors(int maxErrors);
@@ -45,6 +46,7 @@ private:
   ~ErrorReporter();
 
   void writeErrorsFileHeader();
+  void writeErrorsFileSeparator();
 
   std::ofstream m_errorOut;
   std::string   m_outFileName;
