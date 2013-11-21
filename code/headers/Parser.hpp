@@ -34,16 +34,13 @@ private:
   void forStatement(bool isLookedForward);
   void functionCall(bool isLookedForward);
   void functionDeclaration(bool isLookedForward);
-  void functionSign(bool isLookedForward);
   void ifStatement(bool isLookedForward);
   void import(bool isLookedForward);
   void multiplication(bool isLookedForward);
   void notOperation(bool isLookedForward);
   void parameterList(bool isLookedForward);
-  void parameters(bool isLookedForward);
   void print(bool isLookedForward);
   void program();
-  void useDimension(bool isLookedForward);
   void read(bool isLookedForward);
   void relationalOperation(bool isLookedForward);
   void returnExpression(bool isLookedForward);
@@ -52,7 +49,6 @@ private:
   void statements(bool isLookedForward);
   void sumOperation(bool isLookedForward);
   void term(bool isLookedForward);
-  void type(bool isLookedForward);
   void variablesDeclaration(bool isLookedForward);
   void variablesList(bool isLookedForward);
 
