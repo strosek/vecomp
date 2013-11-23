@@ -1,8 +1,9 @@
 paquete perro 
-importar ( "fmt" "con" )
+importar ( "fmt"
+           "con" )
 
 const (PI = 3.141592
-           MAX = 30)
+       MAX = 30)
 
 var ( i, j, k, n, vector[MAX] entero
       r, s, t real
