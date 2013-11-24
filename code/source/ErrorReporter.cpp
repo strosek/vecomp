@@ -65,6 +65,9 @@ void ErrorReporter::writeError(const string& message)
 
   if (m_errors < m_maxErrors)
   {
+#ifdef DEBUG
+    cout << "::: writing error" << endl;
+#endif
     m_errorOut << setw(WIDTH_NUMBER) << ' ' <<
         setw(WIDTH_NUMBER) << ' ' <<
         setw(WIDTH_LEXEME) << ' ' << 
@@ -166,6 +169,9 @@ void ErrorReporter::writeLexicalError(int state, char currentChar,
   
   if (m_errors < m_maxErrors)
   {
+#ifdef DEBUG
+    cout << "::: writing error" << endl;
+#endif
     m_errorOut << setw(WIDTH_NUMBER) << line <<
         setw(WIDTH_NUMBER) << column <<
         setw(WIDTH_LEXEME) << lexeme << 
@@ -189,6 +195,9 @@ void ErrorReporter::writeSyntaxError(const std::string& expectedLexeme,
 
   if (m_errors < m_maxErrors)
   {
+#ifdef DEBUG
+    cout << "::: writing error" << endl;
+#endif
     m_errorOut << setw(WIDTH_NUMBER) << line <<
         setw(WIDTH_NUMBER) << column <<
         setw(WIDTH_LEXEME) << actualLexeme << 
@@ -214,6 +223,9 @@ void ErrorReporter::writeSyntaxError(TokenType_t expectedToken,
 
   if (m_errors < m_maxErrors)
   {
+#ifdef DEBUG
+    cout << "::: writing error" << endl;
+#endif
     m_errorOut << setw(WIDTH_NUMBER) << line <<
         setw(WIDTH_NUMBER) << column <<
         setw(WIDTH_LEXEME) << actualLexeme << 
