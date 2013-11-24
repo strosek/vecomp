@@ -48,7 +48,8 @@ void Parser::parse()
 void Parser::andOperation(bool isLookedForward)
 {
 #ifdef DEBUG
-  cout << "::: entering andoperation()" << endl;
+  cout << "::: entering andoperation()";
+  cout << " with isLookedForward=" << isLookedForward << endl;
 #endif
   if (m_errorReporter->getErrors() >= m_maxErrors)
     return;
@@ -67,7 +68,8 @@ void Parser::andOperation(bool isLookedForward)
 void Parser::argumentsList(bool isLookedForward)
 {
 #ifdef DEBUG
-  cout << "::: entering argumentsList()" << endl;
+  cout << "::: entering argumentsList()";
+  cout << " with isLookedForward=" << isLookedForward << endl;
 #endif
   if (m_errorReporter->getErrors() >= m_maxErrors)
     return;
@@ -91,7 +93,8 @@ void Parser::argumentsList(bool isLookedForward)
 void Parser::assign(bool isLookedForward)
 {
 #ifdef DEBUG
-  cout << "::: entering assign()" << endl;
+  cout << "::: entering assign()";
+  cout << " with isLookedForward=" << isLookedForward << endl;
 #endif
   if (m_errorReporter->getErrors() >= m_maxErrors)
     return;
@@ -111,7 +114,8 @@ void Parser::assign(bool isLookedForward)
 void Parser::block(bool isLookedForward)
 {
 #ifdef DEBUG
-  cout << "::: entering block()" << endl;
+  cout << "::: entering block()";
+  cout << " with isLookedForward=" << isLookedForward << endl;
 #endif
   if (m_errorReporter->getErrors() >= m_maxErrors)
     return;
@@ -120,7 +124,7 @@ void Parser::block(bool isLookedForward)
   advanceToken();
   if (m_currentToken.getLexeme().compare("}") != 0)
   {
-    statements(false);
+    statements(true);
   }
   checkLexeme("}", true);
 #ifdef DEBUG
@@ -131,7 +135,8 @@ void Parser::block(bool isLookedForward)
 void Parser::caseStatement(bool isLookedForward)
 {
 #ifdef DEBUG
-  cout << "::: entering caseStatement()" << endl;
+  cout << "::: entering caseStatement()";
+  cout << " with isLookedForward=" << isLookedForward << endl;
 #endif
   if (m_errorReporter->getErrors() >= m_maxErrors)
     return;
@@ -171,7 +176,8 @@ void Parser::caseStatement(bool isLookedForward)
 void Parser::command(bool isLookedForward)
 {
 #ifdef DEBUG
-  cout << "::: entering command()" << endl;
+  cout << "::: entering command()";
+  cout << " with isLookedForward=" << isLookedForward << endl;
 #endif
   if (m_errorReporter->getErrors() >= m_maxErrors)
     return;
@@ -216,10 +222,14 @@ void Parser::command(bool isLookedForward)
   {
     caseStatement(true);
   }
+  else if (m_currentToken.getLexeme().compare("regresa") == 0)
+  {
+    returnExpression(true);
+  }
   else
   {
     m_errorReporter->writeSyntaxError(
-        "identificador, delimitador, si, desde o caso",
+        "identificador, delimitador, si, desde, caso o regresa",
         m_currentToken.getLexeme(), m_currentToken.getLine(),
         m_currentToken.getRow());
   }
@@ -231,7 +241,8 @@ void Parser::command(bool isLookedForward)
 void Parser::constantsDeclaration(bool isLookedForward)
 {
 #ifdef DEBUG
-  cout << "::: entering constantsDeclaration()" << endl;
+  cout << "::: entering constantsDeclaration()";
+  cout << " with isLookedForward=" << isLookedForward << endl;
 #endif
   if (m_errorReporter->getErrors() >= m_maxErrors)
     return;
@@ -266,7 +277,8 @@ void Parser::constantsDeclaration(bool isLookedForward)
 void Parser::constant(bool isLookedForward)
 {
 #ifdef DEBUG
-  cout << "::: entering constant()" << endl;
+  cout << "::: entering constant()";
+  cout << " with isLookedForward=" << isLookedForward << endl;
 #endif
   if (m_errorReporter->getErrors() >= m_maxErrors)
     return;
@@ -289,7 +301,8 @@ void Parser::constant(bool isLookedForward)
 void Parser::dimension(bool isLookedForward)
 {
 #ifdef DEBUG
-  cout << "::: entering dimension()" << endl;
+  cout << "::: entering dimension()";
+  cout << " with isLookedForward=" << isLookedForward << endl;
 #endif
   if (m_errorReporter->getErrors() >= m_maxErrors)
     return;
@@ -316,7 +329,8 @@ void Parser::dimension(bool isLookedForward)
 void Parser::exponent(bool isLookedForward)
 {
 #ifdef DEBUG
-  cout << "::: entering exponent()" << endl;
+  //cout << "::: entering exponent()";
+  //cout << " with isLookedForward=" << isLookedForward << endl;
 #endif
   if (m_errorReporter->getErrors() >= m_maxErrors)
     return;
@@ -326,10 +340,13 @@ void Parser::exponent(bool isLookedForward)
     advanceToken();
   }
 
-  do
+  sign(true);
+
+  if (m_currentToken.getLexeme().compare("^") == 0)
   {
     sign(false);
-  } while (m_currentToken.getLexeme().compare("^") == 0);
+  }
+
 #ifdef DEBUG
   cout << "::: exit exponent()" << endl;
 #endif
@@ -338,7 +355,8 @@ void Parser::exponent(bool isLookedForward)
 void Parser::expression(bool isLookedForward)
 {
 #ifdef DEBUG
-  cout << "::: entering expression()" << endl;
+  cout << "::: entering expression()";
+  cout << " with isLookedForward=" << isLookedForward << endl;
 #endif
   if (m_errorReporter->getErrors() >= m_maxErrors)
     return;
@@ -350,8 +368,7 @@ void Parser::expression(bool isLookedForward)
 
   do
   {
-    andOperation(false);
-    advanceToken();
+    andOperation(true);
   } while (m_currentToken.getLexeme().compare("||") == 0);
 
 #ifdef DEBUG
@@ -362,7 +379,8 @@ void Parser::expression(bool isLookedForward)
 void Parser::forStatement(bool isLookedForward)
 {
 #ifdef DEBUG
-  cout << "::: entering forStatement()" << endl;
+  cout << "::: entering forStatement()";
+  cout << " with isLookedForward=" << isLookedForward << endl;
 #endif
   if (m_errorReporter->getErrors() >= m_maxErrors)
     return;
@@ -402,7 +420,8 @@ void Parser::forStatement(bool isLookedForward)
 void Parser::functionCall(bool isLookedForward)
 {
 #ifdef DEBUG
-  cout << "::: entering functionCall()" << endl;
+  cout << "::: entering functionCall()";
+  cout << " with isLookedForward=" << isLookedForward << endl;
 #endif
   if (m_errorReporter->getErrors() >= m_maxErrors)
     return;
@@ -428,7 +447,8 @@ void Parser::functionCall(bool isLookedForward)
 void Parser::functionDeclaration(bool isLookedForward)
 {
 #ifdef DEBUG
-  cout << "::: entering functionDeclaration()" << endl;
+  cout << "::: entering functionDeclaration()";
+  cout << " with isLookedForward=" << isLookedForward << endl;
 #endif
   if (m_errorReporter->getErrors() >= m_maxErrors)
     return;
@@ -437,7 +457,7 @@ void Parser::functionDeclaration(bool isLookedForward)
   checkToken(TOKEN_IDEN, false);
   checkLexeme("(", false);
   parameterList(false);
-  checkLexeme(")", true);
+  checkLexeme(")", false);
   returnType(false);
   block(false);
 #ifdef DEBUG
@@ -448,12 +468,13 @@ void Parser::functionDeclaration(bool isLookedForward)
 void Parser::ifStatement(bool isLookedForward)
 {
 #ifdef DEBUG
-  cout << "::: entering ifStatement()" << endl;
+  cout << "::: entering ifStatement()";
+  cout << " with isLookedForward=" << isLookedForward << endl;
 #endif
   if (m_errorReporter->getErrors() >= m_maxErrors)
     return;
 
-  checkLexeme("is", isLookedForward);
+  checkLexeme("si", isLookedForward);
   expression(false);
   block(true);
   advanceToken();
@@ -471,7 +492,8 @@ void Parser::ifStatement(bool isLookedForward)
 void Parser::import(bool isLookedForward)
 {
 #ifdef DEBUG
-  cout << "::: entering import()" << endl;
+  cout << "::: entering import()";
+  cout << " with isLookedForward=" << isLookedForward << endl;
 #endif
   if (m_errorReporter->getErrors() >= m_maxErrors)
     return;
@@ -508,7 +530,8 @@ void Parser::import(bool isLookedForward)
 void Parser::multiplication(bool isLookedForward)
 {
 #ifdef DEBUG
-  cout << "::: entering multiplication()" << endl;
+  cout << "::: entering multiplication()";
+  cout << " with isLookedForward=" << isLookedForward << endl;
 #endif
   if (m_errorReporter->getErrors() >= m_maxErrors)
     return;
@@ -533,7 +556,8 @@ void Parser::multiplication(bool isLookedForward)
 void Parser::notOperation(bool isLookedForward)
 {
 #ifdef DEBUG
-  cout << "::: entering notOperation()" << endl;
+  cout << "::: entering notOperation()";
+  cout << " with isLookedForward=" << isLookedForward << endl;
 #endif
   if (m_errorReporter->getErrors() >= m_maxErrors)
     return;
@@ -557,7 +581,8 @@ void Parser::notOperation(bool isLookedForward)
 void Parser::parameterList(bool isLookedForward)
 {
 #ifdef DEBUG
-  cout << "::: entering parameterList()" << endl;
+  cout << "::: entering parameterList()";
+  cout << " with isLookedForward=" << isLookedForward << endl;
 #endif
   if (m_errorReporter->getErrors() >= m_maxErrors)
     return;
@@ -567,11 +592,24 @@ void Parser::parameterList(bool isLookedForward)
     advanceToken();
   }
 
-  do
+  if (m_currentToken.getLexeme().compare(")") != 0)
   {
-    checkToken(TOKEN_IDEN, false);
-    advanceToken();
-  } while (m_currentToken.getLexeme().compare(")") != 0);
+    bool isFirstIteration = true;
+    do
+    {
+      if (isFirstIteration)
+      {
+        checkToken(TOKEN_IDEN, true);
+        isFirstIteration = false;
+      }
+      else
+      {
+        checkToken(TOKEN_IDEN, false);
+      }
+      advanceToken();
+    } while (m_currentToken.getLexeme().compare(",") == 0);
+    checkNativeDataType(true);
+  }
 #ifdef DEBUG
   cout << "::: exit parameterList()" << endl;
 #endif
@@ -580,7 +618,8 @@ void Parser::parameterList(bool isLookedForward)
 void Parser::print(bool isLookedForward)
 {
 #ifdef DEBUG
-  cout << "::: entering print()" << endl;
+  cout << "::: entering print()";
+  cout << " with isLookedForward=" << isLookedForward << endl;
 #endif
   if (m_errorReporter->getErrors() >= m_maxErrors)
     return;
@@ -609,7 +648,7 @@ void Parser::print(bool isLookedForward)
 void Parser::program()
 {
 #ifdef DEBUG
-  cout << "::: entering program()" << endl;
+  cout << "::: entering program()";
 #endif
   if (m_errorReporter->getErrors() >= m_maxErrors)
     return;
@@ -655,7 +694,8 @@ void Parser::program()
 void Parser::read(bool isLookedForward)
 {
 #ifdef DEBUG
-  cout << "::: entering read()" << endl;
+  cout << "::: entering read()";
+  cout << " with isLookedForward=" << isLookedForward << endl;
 #endif
   if (m_errorReporter->getErrors() >= m_maxErrors)
     return;
@@ -675,15 +715,17 @@ void Parser::read(bool isLookedForward)
 void Parser::relationalOperation(bool isLookedForward)
 {
 #ifdef DEBUG
-  cout << "::: entering relationalOperation()" << endl;
+  cout << "::: entering relationalOperation()";
+  cout << " with isLookedForward=" << isLookedForward << endl;
 #endif
   if (m_errorReporter->getErrors() >= m_maxErrors)
     return;
 
-  do
+  sumOperation(isLookedForward);
+  if (m_currentToken.getToken() == TOKEN_RELOP)
   {
-    sumOperation(isLookedForward);
-  } while (m_currentToken.getToken() == TOKEN_RELOP);
+    sumOperation(false);
+  }
 
 #ifdef DEBUG
   cout << "::: exit relationalOperation()" << endl;
@@ -693,7 +735,8 @@ void Parser::relationalOperation(bool isLookedForward)
 void Parser::returnExpression(bool isLookedForward)
 {
 #ifdef DEBUG
-  cout << "::: entering returnExpression()" << endl;
+  cout << "::: entering returnExpression()";
+  cout << " with isLookedForward=" << isLookedForward << endl;
 #endif
   if (m_errorReporter->getErrors() >= m_maxErrors)
     return;
@@ -701,7 +744,7 @@ void Parser::returnExpression(bool isLookedForward)
   checkLexeme("regresa", isLookedForward);
 
   advanceToken();
-  if (m_currentToken.getLexeme().compare(";") != 0 ||
+  if (m_currentToken.getLexeme().compare(";") != 0 &&
       m_currentToken.getToken() != TOKEN_NEWLINE)
   {
     expression(true);
@@ -715,7 +758,8 @@ void Parser::returnExpression(bool isLookedForward)
 void Parser::returnType(bool isLookedForward)
 {
 #ifdef DEBUG
-  cout << "::: entering returnType()" << endl;
+  cout << "::: entering returnType()";
+  cout << " with isLookedForward=" << isLookedForward << endl;
 #endif
   if (m_errorReporter->getErrors() >= m_maxErrors)
     return;
@@ -762,7 +806,8 @@ void Parser::returnType(bool isLookedForward)
 void Parser::sign(bool isLookedForward)
 {
 #ifdef DEBUG
-  cout << "::: entering sign()" << endl;
+  cout << "::: entering sign()";
+  cout << " with isLookedForward=" << isLookedForward << endl;
 #endif
   if (m_errorReporter->getErrors() >= m_maxErrors)
     return;
@@ -776,7 +821,7 @@ void Parser::sign(bool isLookedForward)
   {
     checkLexeme("-", true);
   }
-  term(false);
+  term(true);
 
 #ifdef DEBUG
   cout << "::: exit sign()" << endl;
@@ -786,7 +831,8 @@ void Parser::sign(bool isLookedForward)
 void Parser::statements(bool isLookedForward)
 {
 #ifdef DEBUG
-  cout << "::: entering statements()" << endl;
+  cout << "::: entering statements()";
+  cout << " with isLookedForward=" << isLookedForward << endl;
 #endif
   if (m_errorReporter->getErrors() >= m_maxErrors)
     return;
@@ -800,11 +846,11 @@ void Parser::statements(bool isLookedForward)
     do
     {
       command(true);
-      advanceToken();
 #ifdef DEBUG
     cout << "::: current lexeme (line " << __LINE__ << "): " <<
         m_currentToken.getLexeme() << endl;
 #endif
+      ignoreNewLines(true);
     } while (m_currentToken.getToken() == TOKEN_IDEN               ||
              m_currentToken.getLexeme().compare("si") == 0         ||
              m_currentToken.getLexeme().compare("desde") == 0      ||
@@ -820,11 +866,13 @@ void Parser::statements(bool isLookedForward)
 void Parser::sumOperation(bool isLookedForward)
 {
 #ifdef DEBUG
-  cout << "::: entering sumOperation()" << endl;
+  cout << "::: entering sumOperation()";
+  cout << " with isLookedForward=" << isLookedForward << endl;
 #endif
   if (m_errorReporter->getErrors() >= m_maxErrors)
     return;
 
+  cout << "did not exit in return" << endl;
   if (!isLookedForward)
   {
     advanceToken();
@@ -844,7 +892,8 @@ void Parser::sumOperation(bool isLookedForward)
 void Parser::term(bool isLookedForward)
 {
 #ifdef DEBUG
-  cout << "::: entering term()" << endl;
+  cout << "::: entering term()";
+  cout << " with isLookedForward=" << isLookedForward << endl;
 #endif
   if (m_errorReporter->getErrors() >= m_maxErrors)
     return;
@@ -853,6 +902,10 @@ void Parser::term(bool isLookedForward)
   {
     advanceToken();
   }
+
+#ifdef DEBUG
+  cout << "checking term with lexeme: " << m_currentToken.getLexeme() << endl;
+#endif
   if (m_currentToken.getLexeme().compare("(") == 0)
   {
     checkLexeme("(", true);
@@ -872,9 +925,14 @@ void Parser::term(bool isLookedForward)
       checkLexeme(")", true);
     }
   }
-  else 
+  else if (isLiteral(m_currentToken.getToken()))
   {
-    checkLiteral(true);
+    advanceToken();
+  }
+  else {
+    m_errorReporter->writeSyntaxError("identificador o constante",
+            m_currentToken.getLexeme(), m_currentToken.getLine(),
+            m_currentToken.getRow());
   }
 #ifdef DEBUG
   cout << "::: exit term()" << endl;
@@ -884,7 +942,8 @@ void Parser::term(bool isLookedForward)
 void Parser::variablesDeclaration(bool isLookedForward)
 {
 #ifdef DEBUG
-  cout << "::: entering variablesDeclaration()" << endl;
+  cout << "::: entering variablesDeclaration()";
+  cout << " with isLookedForward=" << isLookedForward << endl;
 #endif
   if (m_errorReporter->getErrors() >= m_maxErrors)
     return;
@@ -898,7 +957,6 @@ void Parser::variablesDeclaration(bool isLookedForward)
     {
       variablesList(false);
       advanceToken();
-      // TODO: ignore extra newlines
 #ifdef DEBUG
     cout << "::: current lexeme (line " << __LINE__ << "): " <<
         m_currentToken.getLexeme() << endl;
@@ -918,18 +976,38 @@ void Parser::variablesDeclaration(bool isLookedForward)
 void Parser::variablesList(bool isLookedForward)
 {
 #ifdef DEBUG
-  cout << "::: entering variablesList()" << endl;
+  cout << "::: entering variablesList()";
+  cout << " with isLookedForward=" << isLookedForward << endl;
 #endif
+  if (!isLookedForward)
+  {
+    advanceToken();
+  }
+
+  bool isFirstIteration = true;
   do
   {
-    checkToken(TOKEN_IDEN, isLookedForward);
+    if (isFirstIteration)
+    {
+      checkToken(TOKEN_IDEN, true);
+      isFirstIteration = false;
+    }
+    else
+    {
+      checkToken(TOKEN_IDEN, false);
+    }
+
     advanceToken();
     if (m_currentToken.getLexeme().compare("[") == 0)
     {
-      expression(false);
-      checkLexeme("]", true);
+      do
+      {
+        expression(false);
+        checkLexeme("]", true);
+        advanceToken();
+      } while (m_currentToken.getLexeme().compare("[") == 0);
     }
-    advanceToken();
+
 #ifdef DEBUG
     cout << "::: current lexeme (line " << __LINE__ << "): " <<
         m_currentToken.getLexeme() << endl;
@@ -999,13 +1077,10 @@ void Parser::checkNativeDataType(bool isLookedForward)
     }
 
 #ifdef DEBUG
-      cout << "::: checking for native data type , got: " <<
+      cout << "::: checking for native data type, got: " <<
           m_currentToken.getLexeme() << endl;
 #endif
-    if (m_currentToken.getLexeme().compare("entero") != 0 &&
-        m_currentToken.getLexeme().compare("real") != 0   &&
-        m_currentToken.getLexeme().compare("logico") != 0 &&
-        m_currentToken.getLexeme().compare("alfabetico") != 0)
+    if (!isNativeDataType(m_currentToken.getLexeme()))
     {
       m_errorReporter->writeSyntaxError("tipo_dato",
           m_currentToken.getLexeme(), m_currentToken.getLine(),
@@ -1027,12 +1102,7 @@ void Parser::checkLiteral(bool isLookedForward)
       cout << "::: checking for constant literal, got: " <<
           m_currentToken.getLexeme() << endl;
 #endif
-    if (m_currentToken.getToken() != TOKEN_DEC &&
-        m_currentToken.getToken() != TOKEN_OCT &&
-        m_currentToken.getToken() != TOKEN_HEX &&
-        m_currentToken.getToken() != TOKEN_FLOAT &&
-        m_currentToken.getToken() != TOKEN_STRING &&
-        m_currentToken.getToken() != TOKEN_CHARCONST)
+    if (!isLiteral(m_currentToken.getToken()))
     {
       m_errorReporter->writeSyntaxError("constante",
           m_currentToken.getLexeme(), m_currentToken.getLine(),
@@ -1044,7 +1114,8 @@ void Parser::checkLiteral(bool isLookedForward)
 void Parser::ignoreNewLines(bool isLookedForward)
 {
 #ifdef DEBUG
-  cout << "::: entering ignoreNewLines()" << endl;
+  cout << "::: entering ignoreNewLines()";
+  cout << " with isLookedForward=" << isLookedForward << endl;
 #endif
   if (!isLookedForward)
   {
@@ -1062,9 +1133,36 @@ void Parser::ignoreNewLines(bool isLookedForward)
 
 void Parser::advanceToken()
 {
-#ifdef DEBUG
-  cout << "::: manual token advance" << endl;
-#endif
   m_currentToken = m_scanner.getNextTokenLexeme();
+#ifdef DEBUG
+  cout << "::: token advance to: " << m_currentToken.getLexeme() << endl;
+#endif
+}
+
+bool Parser::isNativeDataType(const string& lexeme)
+{
+    if (lexeme.compare("entero") == 0 ||
+        lexeme.compare("real") == 0   ||
+        lexeme.compare("logico") == 0 ||
+        lexeme.compare("alfabetico") == 0)
+    {
+      return true;
+    }
+    return false;
+}
+
+bool Parser::isLiteral(TokenType_t token)
+{
+  if (token == TOKEN_DEC       ||
+      token == TOKEN_HEX       ||
+      token == TOKEN_OCT       ||
+      token == TOKEN_FLOAT     ||
+      token == TOKEN_CHARCONST ||
+      token == TOKEN_STRING)
+  {
+    return true;
+  }
+
+  return false;
 }
 

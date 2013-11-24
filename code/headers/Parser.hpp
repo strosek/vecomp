@@ -58,6 +58,8 @@ private:
   void checkNativeDataType(bool isLookedForward);
   void checkLiteral(bool isLookedForward);
   void ignoreNewLines(bool isLookedForward);
+  bool isNativeDataType(const std::string& lexeme);
+  bool isLiteral(TokenType_t token);
 
   TokenLexeme    m_currentToken;
   Scanner        m_scanner;
