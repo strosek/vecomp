@@ -54,10 +54,14 @@ void Parser::andOperation(bool isLookedForward)
   if (m_errorReporter->getErrors() >= m_maxErrors)
     return;
 
+  if (!isLookedForward)
+  {
+    advanceToken();
+  }
+
   do
   {
-    // TODO: define look-forward.
-    notOperation(isLookedForward);
+    notOperation(true);
   } while (m_currentToken.getLexeme().compare("&&") == 0);
 
 #ifdef DEBUG
@@ -77,8 +81,6 @@ void Parser::argumentsList(bool isLookedForward)
   do
   {
     expression(isLookedForward);
-    // TODO: not sure if it will be forward looked.
-    advanceToken();
 #ifdef DEBUG
     cout << "::: current lexeme (line " << __LINE__ << "): " <<
         m_currentToken.getLexeme() << endl;
@@ -126,6 +128,7 @@ void Parser::block(bool isLookedForward)
   {
     statements(true);
   }
+  ignoreNewLines(true);
   checkLexeme("}", true);
 #ifdef DEBUG
   cout << "::: exit block()" << endl;
@@ -182,10 +185,7 @@ void Parser::command(bool isLookedForward)
   if (m_errorReporter->getErrors() >= m_maxErrors)
     return;
 
-  if (!isLookedForward)
-  {
-    advanceToken();
-  }
+  ignoreNewLines(isLookedForward);
 
   if (m_currentToken.getToken() == TOKEN_IDEN)
   {
@@ -256,7 +256,6 @@ void Parser::constantsDeclaration(bool isLookedForward)
     {
       constant(false);
       advanceToken();
-      // TODO: ignore extra newlines
 #ifdef DEBUG
     cout << "::: current lexeme (line " << __LINE__ << "): " <<
         m_currentToken.getLexeme() << endl;
@@ -311,7 +310,6 @@ void Parser::dimension(bool isLookedForward)
   expression(false);
   checkLexeme("]", false);
 
-  // TODO: check if this structure can be optimized.
   advanceToken();
   while (m_currentToken.getLexeme().compare("[") == 0)
   {
@@ -329,8 +327,8 @@ void Parser::dimension(bool isLookedForward)
 void Parser::exponent(bool isLookedForward)
 {
 #ifdef DEBUG
-  //cout << "::: entering exponent()";
-  //cout << " with isLookedForward=" << isLookedForward << endl;
+  cout << "::: entering exponent()";
+  cout << " with isLookedForward=" << isLookedForward << endl;
 #endif
   if (m_errorReporter->getErrors() >= m_maxErrors)
     return;
@@ -366,9 +364,18 @@ void Parser::expression(bool isLookedForward)
     advanceToken();
   }
 
+  bool isFirstIteration = true;
   do
   {
-    andOperation(true);
+    if (isFirstIteration)
+    {
+      andOperation(true);
+      isFirstIteration = false;
+    }
+    else
+    {
+      andOperation(false);
+    }
   } while (m_currentToken.getLexeme().compare("||") == 0);
 
 #ifdef DEBUG
@@ -477,7 +484,9 @@ void Parser::ifStatement(bool isLookedForward)
   checkLexeme("si", isLookedForward);
   expression(false);
   block(true);
+
   advanceToken();
+  ignoreNewLines(true);
   if (m_currentToken.getLexeme().compare("sino") == 0)
   {
     checkLexeme("sino", true);
@@ -505,10 +514,8 @@ void Parser::import(bool isLookedForward)
   {
     do
     {
-      // TODO: if after newline there is parentheses, exit loop
       checkToken(TOKEN_STRING, false);
       advanceToken();
-      // TODO: ignore extra newlines
     } while (m_currentToken.getToken() == TOKEN_NEWLINE);
 
 #ifdef DEBUG
@@ -541,9 +548,19 @@ void Parser::multiplication(bool isLookedForward)
     advanceToken();
   }
 
+  // TODO: should this be written as 1, while 2..n?
+  bool isFirstIteration = true;
   do
   {
-    exponent(isLookedForward);
+    if (isFirstIteration)
+    {
+      exponent(true);
+      isFirstIteration = false;
+    }
+    else
+    {
+      exponent(false);
+    }
   } while (m_currentToken.getLexeme().compare("*") == 0 ||
            m_currentToken.getLexeme().compare("/") == 0 ||
            m_currentToken.getLexeme().compare("%") == 0);
@@ -878,9 +895,18 @@ void Parser::sumOperation(bool isLookedForward)
     advanceToken();
   }
 
+  bool isFirstIteration = true;
   do
   {
-    multiplication(true);
+    if (isFirstIteration)
+    {
+      multiplication(true);
+      isFirstIteration = false;
+    }
+    else
+    {
+      multiplication(false);
+    }
   } while (m_currentToken.getLexeme().compare("+") == 0 ||
            m_currentToken.getLexeme().compare("-") == 0);
 
@@ -917,10 +943,12 @@ void Parser::term(bool isLookedForward)
     advanceToken();
     if (m_currentToken.getLexeme().compare("[") == 0)
     {
+      advanceToken();
       dimension(true);
     }
     else if (m_currentToken.getLexeme().compare("(") == 0)
     {
+      advanceToken();
       argumentsList(true);
       checkLexeme(")", true);
     }
