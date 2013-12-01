@@ -400,6 +400,6 @@ void Scanner::buildKeywordsMap()
   m_keywordsMap["selecciona"] =   KEYWORD_SELECT;
   m_keywordsMap["tipo"] =         KEYWORD_TYPE;
   m_keywordsMap["valor"] =        KEYWORD_SWITCH;
-  m_keywordsMap["variable"] =     KEYWORD_VAR;
+  m_keywordsMap["var"] =          KEYWORD_VAR;
 }
 
