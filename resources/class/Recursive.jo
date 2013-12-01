@@ -1,6 +1,6 @@
-Classfile /home/edcg/Documents/school/tcompiladores/go_compiler/resources/class/Recursive.class
-  Last modified Nov 8, 2013; size 512 bytes
-  MD5 checksum 09001898bc01ebdc9815c77e192337c5
+Classfile /home/edcg/Garbage/vecomp/resources/class/Recursive.class
+  Last modified Dec 1, 2013; size 513 bytes
+  MD5 checksum f6ba86efa9e3c770684ce1276bb728d0
   Compiled from "Recursive.java"
 public class Recursive
   SourceFile: "Recursive.java"
@@ -55,25 +55,26 @@ Constant pool:
     Code:
       stack=3, locals=1, args_size=1
          0: iload_0       
-         1: ifgt          6
-         4: iload_0       
-         5: ireturn       
-         6: iload_0       
-         7: iconst_1      
-         8: isub          
-         9: invokestatic  #2                  // Method fibonacci:(I)I
-        12: iload_0       
-        13: iconst_2      
-        14: isub          
-        15: invokestatic  #2                  // Method fibonacci:(I)I
-        18: iadd          
-        19: ireturn       
+         1: iconst_1      
+         2: if_icmpgt     7
+         5: iload_0       
+         6: ireturn       
+         7: iload_0       
+         8: iconst_1      
+         9: isub          
+        10: invokestatic  #2                  // Method fibonacci:(I)I
+        13: iload_0       
+        14: iconst_2      
+        15: isub          
+        16: invokestatic  #2                  // Method fibonacci:(I)I
+        19: iadd          
+        20: ireturn       
       LineNumberTable:
         line 5: 0
-        line 6: 4
-        line 8: 6
+        line 6: 5
+        line 8: 7
       StackMapTable: number_of_entries = 1
-           frame_type = 6 /* same */
+           frame_type = 7 /* same */
 
 
   public static void main(java.lang.String[]);

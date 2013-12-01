@@ -1,0 +1,177 @@
+Classfile /home/edcg/Garbage/vecomp/resources/class/Operation.class
+  Last modified Dec 1, 2013; size 920 bytes
+  MD5 checksum cc11b9704b70459d06eeda274e146e73
+  Compiled from "Operation.java"
+public class Operation
+  SourceFile: "Operation.java"
+  minor version: 0
+  major version: 51
+  flags: ACC_PUBLIC, ACC_SUPER
+Constant pool:
+   #1 = Methodref          #16.#25        //  java/lang/Object."<init>":()V
+   #2 = Fieldref           #26.#27        //  java/lang/System.out:Ljava/io/PrintStream;
+   #3 = Class              #28            //  java/lang/StringBuilder
+   #4 = Methodref          #3.#25         //  java/lang/StringBuilder."<init>":()V
+   #5 = String             #29            //  Result int: 
+   #6 = Methodref          #3.#30         //  java/lang/StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
+   #7 = Methodref          #3.#31         //  java/lang/StringBuilder.append:(I)Ljava/lang/StringBuilder;
+   #8 = Methodref          #3.#32         //  java/lang/StringBuilder.toString:()Ljava/lang/String;
+   #9 = Methodref          #33.#34        //  java/io/PrintStream.println:(Ljava/lang/String;)V
+  #10 = Double             2.0d
+  #12 = String             #35            //  Result double: 
+  #13 = Methodref          #3.#36         //  java/lang/StringBuilder.append:(D)Ljava/lang/StringBuilder;
+  #14 = String             #37            //  Result mixed: 
+  #15 = Class              #38            //  Operation
+  #16 = Class              #39            //  java/lang/Object
+  #17 = Utf8               <init>
+  #18 = Utf8               ()V
+  #19 = Utf8               Code
+  #20 = Utf8               LineNumberTable
+  #21 = Utf8               main
+  #22 = Utf8               ([Ljava/lang/String;)V
+  #23 = Utf8               SourceFile
+  #24 = Utf8               Operation.java
+  #25 = NameAndType        #17:#18        //  "<init>":()V
+  #26 = Class              #40            //  java/lang/System
+  #27 = NameAndType        #41:#42        //  out:Ljava/io/PrintStream;
+  #28 = Utf8               java/lang/StringBuilder
+  #29 = Utf8               Result int: 
+  #30 = NameAndType        #43:#44        //  append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
+  #31 = NameAndType        #43:#45        //  append:(I)Ljava/lang/StringBuilder;
+  #32 = NameAndType        #46:#47        //  toString:()Ljava/lang/String;
+  #33 = Class              #48            //  java/io/PrintStream
+  #34 = NameAndType        #49:#50        //  println:(Ljava/lang/String;)V
+  #35 = Utf8               Result double: 
+  #36 = NameAndType        #43:#51        //  append:(D)Ljava/lang/StringBuilder;
+  #37 = Utf8               Result mixed: 
+  #38 = Utf8               Operation
+  #39 = Utf8               java/lang/Object
+  #40 = Utf8               java/lang/System
+  #41 = Utf8               out
+  #42 = Utf8               Ljava/io/PrintStream;
+  #43 = Utf8               append
+  #44 = Utf8               (Ljava/lang/String;)Ljava/lang/StringBuilder;
+  #45 = Utf8               (I)Ljava/lang/StringBuilder;
+  #46 = Utf8               toString
+  #47 = Utf8               ()Ljava/lang/String;
+  #48 = Utf8               java/io/PrintStream
+  #49 = Utf8               println
+  #50 = Utf8               (Ljava/lang/String;)V
+  #51 = Utf8               (D)Ljava/lang/StringBuilder;
+{
+  public Operation();
+    flags: ACC_PUBLIC
+    Code:
+      stack=1, locals=1, args_size=1
+         0: aload_0       
+         1: invokespecial #1                  // Method java/lang/Object."<init>":()V
+         4: return        
+      LineNumberTable:
+        line 1: 0
+
+  public static void main(java.lang.String[]);
+    flags: ACC_PUBLIC, ACC_STATIC
+    Code:
+      stack=6, locals=10, args_size=1
+         0: iconst_1      
+         1: istore_1      
+         2: iconst_2      
+         3: istore_2      
+         4: iload_1       
+         5: iload_2       
+         6: iadd          
+         7: istore        7
+         9: getstatic     #2                  // Field java/lang/System.out:Ljava/io/PrintStream;
+        12: new           #3                  // class java/lang/StringBuilder
+        15: dup           
+        16: invokespecial #4                  // Method java/lang/StringBuilder."<init>":()V
+        19: ldc           #5                  // String Result int: 
+        21: invokevirtual #6                  // Method java/lang/StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
+        24: iload         7
+        26: invokevirtual #7                  // Method java/lang/StringBuilder.append:(I)Ljava/lang/StringBuilder;
+        29: invokevirtual #8                  // Method java/lang/StringBuilder.toString:()Ljava/lang/String;
+        32: invokevirtual #9                  // Method java/io/PrintStream.println:(Ljava/lang/String;)V
+        35: iload_1       
+        36: iload_2       
+        37: imul          
+        38: istore        7
+        40: getstatic     #2                  // Field java/lang/System.out:Ljava/io/PrintStream;
+        43: new           #3                  // class java/lang/StringBuilder
+        46: dup           
+        47: invokespecial #4                  // Method java/lang/StringBuilder."<init>":()V
+        50: ldc           #5                  // String Result int: 
+        52: invokevirtual #6                  // Method java/lang/StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
+        55: iload         7
+        57: invokevirtual #7                  // Method java/lang/StringBuilder.append:(I)Ljava/lang/StringBuilder;
+        60: invokevirtual #8                  // Method java/lang/StringBuilder.toString:()Ljava/lang/String;
+        63: invokevirtual #9                  // Method java/io/PrintStream.println:(Ljava/lang/String;)V
+        66: dconst_1      
+        67: dstore_3      
+        68: ldc2_w        #10                 // double 2.0d
+        71: dstore        5
+        73: dload_3       
+        74: dload         5
+        76: dadd          
+        77: dstore        8
+        79: getstatic     #2                  // Field java/lang/System.out:Ljava/io/PrintStream;
+        82: new           #3                  // class java/lang/StringBuilder
+        85: dup           
+        86: invokespecial #4                  // Method java/lang/StringBuilder."<init>":()V
+        89: ldc           #12                 // String Result double: 
+        91: invokevirtual #6                  // Method java/lang/StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
+        94: dload         8
+        96: invokevirtual #13                 // Method java/lang/StringBuilder.append:(D)Ljava/lang/StringBuilder;
+        99: invokevirtual #8                  // Method java/lang/StringBuilder.toString:()Ljava/lang/String;
+       102: invokevirtual #9                  // Method java/io/PrintStream.println:(Ljava/lang/String;)V
+       105: dload_3       
+       106: dload         5
+       108: dmul          
+       109: dstore        8
+       111: getstatic     #2                  // Field java/lang/System.out:Ljava/io/PrintStream;
+       114: new           #3                  // class java/lang/StringBuilder
+       117: dup           
+       118: invokespecial #4                  // Method java/lang/StringBuilder."<init>":()V
+       121: ldc           #12                 // String Result double: 
+       123: invokevirtual #6                  // Method java/lang/StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
+       126: dload         8
+       128: invokevirtual #13                 // Method java/lang/StringBuilder.append:(D)Ljava/lang/StringBuilder;
+       131: invokevirtual #8                  // Method java/lang/StringBuilder.toString:()Ljava/lang/String;
+       134: invokevirtual #9                  // Method java/io/PrintStream.println:(Ljava/lang/String;)V
+       137: iload_1       
+       138: i2d           
+       139: iload_2       
+       140: i2d           
+       141: dload_3       
+       142: dmul          
+       143: dadd          
+       144: dload         5
+       146: dadd          
+       147: dstore        8
+       149: getstatic     #2                  // Field java/lang/System.out:Ljava/io/PrintStream;
+       152: new           #3                  // class java/lang/StringBuilder
+       155: dup           
+       156: invokespecial #4                  // Method java/lang/StringBuilder."<init>":()V
+       159: ldc           #14                 // String Result mixed: 
+       161: invokevirtual #6                  // Method java/lang/StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
+       164: dload         8
+       166: invokevirtual #13                 // Method java/lang/StringBuilder.append:(D)Ljava/lang/StringBuilder;
+       169: invokevirtual #8                  // Method java/lang/StringBuilder.toString:()Ljava/lang/String;
+       172: invokevirtual #9                  // Method java/io/PrintStream.println:(Ljava/lang/String;)V
+       175: return        
+      LineNumberTable:
+        line 10: 0
+        line 11: 2
+        line 12: 4
+        line 13: 9
+        line 14: 35
+        line 15: 40
+        line 17: 66
+        line 18: 68
+        line 19: 73
+        line 20: 79
+        line 21: 105
+        line 22: 111
+        line 24: 137
+        line 25: 149
+        line 26: 175
+}

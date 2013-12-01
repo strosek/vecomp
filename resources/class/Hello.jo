@@ -1,5 +1,5 @@
-Classfile /home/edcg/Documents/school/tcompiladores/go_compiler/resources/class/Hello.class
-  Last modified Oct 20, 2013; size 401 bytes
+Classfile /home/edcg/Garbage/vecomp/resources/class/Hello.class
+  Last modified Dec 1, 2013; size 401 bytes
   MD5 checksum af522b7d69c22c58b83a6a2dbb80d70e
   Compiled from "Hello.java"
 public class Hello
