@@ -25,6 +25,9 @@ void Parser::parse()
   cout << "::: Scanning :::::::::::::::::::::::::::::::::::::::::::::" << endl;
 #endif
   m_scanner.scan();
+#ifdef DEBUG
+    cout << "Total tokens: " << m_scanner.getMaxTokens() << endl;
+#endif
 
   if (m_errorReporter->getErrors() >= m_maxErrors)
     return; 
@@ -185,8 +188,14 @@ void Parser::command(bool isLookedForward)
   if (m_errorReporter->getErrors() >= m_maxErrors)
     return;
 
-  ignoreNewLines(isLookedForward);
-
+  if (!isLookedForward)
+  {
+    advanceToken();
+  }
+#ifdef DEBUG
+  cout << "checking for command first word, got: " <<
+      m_currentToken.getLexeme()<< endl;
+#endif
   if (m_currentToken.getToken() == TOKEN_IDEN)
   {
     if (m_currentToken.getLexeme().compare("con") == 0)
@@ -225,6 +234,10 @@ void Parser::command(bool isLookedForward)
   else if (m_currentToken.getLexeme().compare("regresa") == 0)
   {
     returnExpression(true);
+  }
+  else if (m_currentToken.getLexeme().compare("var") == 0)
+  {
+    variablesDeclaration(true);
   }
   else
   {
@@ -446,6 +459,7 @@ void Parser::functionCall(bool isLookedForward)
     argumentsList(true);
   }
   checkLexeme(")", true);
+  advanceToken();
 #ifdef DEBUG
   cout << "::: exit functionCall()" << endl;
 #endif
@@ -485,8 +499,7 @@ void Parser::ifStatement(bool isLookedForward)
   expression(false);
   block(true);
 
-  advanceToken();
-  ignoreNewLines(true);
+  ignoreNewLines(false);
   if (m_currentToken.getLexeme().compare("sino") == 0)
   {
     checkLexeme("sino", true);
@@ -665,7 +678,7 @@ void Parser::print(bool isLookedForward)
 void Parser::program()
 {
 #ifdef DEBUG
-  cout << "::: entering program()";
+  cout << "::: entering program()" << endl;
 #endif
   if (m_errorReporter->getErrors() >= m_maxErrors)
     return;
@@ -673,9 +686,8 @@ void Parser::program()
   checkLexeme("paquete", false);
 
   checkLexeme("principal", false);
-
+ 
   ignoreNewLines(false);
-
   do
   {
     if (m_currentToken.getLexeme().compare("importar") == 0)
@@ -858,8 +870,10 @@ void Parser::statements(bool isLookedForward)
   {
     advanceToken();
   }
+
   if (m_currentToken.getLexeme().compare("}") != 0)
   {
+    ignoreNewLines(true);
     do
     {
       command(true);
@@ -867,8 +881,8 @@ void Parser::statements(bool isLookedForward)
     cout << "::: current lexeme (line " << __LINE__ << "): " <<
         m_currentToken.getLexeme() << endl;
 #endif
-      ignoreNewLines(true);
     } while (m_currentToken.getToken() == TOKEN_IDEN               ||
+             m_currentToken.getLexeme().compare("var") == 0        ||
              m_currentToken.getLexeme().compare("si") == 0         ||
              m_currentToken.getLexeme().compare("desde") == 0      ||
              m_currentToken.getLexeme().compare("caso") == 0       ||
@@ -889,7 +903,6 @@ void Parser::sumOperation(bool isLookedForward)
   if (m_errorReporter->getErrors() >= m_maxErrors)
     return;
 
-  cout << "did not exit in return" << endl;
   if (!isLookedForward)
   {
     advanceToken();
@@ -943,14 +956,13 @@ void Parser::term(bool isLookedForward)
     advanceToken();
     if (m_currentToken.getLexeme().compare("[") == 0)
     {
-      advanceToken();
       dimension(true);
+      advanceToken();
     }
     else if (m_currentToken.getLexeme().compare("(") == 0)
     {
+      functionCall(true);
       advanceToken();
-      argumentsList(true);
-      checkLexeme(")", true);
     }
   }
   else if (isLiteral(m_currentToken.getToken()))
@@ -996,6 +1008,7 @@ void Parser::variablesDeclaration(bool isLookedForward)
   {
     variablesList(true);
   }
+  advanceToken();
 #ifdef DEBUG
   cout << "::: exit variablesDeclaration()" << endl;
 #endif
@@ -1052,7 +1065,11 @@ void Parser::checkToken(TokenType_t expectedToken, bool isLookedForward)
 {
   if (m_errorReporter->getErrors() < m_maxErrors)
   {
-    if (!isLookedForward)
+    if (expectedToken != TOKEN_NEWLINE)
+    {
+      ignoreNewLines(isLookedForward);
+    }
+    else if (!isLookedForward)
     {
       advanceToken();
     }
@@ -1076,10 +1093,7 @@ void Parser::checkLexeme(const string& expectedLexeme, bool isLookedForward)
 {
   if (m_errorReporter->getErrors() < m_maxErrors)
   {
-    if (!isLookedForward)
-    {
-      advanceToken();
-    }
+    ignoreNewLines(isLookedForward);
 
 #ifdef DEBUG
       cout << "::: checking for " << expectedLexeme << ", got: " <<
@@ -1099,10 +1113,7 @@ void Parser::checkNativeDataType(bool isLookedForward)
 {
   if (m_errorReporter->getErrors() < m_maxErrors)
   {
-    if (!isLookedForward)
-    {
-      advanceToken();
-    }
+    ignoreNewLines(isLookedForward);
 
 #ifdef DEBUG
       cout << "::: checking for native data type, got: " <<
@@ -1121,10 +1132,7 @@ void Parser::checkLiteral(bool isLookedForward)
 {
   if (m_errorReporter->getErrors() < m_maxErrors)
   {
-    if (!isLookedForward)
-    {
-      advanceToken();
-    }
+    ignoreNewLines(isLookedForward);
 
 #ifdef DEBUG
       cout << "::: checking for constant literal, got: " <<
@@ -1142,7 +1150,7 @@ void Parser::checkLiteral(bool isLookedForward)
 void Parser::ignoreNewLines(bool isLookedForward)
 {
 #ifdef DEBUG
-  cout << "::: entering ignoreNewLines()";
+  cout << "::: ignoring newlines()";
   cout << " with isLookedForward=" << isLookedForward << endl;
 #endif
   if (!isLookedForward)
@@ -1150,12 +1158,13 @@ void Parser::ignoreNewLines(bool isLookedForward)
     advanceToken();
   }
 
-  while (m_currentToken.getToken() == TOKEN_NEWLINE)
+  while (m_currentToken.getToken() == TOKEN_NEWLINE ||
+         m_currentToken.getLexeme().compare(";") == 0)
   {
     advanceToken();
   }
 #ifdef DEBUG
-  cout << "::: exit ignoreNewLines()" << endl;
+  cout << "::: stopped ignoring newlines()" << endl;
 #endif
 }
 
