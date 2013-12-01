@@ -1,4 +1,4 @@
-paquete perro 
+paquete principal
 importar ( "fmt"
            "con" )
 
