@@ -41,7 +41,7 @@ int main(int argc, char** argv)
   else
   {
     cerr << "error: se esperaba un nombre de archivo a compilar" << endl;
-    cerr << "uso:   vecomp <filename>" << endl;
+    cerr << "uso:   vecomp <archivo>" << endl;
   }
 
   return errorReporter->getErrors() == 0 ? EXIT_SUCCESS : EXIT_FAILURE;
