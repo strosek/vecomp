@@ -406,31 +406,41 @@ void Parser::forStatement(bool isLookedForward)
     return;
   
   checkLexeme("desde", isLookedForward);
-  checkLexeme("(", false);
 
-  assign(false);
-  while (m_currentToken.getLexeme().compare(",") == 0)
+  advanceToken();
+
+  if (m_currentToken.getLexeme().compare(";") != 0)
   {
-    assign(true);
-    advanceToken();
+    assign(false);
+    while (m_currentToken.getLexeme().compare(",") == 0)
+    {
+      assign(true);
+    }
   }
+
   checkLexeme(";", true);
 
   advanceToken();
+  cout << "checking for empty condition in for: " << 
+      m_currentToken.getLexeme() << endl;
   if (m_currentToken.getLexeme().compare(";") != 0)
   {
     expression(true);
   }
-  checkLexeme(";", false);
 
-  assign(false);
-  while (m_currentToken.getLexeme().compare(",") == 0)
+  checkLexeme(";", true);
+  advanceToken();
+
+  if (m_currentToken.getLexeme().compare(";") != 0)
   {
-    assign(true);
-    advanceToken();
+    assign(false);
+    while (m_currentToken.getLexeme().compare(",") == 0)
+    {
+      assign(true);
+      advanceToken();
+    }
   }
-  checkLexeme(")", true);
-  block(false);
+  block(true);
 
 #ifdef DEBUG
   cout << "::: exit forStatement()" << endl;
@@ -877,9 +887,10 @@ void Parser::statements(bool isLookedForward)
     do
     {
       command(true);
+      ignoreNewLines(true);
 #ifdef DEBUG
-    cout << "::: current lexeme (line " << __LINE__ << "): " <<
-        m_currentToken.getLexeme() << endl;
+      cout << "::: current lexeme (line " << __LINE__ << "): " <<
+          m_currentToken.getLexeme() << endl;
 #endif
     } while (m_currentToken.getToken() == TOKEN_IDEN               ||
              m_currentToken.getLexeme().compare("var") == 0        ||
@@ -1093,7 +1104,14 @@ void Parser::checkLexeme(const string& expectedLexeme, bool isLookedForward)
 {
   if (m_errorReporter->getErrors() < m_maxErrors)
   {
-    ignoreNewLines(isLookedForward);
+    if (expectedLexeme.compare(";") != 0)
+    {
+      ignoreNewLines(isLookedForward);
+    }
+    else if (!isLookedForward)
+    {
+      advanceToken();
+    }
 
 #ifdef DEBUG
       cout << "::: checking for " << expectedLexeme << ", got: " <<
