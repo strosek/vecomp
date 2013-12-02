@@ -441,6 +441,7 @@ void Parser::forStatement(bool isLookedForward)
     }
   }
   block(true);
+  ignoreNewLines(false);
 
 #ifdef DEBUG
   cout << "::: exit forStatement()" << endl;
@@ -488,9 +489,10 @@ void Parser::functionDeclaration(bool isLookedForward)
   checkToken(TOKEN_IDEN, false);
   checkLexeme("(", false);
   parameterList(false);
-  checkLexeme(")", false);
+  checkLexeme(")", true);
   returnType(false);
   block(false);
+  ignoreNewLines(true);
 #ifdef DEBUG
   cout << "::: exit functionDeclaration()" << endl;
 #endif
@@ -508,8 +510,8 @@ void Parser::ifStatement(bool isLookedForward)
   checkLexeme("si", isLookedForward);
   expression(false);
   block(true);
-
   ignoreNewLines(false);
+
   if (m_currentToken.getLexeme().compare("sino") == 0)
   {
     checkLexeme("sino", true);
@@ -632,7 +634,7 @@ void Parser::parameterList(bool isLookedForward)
     advanceToken();
   }
 
-  if (m_currentToken.getLexeme().compare(")") != 0)
+  while (m_currentToken.getLexeme().compare(")") != 0)
   {
     bool isFirstIteration = true;
     do
@@ -649,6 +651,7 @@ void Parser::parameterList(bool isLookedForward)
       advanceToken();
     } while (m_currentToken.getLexeme().compare(",") == 0);
     checkNativeDataType(true);
+    advanceToken();
   }
 #ifdef DEBUG
   cout << "::: exit parameterList()" << endl;
@@ -726,7 +729,7 @@ void Parser::program()
            m_currentToken.getLexeme().compare("const")  == 0    ||
            m_currentToken.getLexeme().compare("funcion")  == 0);
 #ifdef DEBUG
-  cout << "::: exiting program()" << endl;
+  cout << "::: exit program()" << endl;
 #endif
 }
 
@@ -808,33 +811,36 @@ void Parser::returnType(bool isLookedForward)
     advanceToken();
   }
 
-  if (m_currentToken.getLexeme().compare("(") == 0)
+  if (m_currentToken.getLexeme().compare("{") != 0)
   {
-    checkLexeme("(", true);
-    advanceToken();
-    if (m_currentToken.getToken() == TOKEN_IDEN)
+    if (m_currentToken.getLexeme().compare("(") == 0)
     {
-      do
+      checkLexeme("(", true);
+      advanceToken();
+      if (m_currentToken.getToken() == TOKEN_IDEN)
       {
-        checkToken(TOKEN_IDEN, true);
-        variablesList(false);
+        do
+        {
+          checkToken(TOKEN_IDEN, true);
+          variablesList(false);
+          checkNativeDataType(true);
+          advanceToken();
+        } while (m_currentToken.getLexeme().compare(",") == 0);
+        checkLexeme(")", true);
+      }
+      else
+      {
         checkNativeDataType(true);
-        advanceToken();
-      } while (m_currentToken.getLexeme().compare(",") == 0);
-      checkLexeme(")", true);
+        checkLexeme(")", false);
+      }
     }
-    else
+    else if (m_currentToken.getLexeme().compare("entero") == 0 ||
+             m_currentToken.getLexeme().compare("real") == 0   ||
+             m_currentToken.getLexeme().compare("logico") == 0 ||
+             m_currentToken.getLexeme().compare("alfabetico") == 0)
     {
       checkNativeDataType(true);
-      checkLexeme(")", false);
     }
-  }
-  else if (m_currentToken.getLexeme().compare("entero") == 0 ||
-           m_currentToken.getLexeme().compare("real") == 0   ||
-           m_currentToken.getLexeme().compare("logico") == 0 ||
-           m_currentToken.getLexeme().compare("alfabetico") == 0)
-  {
-    checkNativeDataType(true);
   }
 
 #ifdef DEBUG
@@ -897,6 +903,7 @@ void Parser::statements(bool isLookedForward)
              m_currentToken.getLexeme().compare("si") == 0         ||
              m_currentToken.getLexeme().compare("desde") == 0      ||
              m_currentToken.getLexeme().compare("caso") == 0       ||
+             m_currentToken.getLexeme().compare("regresa") == 0    ||
              m_currentToken.getLexeme().compare("interrumpe") == 0 ||
              m_currentToken.getLexeme().compare("continua") == 0);
   }
