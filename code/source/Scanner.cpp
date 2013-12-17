@@ -137,7 +137,7 @@ void Scanner::scan()
             break;
           default :
 #ifdef DEBUG
-            cerr << "vecomp: error de estado siguiente" << endl;
+            cerr << "vecomp: next state error while scanning" << endl;
 #endif
             break;
           }
