@@ -141,6 +141,8 @@ public:
   void        scan();
   int         getMaxTokens() const;
   int         getTokensProcessed() const;
+  void        moveTokenBackward();
+  void        moveTokenForward();
   TokenLexeme getNextTokenLexeme();
 
 private:
@@ -153,7 +155,7 @@ private:
   int                               m_currentToken;
   int                               m_nTokens;
   int                               m_nTokensProcessed;
-  std::queue<TokenLexeme>           m_tokensLexemes;
+  std::vector<TokenLexeme>          m_tokensLexemes;
   std::map<std::string, Keyword_t>  m_keywordsMap;
   ErrorReporter*                    m_errorReporter;
   FileReader*                       m_fileReader;

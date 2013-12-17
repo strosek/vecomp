@@ -144,7 +144,7 @@ void Scanner::scan()
 
           if (token != TOKEN_LINECOMMENT && token != TOKEN_MULTICOMMENT)
           {
-            m_tokensLexemes.push(TokenLexeme(token, lexeme, m_lineNo, 
+            m_tokensLexemes.push_back(TokenLexeme(token, lexeme, m_lineNo, 
                                              m_column - lexeme.length()));
 #ifdef DEBUG
             cout << "pushed element: " << setw(20) <<
@@ -203,14 +203,30 @@ void Scanner::scan()
   }
 }
 
+void Scanner::moveTokenBackward()
+{
+  --m_currentToken;
+}
+
+void Scanner::moveTokenForward()
+{
+  ++m_currentToken;
+}
+
 TokenLexeme Scanner::getNextTokenLexeme()
 {
   TokenLexeme temporal;
   if (!m_tokensLexemes.empty())
   {
-    temporal = m_tokensLexemes.front();
-    m_tokensLexemes.pop();
+    temporal = m_tokensLexemes.at(m_currentToken);
   }
+
+#ifdef DEBUG
+  cout << "::: returning token at: " << m_currentToken << ", " <<
+      m_tokensLexemes.at(m_currentToken).getLexeme() << endl;
+#endif
+  moveTokenForward();
+
   ++m_nTokensProcessed;
 
   return temporal;
