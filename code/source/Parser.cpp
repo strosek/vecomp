@@ -113,6 +113,7 @@ void Parser::block()
   advanceToken();
   if (m_currentToken.getLexeme().compare("}") != 0)
   {
+    m_scanner.moveTokenBackward();
     statements();
   }
   ignoreNewLines();
@@ -291,9 +292,12 @@ void Parser::dimension()
     checkLexeme("[");
     advanceToken();
     expression();
-    m_scanner.moveTokenBackward();
     checkLexeme("]");
     advanceToken();
+    if (m_currentToken.getLexeme().compare("[") == 0)
+    {
+      m_scanner.moveTokenBackward();
+    }
   } while (m_currentToken.getLexeme().compare("[") == 0);
 
   m_scanner.moveTokenBackward();
@@ -335,6 +339,8 @@ void Parser::expression()
   {
     andOperation();
   } while (m_currentToken.getLexeme().compare("||") == 0);
+
+  m_scanner.moveTokenBackward();
 
 #ifdef DEBUG
   cout << "::: exit expression()" << endl;
@@ -444,6 +450,8 @@ void Parser::ifStatement()
     return;
 
   checkLexeme("si");
+
+  advanceToken();
   expression();
   block();
   ignoreNewLines();
@@ -501,13 +509,19 @@ void Parser::multiplication()
   if (m_errorReporter->getErrors() >= m_maxErrors)
     return;
 
+  bool isOperatorFound = false;
   do
   {
+    isOperatorFound = false;
     exponent();
-  } while (m_currentToken.getLexeme().compare("*") == 0 ||
-           m_currentToken.getLexeme().compare("/") == 0 ||
-           m_currentToken.getLexeme().compare("%") == 0);
-
+    if (m_currentToken.getLexeme().compare("*") == 0 ||
+        m_currentToken.getLexeme().compare("/") == 0 ||
+        m_currentToken.getLexeme().compare("%") == 0)
+    {
+      isOperatorFound = true;
+      advanceToken();
+    }
+  } while (isOperatorFound); 
 #ifdef DEBUG
   cout << "::: exit multiplication()" << endl;
 #endif
@@ -547,9 +561,14 @@ void Parser::parameterList()
       checkToken(TOKEN_IDEN);
       advanceToken();
     } while (m_currentToken.getLexeme().compare(",") == 0);
+
+    m_scanner.moveTokenBackward();
     checkNativeDataType();
+
     advanceToken();
   }
+
+  m_scanner.moveTokenBackward();
 #ifdef DEBUG
   cout << "::: exit parameterList()" << endl;
 #endif
@@ -660,6 +679,7 @@ void Parser::relationalOperation()
   sumOperation();
   if (m_currentToken.getToken() == TOKEN_RELOP)
   {
+    advanceToken();
     sumOperation();
   }
 
@@ -698,6 +718,7 @@ void Parser::returnType()
   if (m_errorReporter->getErrors() >= m_maxErrors)
     return;
   
+  advanceToken();
   if (m_currentToken.getLexeme().compare("{") != 0)
   {
     if (m_currentToken.getLexeme().compare("(") == 0)
@@ -721,11 +742,9 @@ void Parser::returnType()
         checkLexeme(")");
       }
     }
-    else if (m_currentToken.getLexeme().compare("entero") == 0 ||
-             m_currentToken.getLexeme().compare("real") == 0   ||
-             m_currentToken.getLexeme().compare("logico") == 0 ||
-             m_currentToken.getLexeme().compare("alfabetico") == 0)
+    else 
     {
+      m_scanner.moveTokenBackward();
       checkNativeDataType();
     }
   }
@@ -745,6 +764,7 @@ void Parser::sign()
 
   if (m_currentToken.getLexeme().compare("-") == 0)
   {
+    m_scanner.moveTokenBackward();
     checkLexeme("-");
   }
   term();
@@ -795,11 +815,18 @@ void Parser::sumOperation()
   if (m_errorReporter->getErrors() >= m_maxErrors)
     return;
 
+  bool isOperatorFound = false;
   do
   {
+    isOperatorFound = false;
     multiplication();
-  } while (m_currentToken.getLexeme().compare("+") == 0 ||
-           m_currentToken.getLexeme().compare("-") == 0);
+    if (m_currentToken.getLexeme().compare("+") == 0 ||
+        m_currentToken.getLexeme().compare("-") == 0)
+    {
+      isOperatorFound = true;
+      advanceToken();
+    }
+  } while (isOperatorFound); 
 
 #ifdef DEBUG
   cout << "::: exit sumOperation()" << endl;
@@ -833,6 +860,7 @@ void Parser::term()
     }
     else if (m_currentToken.getLexeme().compare("(") == 0)
     {
+      m_scanner.moveTokenBackward();
       functionCall();
       advanceToken();
     }
@@ -867,16 +895,19 @@ void Parser::variablesDeclaration()
     do
     {
       variablesList();
+
       advanceToken();
 #ifdef DEBUG
     cout << "::: current lexeme (line " << __LINE__ << "): " <<
         m_currentToken.getLexeme() << endl;
 #endif
     } while (m_currentToken.getToken() == TOKEN_NEWLINE);
+    m_scanner.moveTokenBackward();
     checkLexeme(")");
   }
   else
   {
+    m_scanner.moveTokenBackward();
     variablesList();
   }
   advanceToken();
@@ -899,12 +930,17 @@ void Parser::variablesList()
     {
       m_scanner.moveTokenBackward();
       dimension();
+      advanceToken();
     }
 
 #ifdef DEBUG
     cout << "::: current lexeme (line " << __LINE__ << "): " <<
         m_currentToken.getLexeme() << endl;
 #endif
+    if (m_currentToken.getLexeme().compare(",") != 0)
+    {
+      m_scanner.moveTokenBackward();
+    }
   } while (m_currentToken.getLexeme().compare(",") == 0);
 
   checkNativeDataType();
