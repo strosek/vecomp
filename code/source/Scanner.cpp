@@ -205,11 +205,17 @@ void Scanner::scan()
 
 void Scanner::moveTokenBackward()
 {
+#ifdef DEBUG
+  cout << "move backward" << endl;
+#endif
   --m_currentToken;
 }
 
 void Scanner::moveTokenForward()
 {
+#ifdef DEBUG
+  cout << "move forward" << endl;
+#endif
   ++m_currentToken;
 }
 
@@ -222,10 +228,10 @@ TokenLexeme Scanner::getNextTokenLexeme()
   }
 
 #ifdef DEBUG
-  cout << "::: returning token at: " << m_currentToken << ", " <<
+  cout << "::: advance token to position: " << m_currentToken << ", " <<
       m_tokensLexemes.at(m_currentToken).getLexeme() << endl;
 #endif
-  moveTokenForward();
+  ++m_currentToken;
 
   ++m_nTokensProcessed;
 
