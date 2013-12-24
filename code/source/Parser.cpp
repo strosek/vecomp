@@ -95,6 +95,7 @@ void Parser::assign()
     return;
 
   checkToken(TOKEN_ASSIGNOP);
+  advanceToken();
   expression();
 #ifdef DEBUG
   cout << "::: exit assign()" << endl;
@@ -187,13 +188,18 @@ void Parser::command()
     }
     else
     {
+      // FIXME: this should not need the double forward movement.
+      m_scanner.moveTokenForward();
       advanceToken();
+      cout << "current token before assign: " << m_currentToken.getLexeme() << endl;
       if (m_currentToken.getToken() == TOKEN_ASSIGNOP)
       {
+        m_scanner.moveTokenBackward();
         assign();
       }
       else if (m_currentToken.getLexeme().compare("(") == 0)
       {
+        m_scanner.moveTokenBackward();
         functionCall();
       }
     }
@@ -862,7 +868,6 @@ void Parser::term()
     {
       m_scanner.moveTokenBackward();
       functionCall();
-      advanceToken();
     }
   }
   else if (isLiteral(m_currentToken.getToken()))
