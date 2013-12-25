@@ -224,6 +224,10 @@ void Parser::command()
   {
     variablesDeclaration();
   }
+  else if (m_currentToken.getLexeme().compare("interrumpe") == 0)
+  {
+    advanceToken();
+  }
   else
   {
     m_errorReporter->writeSyntaxError(
@@ -373,21 +377,27 @@ void Parser::forStatement()
       assign();
     }
   }
+  else
+  {
+    m_scanner.moveTokenBackward();
+  }
 
   checkLexeme(";");
 
   advanceToken();
-  cout << "checking for empty condition in for: " << 
-      m_currentToken.getLexeme() << endl;
   if (m_currentToken.getLexeme().compare(";") != 0)
   {
     expression();
   }
+  else
+  {
+    m_scanner.moveTokenBackward();
+  }
 
   checkLexeme(";");
-  advanceToken();
 
-  if (m_currentToken.getLexeme().compare(";") != 0)
+  advanceToken();
+  if (m_currentToken.getLexeme().compare("{") != 0)
   {
     assign();
     while (m_currentToken.getLexeme().compare(",") == 0)
@@ -396,6 +406,11 @@ void Parser::forStatement()
       advanceToken();
     }
   }
+  else
+  {
+    m_scanner.moveTokenBackward();
+  }
+
   block();
   ignoreNewLines();
 
@@ -560,8 +575,10 @@ void Parser::parameterList()
   if (m_errorReporter->getErrors() >= m_maxErrors)
     return;
 
+  advanceToken();
   while (m_currentToken.getLexeme().compare(")") != 0)
   {
+    m_scanner.moveTokenBackward();
     do
     {
       checkToken(TOKEN_IDEN);
@@ -592,7 +609,7 @@ void Parser::print()
   checkLexeme(".");
 
   advanceToken();
-  if (m_currentToken.getLexeme().compare("Imprime") != 0 ||
+  if (m_currentToken.getLexeme().compare("Imprime") != 0 &&
       m_currentToken.getLexeme().compare("Imprimenl") != 0)
   {
     m_errorReporter->writeSyntaxError("Imprime o Imprimenl",
@@ -601,6 +618,7 @@ void Parser::print()
   }
   
   checkLexeme("(");
+  advanceToken();
   argumentsList();
   checkLexeme(")");
 
@@ -662,10 +680,11 @@ void Parser::read()
   if (m_errorReporter->getErrors() >= m_maxErrors)
     return;
 
-  checkLexeme("fmt");
+  checkLexeme("con");
   checkLexeme(".");
   checkLexeme("Lee");
   checkLexeme("(");
+  advanceToken();
   argumentsList();
   checkLexeme(")");
 
@@ -753,6 +772,10 @@ void Parser::returnType()
       m_scanner.moveTokenBackward();
       checkNativeDataType();
     }
+  }
+  else
+  {
+    m_scanner.moveTokenBackward();
   }
 
 #ifdef DEBUG
