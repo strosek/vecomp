@@ -72,14 +72,21 @@ void Parser::argumentsList()
   cout << "::: entering argumentsList()" << endl;
 #endif
 
+  bool isOperatorFound = false;
   do
   {
+    isOperatorFound = false;
     expression();
-#ifdef DEBUG
-    cout << "::: current lexeme (line " << __LINE__ << "): " <<
-        m_currentToken.getLexeme() << endl;
-#endif
-  } while (m_currentToken.getLexeme().compare(",") == 0);
+
+    advanceToken();
+    if (m_currentToken.getLexeme().compare(",") == 0)
+    {
+      isOperatorFound = true;
+      advanceToken();
+    }
+  } while (isOperatorFound); 
+
+  m_scanner.moveTokenBackward();
 
 #ifdef DEBUG
   cout << "::: exit argumentsList()" << endl;
@@ -138,7 +145,7 @@ void Parser::caseStatement()
 
   do
   {
-    advanceToken();
+    ignoreNewLines();
     do
     {
       if (m_currentToken.getLexeme().compare("valor") == 0)
@@ -155,6 +162,7 @@ void Parser::caseStatement()
     } while (m_currentToken.getLexeme().compare("valor") == 0 ||
              m_currentToken.getLexeme().compare("defecto") == 0);
 
+    m_scanner.moveTokenBackward();
     statements();
   } while (m_currentToken.getLexeme().compare("valor") == 0 ||
            m_currentToken.getLexeme().compare("defecto") == 0);
@@ -412,7 +420,6 @@ void Parser::forStatement()
   }
 
   block();
-  ignoreNewLines();
 
 #ifdef DEBUG
   cout << "::: exit forStatement()" << endl;
@@ -430,7 +437,12 @@ void Parser::functionCall()
   checkLexeme("(");
   
   advanceToken();
-  if (m_currentToken.getToken() == TOKEN_IDEN)
+  if (m_currentToken.getToken() == TOKEN_IDEN ||
+      m_currentToken.getToken() == TOKEN_STRING ||
+      m_currentToken.getToken() == TOKEN_DEC ||
+      m_currentToken.getToken() == TOKEN_HEX ||
+      m_currentToken.getToken() == TOKEN_OCT ||
+      m_currentToken.getToken() == TOKEN_FLOAT)
   {
     argumentsList();
   }
