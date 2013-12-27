@@ -17,7 +17,7 @@ ErrorReporter::ErrorReporter() :
   m_outFileName("errores.out"),
   m_warnings(0),
   m_errors(0),
-  m_maxErrors(5),
+  m_maxErrors(1),
   m_fileReader(nullptr)
 {
 }
@@ -27,7 +27,7 @@ ErrorReporter::ErrorReporter(const string& outFileName) :
   m_outFileName(outFileName),
   m_warnings(0),
   m_errors(0),
-  m_maxErrors(5),
+  m_maxErrors(1),
   m_fileReader(nullptr)
 {
 }
