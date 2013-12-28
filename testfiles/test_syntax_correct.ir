@@ -60,13 +60,13 @@ funcion VolCil(radio, altura real) real {
 
 funcion Test() {
    desde i := 1; i <= 10; i := i + 1 {
-     si i == 5 {  continua }
+     si i == 5 { continua }
      fmt.Imprimenl("i= ", i)
    }
-   i:=1;
+   i := 1;
    desde ; ; i := i + 1 {
-      fmt.Imprimnl("i= ", i);
-      Si (i = 7) { interrumpe }
+      fmt.Imprimenl("i= ", i);
+      si i == 7 { interrumpe }
    }
 }
 
@@ -78,7 +78,7 @@ funcion LeeVec(k entero) {
 }
 
 funcion OrdVec(k entero) {
-var temp entero;
+var Temp entero;
    desde i := 1; i < k ; i := i + 1 {
       desde j := i + 1; i <= k; j := j + 1 {
          si vector[i] > vector[j] {
@@ -143,8 +143,8 @@ funcion principal() {
     ImpMat( n );
     Test();
     fmt.Imprime("Dame tu nombre: ");
-    fmt.Lee(alfa);
+    con.Lee(alfa);
     fmt.Imprime("Dame tu Apellido: ");
-    fmt.Lee(beta);
+    con.Lee(beta);
     fmt.Imprimenl("Hola ", Concat(alfa, beta), " ya pasaste!!!");
 }
