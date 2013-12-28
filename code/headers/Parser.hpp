@@ -65,6 +65,7 @@ private:
   Scanner        m_scanner;
   ErrorReporter* m_errorReporter;
   int            m_maxErrors;
+  int            m_nTokensProcessed;
 };
 
 #endif /* PARSER_HPP */
