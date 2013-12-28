@@ -152,9 +152,8 @@ private:
 
   size_t                            m_lineNo;
   size_t                            m_column;
-  int                               m_currentToken;
+  size_t                            m_currentToken;
   int                               m_nTokens;
-  int                               m_nTokensProcessed;
   std::vector<TokenLexeme>          m_tokensLexemes;
   std::map<std::string, Keyword_t>  m_keywordsMap;
   ErrorReporter*                    m_errorReporter;

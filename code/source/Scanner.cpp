@@ -17,7 +17,6 @@ Scanner::Scanner(FileReader* fileReader, ErrorReporter* errorReporter) :
   m_column(1),
   m_currentToken(0),
   m_nTokens(0),
-  m_nTokensProcessed(0),
   m_tokensLexemes(),
   m_keywordsMap(),
   m_errorReporter(errorReporter),
@@ -230,19 +229,17 @@ void Scanner::moveTokenForward()
 TokenLexeme Scanner::getNextTokenLexeme()
 {
   TokenLexeme temporal;
-  if (!m_tokensLexemes.empty())
+  if (m_currentToken < m_tokensLexemes.size())
   {
     temporal = m_tokensLexemes.at(m_currentToken);
-  }
 
 #ifdef DEBUG
   cout << "::: advance token to position: " << m_currentToken << ", line: " <<
       m_tokensLexemes.at(m_currentToken).getLine() << ":  " << 
       m_tokensLexemes.at(m_currentToken).getLexeme() << endl;
 #endif
+  }
   ++m_currentToken;
-
-  ++m_nTokensProcessed;
 
   return temporal;
 }
@@ -358,7 +355,7 @@ int Scanner::getMaxTokens() const
 
 int Scanner::getTokensProcessed() const
 {
-  return m_nTokensProcessed;
+  return m_currentToken;
 }
 
 bool Scanner::isTerminalState(int state)
