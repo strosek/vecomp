@@ -201,12 +201,20 @@ void Scanner::scan()
       m_errorReporter->writeError("archivo vacio");
     }
   }
+
+#ifdef DEBUG
+  cout << "::: Lexemes list: " << endl;
+  for (size_t i = 0; i < m_tokensLexemes.size(); ++i)
+  {
+    cout << i << ": " << m_tokensLexemes.at(i).getLexeme() << endl;
+  }
+#endif
 }
 
-void Scanner::moveTokenBackward()
+void Scanner::moveTokenBackwards()
 {
 #ifdef DEBUG
-  cout << "move backward" << endl;
+  cout << "move backwards" << endl;
 #endif
   --m_currentToken;
 }
@@ -413,7 +421,6 @@ void Scanner::buildKeywordsMap()
   m_keywordsMap["mapa"] =         KEYWORD_MAP;
   m_keywordsMap["mod"] =          KEYWORD_MOD;
   m_keywordsMap["paquete"] =      KEYWORD_PACKET;
-  m_keywordsMap["principal"] =    KEYWORD_MAIN;
   m_keywordsMap["rango"] =        KEYWORD_RANGE;
   m_keywordsMap["real"] =         KEYWORD_REAL;
   m_keywordsMap["regresa"] =      KEYWORD_RETURN;

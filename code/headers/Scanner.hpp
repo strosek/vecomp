@@ -141,7 +141,7 @@ public:
   void        scan();
   int         getMaxTokens() const;
   int         getTokensProcessed() const;
-  void        moveTokenBackward();
+  void        moveTokenBackwards();
   void        moveTokenForward();
   TokenLexeme getNextTokenLexeme();
 
