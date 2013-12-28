@@ -236,7 +236,8 @@ TokenLexeme Scanner::getNextTokenLexeme()
   }
 
 #ifdef DEBUG
-  cout << "::: advance token to position: " << m_currentToken << ", " <<
+  cout << "::: advance token to position: " << m_currentToken << ", line: " <<
+      m_tokensLexemes.at(m_currentToken).getLine() << ":  " << 
       m_tokensLexemes.at(m_currentToken).getLexeme() << endl;
 #endif
   ++m_currentToken;
