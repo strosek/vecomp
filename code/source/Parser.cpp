@@ -691,6 +691,13 @@ void Parser::program()
     }
 
     ignoreNewLines();
+
+    if (m_currentToken.getLexeme().compare(",") == 0 ||
+        m_currentToken.getToken() == TOKEN_NEWLINE)
+    {
+      advanceToken();
+    }
+
 #ifdef DEBUG
     cout << "::: current lexeme (line " << __LINE__ << "): " <<
         m_currentToken.getLexeme() << endl;
@@ -1100,8 +1107,7 @@ void Parser::ignoreNewLines()
   {
     advanceToken();
   } while ((m_currentToken.getToken() == TOKEN_NEWLINE ||
-            m_currentToken.getLexeme().compare(";") == 0) &&
-            m_nTokensProcessed < m_scanner.getMaxTokens());
+            m_currentToken.getLexeme().compare(";") == 0));
 
   m_scanner.moveTokenBackwards();
 
