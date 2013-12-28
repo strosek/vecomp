@@ -187,6 +187,7 @@ void Parser::command()
   cout << "checking for command first word, got: " <<
       m_currentToken.getLexeme()<< endl;
 #endif
+
   if (m_currentToken.getToken() == TOKEN_IDEN)
   {
     if (m_currentToken.getLexeme().compare("con") == 0)
@@ -404,7 +405,7 @@ void Parser::forStatement()
     m_scanner.moveTokenBackwards();
   }
 
-  checkLexeme(";");
+  checkLexeme(";"); 
 
   advanceToken();
   if (m_currentToken.getLexeme().compare(";") != 0)
@@ -487,7 +488,6 @@ void Parser::functionDeclaration()
   checkLexeme(")");
   returnType();
   block();
-  ignoreNewLines();
 #ifdef DEBUG
   cout << "::: exit functionDeclaration()" << endl;
 #endif
@@ -689,6 +689,7 @@ void Parser::program()
     {
       functionDeclaration();
     }
+
     ignoreNewLines();
 #ifdef DEBUG
     cout << "::: current lexeme (line " << __LINE__ << "): " <<
@@ -849,6 +850,11 @@ void Parser::statements()
     {
       command();
       ignoreNewLines();
+      if (m_currentToken.getLexeme().compare(";") == 0 ||
+          m_currentToken.getToken() == TOKEN_NEWLINE)
+      {
+        advanceToken();
+      }
 #ifdef DEBUG
       cout << "::: current lexeme (line " << __LINE__ << "): " <<
           m_currentToken.getLexeme() << endl;
