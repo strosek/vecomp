@@ -78,6 +78,27 @@ void ErrorReporter::writeError(const string& message)
   ++m_errors;
 }
 
+void ErrorReporter::writeError(int line, int column, const std::string lexeme,
+                               const std::string& message)
+{
+  writeErrorsFileHeader();
+
+  if (m_errors < m_maxErrors)
+  {
+#ifdef DEBUG
+    cout << "::: writing error" << endl;
+#endif
+    m_errorOut << setw(WIDTH_NUMBER) << line <<
+        setw(WIDTH_NUMBER) << column <<
+        setw(WIDTH_LEXEME) << lexeme << 
+        setw(WIDTH_MESSAGE) << message <<
+        setw(WIDTH_LINE) << m_fileReader->getTextAtLine(line - 1);
+    m_errorOut.flush();
+  }
+
+  ++m_errors;
+}
+
 void ErrorReporter::writeLexicalError(int state, char currentChar,
                                       const string& lexeme, int line,
                                       int column)
