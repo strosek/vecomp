@@ -15,7 +15,7 @@ using namespace std;
 
 int main(int argc, char** argv)
 {
-  ErrorReporter* errorReporter;
+  ErrorReporter* errorReporter = nullptr;
 
   if (argc == 2)
   {
@@ -44,6 +44,17 @@ int main(int argc, char** argv)
     cerr << "uso:   vecomp <archivo>" << endl;
   }
 
-  return errorReporter->getErrors() == 0 ? EXIT_SUCCESS : EXIT_FAILURE;
+  int returnValue;
+  if (errorReporter == nullptr)
+  {
+    returnValue = EXIT_FAILURE;
+  }
+  else
+  {
+    returnValue = errorReporter->getErrors() == 0 ? EXIT_SUCCESS :
+        EXIT_FAILURE;
+  }
+  
+  return returnValue;
 }
 
