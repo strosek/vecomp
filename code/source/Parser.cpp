@@ -221,6 +221,13 @@ void Parser::command()
         m_scanner.moveTokenBackwards();
         functionCall();
       }
+      else
+      {
+        m_errorReporter->writeSyntaxError(
+            ":=, ( o [",
+            m_currentToken.getLexeme(), m_currentToken.getLine(),
+            m_currentToken.getRow());
+      }
     }
   }
   else if (m_currentToken.getLexeme().compare("si") == 0)
@@ -253,10 +260,9 @@ void Parser::command()
   }
   else
   {
-    m_errorReporter->writeSyntaxError(
-        "identificador, delimitador, si, desde, caso o regresa",
-        m_currentToken.getLexeme(), m_currentToken.getLine(),
-        m_currentToken.getRow());
+    m_errorReporter->writeError(m_currentToken.getLine(),
+        m_currentToken.getRow(), m_currentToken.getLexeme(),
+        "inicio de comando invalido");
   }
 #ifdef DEBUG
   cout << "::: exit command()" << endl;
@@ -1072,9 +1078,12 @@ void Parser::checkNativeDataType()
 #endif
     if (!isNativeDataType(m_currentToken.getLexeme()))
     {
-      m_errorReporter->writeSyntaxError("tipo_dato",
-          m_currentToken.getLexeme(), m_currentToken.getLine(),
-          m_currentToken.getRow());
+      string message = "se esperaba token: \"tipo_dato\", se recibio \"";
+      message += TokenLexeme::getTokenString(m_currentToken.getToken());
+      message += "\"";
+
+      m_errorReporter->writeError(m_currentToken.getLine(),
+          m_currentToken.getRow(), m_currentToken.getLexeme(), message);
     }
   }
 }
