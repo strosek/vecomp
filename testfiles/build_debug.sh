@@ -1,8 +1,6 @@
 #!/bin/bash
 
-# Script for building vecomp project and execute a given test
-
-clear
+# Script for building vecomp project with debug info 
 
 flags='-Wall -Wextra -Wc++11-compat -Wswitch -Wshadow -Weffc++ -g -std=c++11 -D DEBUG'
 
