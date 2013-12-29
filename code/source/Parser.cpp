@@ -14,7 +14,7 @@ Parser::Parser(FileReader* fileReader, ErrorReporter* errorReporter) :
   m_currentToken(),
   m_scanner(Scanner(fileReader, errorReporter)),
   m_errorReporter(errorReporter),
-  m_maxErrors(1),
+  m_maxErrors(5),
   m_nTokensProcessed(0)
 {
   m_maxErrors = m_errorReporter->getMaxErrors();
