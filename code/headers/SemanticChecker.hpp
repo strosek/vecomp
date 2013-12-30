@@ -7,11 +7,13 @@
 #include <map>
 #include <string>
 
-typedef struct st
+typedef struct sd
 {
-  std::string type;
-  int    dimensions;
+  std::string             type;
+  int                     dimensions;
   std::list<std::string&> parametersTypes;
+  bool                    isConstant;
+  size_t                  line;
 } SymbolData_t;
 
 class SemanticChecker
@@ -19,9 +21,10 @@ class SemanticChecker
 public:
   SemanticChecker();
 
-  void        checkVariableDeclared(const std::string& iden);
+  void        checkVariableDeclared(const std::string& iden
+                                    const std::string& type);
   void        checkFunctionDeclared(const std::string& iden,
-                                 list<std::string&> parametersTypes);
+                                    std::list<std::string&> parametersTypes);
   void        checkModifiable(const std::string& iden);
   std::string getFunctionType(const std::string& iden,
                               const list<std::string>& parametersTypes);
@@ -29,19 +32,20 @@ public:
   bool        getIsInFor();
   bool        getIsMainPresent();
   bool        getIsInSwitch();
+
 private:
-  void        getExpressionType(const std::string& expression,
-                                const std::string& expectedType);
+  void checkExpressionType(const std::string& expression,
+                           const std::string& expectedType);
 
-  bool                                 m_isMainPresent;
-  bool                                 m_isInFor;
-  bool                                 m_isInSwitch;
-  bool                                 m_isReturnCalled;
+  bool                                m_isMainPresent;
+  bool                                m_isInFor;
+  bool                                m_isInSwitch;
+  bool                                m_isReturnCalled;
 
-  ErrorReporter *                      m_errorReporter;
-  std::map<std::string&, std::string&> m_expressionTypes;
-  std::stack<std::string>              m_controlStack;
-  std::map<std::string&, SymbolData_t> m_symbolsTable;
+  ErrorReporter *                     m_errorReporter;
+  std::map<std::string, std::string>  m_expressionTypes;
+  std::stack<std::string>             m_controlStack;
+  std::map<std::string, SymbolData_t> m_symbolsTable;
 };
 
 #endif /* SEMANTICCHECKER_HPP */
