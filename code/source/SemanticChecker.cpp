@@ -9,19 +9,21 @@ SemanticChecker::SemanticChecker(ErrorReporter * errorReporter) :
   m_isInFor(false),
   m_isInSwitch(false),
   m_isReturnCalled(false),
-  m_errorReporter(),
+  m_errorReporter(errorReporter),
   m_expressionTypes(),
   m_controlStack(),
   m_symbolsTable()
 {
-  m_expressionTypes["iAi"] = "i";
+  m_expressionTypes["bLb"] = "b";
+  m_expressionTypes["cAc"] = "i";
   m_expressionTypes["cAi"] = "i";
-  m_expressionTypes["iAc"] = "i";
+  m_expressionTypes["cRc"] = "b";
   m_expressionTypes["fAf"] = "f";
   m_expressionTypes["fAi"] = "f";
+  m_expressionTypes["iAc"] = "i";
   m_expressionTypes["iAf"] = "f";
-  m_expressionTypes["cAc"] = "i";
-  m_expressionTypes["cRc"] = "b";
+  m_expressionTypes["iAi"] = "i";
+  m_expressionTypes["iEi"] = "f";
 }
 
 void SemanticChecker::checkVariableDeclared(const TokenLexeme& token,
@@ -30,7 +32,7 @@ void SemanticChecker::checkVariableDeclared(const TokenLexeme& token,
   string message;
   bool isErrorFound = false;
 
-  if (m_symbolsTable.find(token.getLexeme()) == m_symbolsTable::end())
+  if (m_symbolsTable.find(token.getLexeme()) == m_symbolsTable.end())
   {
     message = "variable no declarada";
     isErrorFound = true;
@@ -48,25 +50,26 @@ void SemanticChecker::checkVariableDeclared(const TokenLexeme& token,
 
   if (isErrorFound)
   {
-    m_errorReporter.writerError(token.getLine(), token.getRow(),
-                                token.getLexme(), message);
+    m_errorReporter->writeError(token.getLine(), token.getRow(),
+                                token.getLexeme(), message);
   }
 }
 
 void SemanticChecker::checkFunctionDeclared(const TokenLexeme& token,
-                                            list<string&> parametersTypes)
+                                            list<string> parametersTypes)
 {
   bool isErrorFound = false;
-  if (m_symbolsTable.find(token.getLexeme()) != m_symbolsTable::end())
+  string message;
+  if (m_symbolsTable.find(token.getLexeme()) != m_symbolsTable.end())
   {
     if (parametersTypes.size() == m_symbolsTable[token.getLexeme()].
             parametersTypes.size())
     {
-      list<string> tableValues =
+      list<string>& tableValues =
           m_symbolsTable[token.getLexeme()].parametersTypes;
 
-      for (tableValues::iterator tableIt = tableValues.begin(),
-           parametersTypes::iterator checkIt = parametersTypes.begin();
+      for (list<string>::iterator tableIt = tableValues.begin(),
+           checkIt = parametersTypes.begin();
 
            tableIt != tableValues.end() && checkIt != parametersTypes.end() &&
            !isErrorFound;
@@ -93,41 +96,87 @@ void SemanticChecker::checkFunctionDeclared(const TokenLexeme& token,
 
   if (isErrorFound)
   {
-    m_errorReporter.writerError(token.getLine(), token.getRow(),
-                                token.getLexme(), message);
+    m_errorReporter->writeError(token.getLine(), token.getRow(),
+                                token.getLexeme(), message);
   }
 }
 
 void SemanticChecker::checkModifiable(const TokenLexeme& token)
 {
-  if (m_symbolsTable.find(token.getLexeme()) != m_symbolsTable::end())
+  if (m_symbolsTable.find(token.getLexeme()) != m_symbolsTable.end())
   {
-    if (!m_symbolsTable[token.getLexme()].isModifiable)
+    if (!m_symbolsTable[token.getLexeme()].isConstant)
     {
-      m_errorReporter.writerError(token.getLine(), token.getRow(),
-                                  token.getLexme(), "variable es constante");
+      m_errorReporter->writeError(token.getLine(), token.getRow(),
+                                  token.getLexeme(), "variable es constante");
     }
   }
 }
 
 string SemanticChecker::getFunctionType(const string& iden,
-                                        const list<string& parametersTypes)
+                                        const list<string>& parametersTypes)
 {
+  string returnValue;
+
+  if (isSymbolPresent(iden)) 
+  {
+    if (parametersMatch(iden, parametersTypes))
+    {
+      returnValue = m_symbolsTable[iden].type;
+    }
+  }
+
+  return returnValue;
 }
 
 string SemanticChecker::getCurrentScope()
 {
+  return m_controlStack.top();
 }
 
-bool SemanticChecker::getIsInFor()
+bool SemanticChecker::isInFor()
+{
+  return m_isInFor;
+}
+
+bool SemanticChecker::isMainPresent()
+{
+  return m_isMainPresent;
+}
+
+bool SemanticChecker::isInSwitch()
+{
+  return m_isInSwitch;
+}
+
+void SemanticChecker::setMainPresent(bool isPresent)
 {
 }
 
-bool SemanticChecker::getIsMainPresent()
+void SemanticChecker::setInFor(bool inFor)
 {
 }
 
-bool SemanticChecker::getIsInSwitch()
+void SemanticChecker::setInSwitch(bool inSwitch)
 {
+}
+
+void SemanticChecker::enterToScope(const string& scope)
+{
+}
+
+void SemanticChecker::exitCurrentScope()
+{
+}
+
+bool SemanticChecker::isSymbolPresent(const string& name)
+{
+  return false;
+}
+
+bool SemanticChecker::parametersMatch(const string& name,
+    const list<string>& parametersTypes)
+{
+  return false;
 }
 
