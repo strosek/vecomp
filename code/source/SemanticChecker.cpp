@@ -67,7 +67,7 @@ void SemanticChecker::checkVariableDeclared(const TokenLexeme& token,
   string message;
   bool isErrorFound = false;
 
-  if (m_symbolsTable.find(token.getLexeme()) == m_symbolsTable.end())
+  if (!isSymbolPresent(token.getLexeme()))
   {
     message = "variable no declarada";
     isErrorFound = true;
@@ -95,32 +95,12 @@ void SemanticChecker::checkFunctionDeclared(const TokenLexeme& token,
 {
   bool isErrorFound = false;
   string message;
-  if (m_symbolsTable.find(token.getLexeme()) != m_symbolsTable.end())
+  if (isSymbolPresent(token.getLexeme()))
   {
-    if (parametersTypes.size() == m_symbolsTable[token.getLexeme()].
-            parametersTypes.size())
+    if (!parametersMatch(token.getLexeme(), parametersTypes))
     {
-      list<string>& tableValues =
-          m_symbolsTable[token.getLexeme()].parametersTypes;
-
-      for (list<string>::iterator tableIt = tableValues.begin(),
-           checkIt = parametersTypes.begin();
-
-           tableIt != tableValues.end() && checkIt != parametersTypes.end() &&
-           !isErrorFound;
-
-           ++tableIt, ++checkIt)
-      {
-        if (tableIt->compare((*checkIt)) != 0)
-        {
-          isErrorFound = true;
-        }
-      }
-
-      if (isErrorFound)
-      {
-        message = "funcion no declarada con esos parametros";
-      }
+      isErrorFound = true;
+      message = "funcion no declarada con esos parametros";
     }
   }
   else
@@ -148,8 +128,18 @@ void SemanticChecker::checkModifiable(const TokenLexeme& token)
   }
 }
 
+void SemanticChecker::checkExpression(const string& expression,
+                                      int line, int row)
+{
+  if (m_expressionTypes.find(expression) == m_expressionTypes.end())
+  {
+    m_errorReporter->writeError(line, row, " ",
+        "expresion con operandos de tipo invalido");
+  }
+}
+
 string SemanticChecker::getFunctionType(const string& iden,
-                                        const list<string>& parametersTypes)
+                                        list<string>& parametersTypes)
 {
   string returnValue;
 
@@ -186,32 +176,71 @@ bool SemanticChecker::isInSwitch()
 
 void SemanticChecker::setMainPresent(bool isPresent)
 {
+  m_isMainPresent = isPresent;
 }
 
 void SemanticChecker::setInFor(bool inFor)
 {
+  m_isInFor = inFor;
 }
 
 void SemanticChecker::setInSwitch(bool inSwitch)
 {
+  m_isInSwitch = inSwitch;
 }
 
 void SemanticChecker::enterToScope(const string& scope)
 {
+  m_controlStack.push(scope);
 }
 
 void SemanticChecker::exitCurrentScope()
 {
+  m_controlStack.pop();
 }
 
 bool SemanticChecker::isSymbolPresent(const string& name)
 {
+  if (m_symbolsTable.find(name) != m_symbolsTable.end())
+  {
+    return true;
+  }
+
   return false;
 }
 
 bool SemanticChecker::parametersMatch(const string& name,
-    const list<string>& parametersTypes)
+                                      list<string>& parametersTypes)
 {
-  return false;
+  if (m_symbolsTable.find(name) != m_symbolsTable.end())
+  {
+    bool isErrorFound = false;
+    if (parametersTypes.size() == m_symbolsTable[name].parametersTypes.size())
+    {
+      list<string>& tableValues =
+          m_symbolsTable[name].parametersTypes;
+
+      for (list<string>::iterator tableIt = tableValues.begin(),
+           checkIt = parametersTypes.begin();
+
+           tableIt != tableValues.end() && checkIt != parametersTypes.end() &&
+           !isErrorFound;
+
+           ++tableIt, ++checkIt)
+      {
+        if (tableIt->compare((*checkIt)) != 0)
+        {
+          isErrorFound = true;
+        }
+      }
+
+      if (isErrorFound)
+      {
+        return false;
+      }
+    }
+  }
+
+  return true;
 }
 

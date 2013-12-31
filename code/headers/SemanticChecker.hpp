@@ -23,6 +23,7 @@ typedef struct sd
   size_t                 line;
 } SymbolData_t;
 
+
 class SemanticChecker
 {
 public:
@@ -36,8 +37,9 @@ public:
   void        checkFunctionDeclared(const TokenLexeme& token,
                                     std::list<std::string> parametersTypes);
   void        checkModifiable(const TokenLexeme& iden);
+  void        checkExpression(const std::string& expression, int line, int row);
   std::string getFunctionType(const std::string& iden,
-                              const std::list<std::string>& parametersTypes);
+                              std::list<std::string>& parametersTypes);
 
   std::string getCurrentScope();
   bool        isInFor();
@@ -54,7 +56,7 @@ private:
                            const std::string& expectedType);
   bool isSymbolPresent(const std::string& name);
   bool parametersMatch(const std::string& name,
-                       const std::list<std::string>& parametersTypes);
+                       std::list<std::string>& parametersTypes);
 
   bool                                m_isMainPresent;
   bool                                m_isInFor;
