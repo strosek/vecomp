@@ -14,16 +14,51 @@ SemanticChecker::SemanticChecker(ErrorReporter * errorReporter) :
   m_controlStack(),
   m_symbolsTable()
 {
-  m_expressionTypes["bLb"] = "b";
-  m_expressionTypes["cAc"] = "i";
-  m_expressionTypes["cAi"] = "i";
-  m_expressionTypes["cRc"] = "b";
-  m_expressionTypes["fAf"] = "f";
-  m_expressionTypes["fAi"] = "f";
-  m_expressionTypes["iAc"] = "i";
-  m_expressionTypes["iAf"] = "f";
+  /* OPERATORS
+   *
+   * S = Sum (+)
+   * A = Arithmetic (- * /)
+   * P = Power (^)
+   * M = Modulo (%)
+   * R = Relational (< > <= >=)
+   * E = Equality (!= ==)
+   * L = Logical (&& ||)
+   *
+   * VALUES
+   *
+   * f = float
+   * i = integer
+   * b = boolean
+   * s = string
+   */
+  m_expressionTypes["iSi"] = "i";
   m_expressionTypes["iAi"] = "i";
-  m_expressionTypes["iEi"] = "f";
+  m_expressionTypes["iPi"] = "f";
+  m_expressionTypes["iMi"] = "i";
+  m_expressionTypes["iRi"] = "b";
+  m_expressionTypes["iEi"] = "b";
+
+  m_expressionTypes["fSf"] = "f";
+  m_expressionTypes["fAf"] = "f";
+  m_expressionTypes["fPf"] = "f";
+  m_expressionTypes["fRf"] = "b";
+  m_expressionTypes["fEf"] = "b";
+
+  m_expressionTypes["fSi"] = "f";
+  m_expressionTypes["fAi"] = "f";
+  m_expressionTypes["fPi"] = "f";
+  m_expressionTypes["fRi"] = "b";
+  m_expressionTypes["fEi"] = "b";
+  m_expressionTypes["iSf"] = "f";
+  m_expressionTypes["iAf"] = "f";
+  m_expressionTypes["iPf"] = "f";
+  m_expressionTypes["iRf"] = "b";
+  m_expressionTypes["iEf"] = "b";
+
+  m_expressionTypes["sRs"] = "b";
+  m_expressionTypes["s+s"] = "s";
+  m_expressionTypes["bLb"] = "b";
+  m_expressionTypes["bEb"] = "b";
 }
 
 void SemanticChecker::checkVariableDeclared(const TokenLexeme& token,
