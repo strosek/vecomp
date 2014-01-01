@@ -2,16 +2,19 @@
 
 #include "../headers/SemanticChecker.hpp"
 
+#include <utility>
+
 using namespace std;
 
 SemanticChecker::SemanticChecker(ErrorReporter * errorReporter) :
   m_isMainPresent(false),
-  m_isInFor(false),
-  m_isInSwitch(false),
+  m_forLevel(0),
+  m_switchLevel(0),
   m_isReturnCalled(false),
   m_errorReporter(errorReporter),
   m_expressionTypes(),
   m_controlStack(),
+  m_imports(),
   m_symbolsTable()
 {
   /* OPERATORS
@@ -138,6 +141,30 @@ void SemanticChecker::checkExpression(const string& expression,
   }
 }
 
+void SemanticChecker::checkDimensions(TokenLexeme& token, 
+                                      std::vector<int> sizes)
+{
+  if (isSymbolPresent(token.getLexeme()))
+  {
+    string message;
+
+    if (m_symbolsTable[token.getLexeme()].dimensions.size() <= 0)
+    {
+      message = "variable no dimensionada";
+    }
+    else if (sizes.size() < m_symbolsTable[token.getLexeme()].dimensions.size())
+    {
+      m_errorReporter->writeError(token.getLine(), token.getRow(),
+          token.getLexeme(), "fatan dimensiones");
+    }
+    else if (sizes.size() > m_symbolsTable[token.getLexeme()].dimensions.size())
+    {
+      m_errorReporter->writeError(token.getLine(), token.getRow(),
+          token.getLexeme(), "exceso de dimensiones");
+    }
+  }
+}
+
 string SemanticChecker::getFunctionType(const string& iden,
                                         list<string>& parametersTypes)
 {
@@ -161,7 +188,12 @@ string SemanticChecker::getCurrentScope()
 
 bool SemanticChecker::isInFor()
 {
-  return m_isInFor;
+  if (m_forLevel > 0)
+  {
+    return true;
+  }
+
+  return false;
 }
 
 bool SemanticChecker::isMainPresent()
@@ -171,7 +203,12 @@ bool SemanticChecker::isMainPresent()
 
 bool SemanticChecker::isInSwitch()
 {
-  return m_isInSwitch;
+  if (m_switchLevel > 0)
+  {
+    return true;
+  }
+
+  return false;
 }
 
 void SemanticChecker::setMainPresent(bool isPresent)
@@ -179,14 +216,24 @@ void SemanticChecker::setMainPresent(bool isPresent)
   m_isMainPresent = isPresent;
 }
 
-void SemanticChecker::setInFor(bool inFor)
+void SemanticChecker::enterFor()
 {
-  m_isInFor = inFor;
+  ++m_forLevel;
 }
 
-void SemanticChecker::setInSwitch(bool inSwitch)
+void SemanticChecker::enterSwitch()
 {
-  m_isInSwitch = inSwitch;
+  ++m_switchLevel;
+}
+
+void SemanticChecker::exitFor()
+{
+  --m_switchLevel;
+}
+
+void SemanticChecker::exitSwitch()
+{
+  --m_switchLevel;
 }
 
 void SemanticChecker::enterToScope(const string& scope)
@@ -242,5 +289,14 @@ bool SemanticChecker::parametersMatch(const string& name,
   }
 
   return true;
+}
+
+void SemanticChecker::addImport(const TokenLexeme& import)
+{
+  if (m_imports.insert(import.getLexeme()).second != true)
+  {
+    m_errorReporter->writeError(import.getLine(), import.getRow(),
+        import.getLexeme(), "libreria importada repetida");
+  }
 }
 

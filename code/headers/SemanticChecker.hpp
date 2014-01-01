@@ -5,6 +5,7 @@
 
 #include <list>
 #include <map>
+#include <set>
 #include <stack>
 #include <string>
 #include <vector>
@@ -14,6 +15,17 @@
 
 typedef struct sd
 {
+  sd() :
+    type(),
+    dimensions(),
+    parametersTypes(),
+    returnType(),
+    scope(),
+    isConstant(false),
+    line(1)
+  {
+  }
+
   std::string            type;
   std::vector<int>       dimensions;
   std::list<std::string> parametersTypes;
@@ -38,6 +50,7 @@ public:
                                     std::list<std::string> parametersTypes);
   void        checkModifiable(const TokenLexeme& iden);
   void        checkExpression(const std::string& expression, int line, int row);
+  void        checkDimensions(TokenLexeme& token, std::vector<int> sizes);
   std::string getFunctionType(const std::string& iden,
                               std::list<std::string>& parametersTypes);
 
@@ -47,10 +60,13 @@ public:
   bool        isInSwitch();
 
   void        setMainPresent(bool isPresent);
-  void        setInFor(bool isInFor);
-  void        setInSwitch(bool isInSwitch);
+  void        enterFor();
+  void        exitFor();
+  void        enterSwitch();
+  void        exitSwitch();
   void        enterToScope(const std::string& scope);
   void        exitCurrentScope();
+  void        addImport(const TokenLexeme& import);
 private:
   void checkExpressionType(const std::string& expression,
                            const std::string& expectedType);
@@ -59,13 +75,14 @@ private:
                        std::list<std::string>& parametersTypes);
 
   bool                                m_isMainPresent;
-  bool                                m_isInFor;
-  bool                                m_isInSwitch;
+  int                                 m_forLevel;
+  int                                 m_switchLevel;
   bool                                m_isReturnCalled;
 
   ErrorReporter *                     m_errorReporter;
   std::map<std::string, std::string>  m_expressionTypes;
   std::stack<std::string>             m_controlStack;
+  std::set<std::string>               m_imports;
   std::map<std::string, SymbolData_t> m_symbolsTable;
 };
 
