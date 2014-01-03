@@ -228,7 +228,7 @@ void SemanticChecker::enterSwitch()
 
 void SemanticChecker::exitFor()
 {
-  --m_switchLevel;
+  --m_forLevel;
 }
 
 void SemanticChecker::exitSwitch()
