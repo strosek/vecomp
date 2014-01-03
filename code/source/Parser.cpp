@@ -15,7 +15,8 @@ Parser::Parser(FileReader* fileReader, ErrorReporter* errorReporter) :
   m_scanner(Scanner(fileReader, errorReporter)),
   m_errorReporter(errorReporter),
   m_maxErrors(5),
-  m_nTokensProcessed(0)
+  m_nTokensProcessed(0),
+  m_semanticChecker(SemanticChecker(errorReporter))
 {
   m_maxErrors = m_errorReporter->getMaxErrors();
 }
@@ -38,9 +39,14 @@ void Parser::parse()
 #endif
   program();
 
+  if (!m_semanticChecker.isMainPresent())
+  {
+    m_errorReporter->writeError("no se declaro una funcion principal");
+  }
+
 #ifdef DEBUG
-    cout << "expected tokens: " << m_scanner.getTokensProcessed() <<
-        ", got: " << m_scanner.getMaxTokens() << endl;
+  cout << "expected tokens: " << m_scanner.getTokensProcessed() <<
+      ", got: " << m_scanner.getMaxTokens() << endl;
 #endif
   if (m_scanner.getTokensProcessed() != m_scanner.getMaxTokens())
   {
@@ -139,6 +145,8 @@ void Parser::caseStatement()
 #endif
   if (m_errorReporter->getErrors() >= m_maxErrors)
     return;
+
+  m_semanticChecker.enterSwitch();
   
   checkLexeme("caso");
   checkToken(TOKEN_IDEN);
@@ -170,6 +178,7 @@ void Parser::caseStatement()
 
   checkLexeme("}");
 
+  m_semanticChecker.exitSwitch();
 #ifdef DEBUG
   cout << "::: exit caseStatement()" << endl;
 #endif
@@ -185,7 +194,7 @@ void Parser::command()
 
 #ifdef DEBUG
   cout << "checking for command first word, got: " <<
-      m_currentToken.getLexeme()<< endl;
+      m_currentToken.getLexeme() << endl;
 #endif
 
   if (m_currentToken.getToken() == TOKEN_IDEN)
@@ -253,10 +262,24 @@ void Parser::command()
   else if (m_currentToken.getLexeme().compare("interrumpe") == 0)
   {
     advanceToken();
+
+    if (!m_semanticChecker.isInSwitch() && !m_semanticChecker.isInFor())
+    {
+      TokenLexeme lastToken = getLastToken();
+      m_errorReporter->writeError(lastToken.getLine(), lastToken.getRow(),
+            lastToken.getLexeme(),
+            "interrumpe solo es permitido en ciclo desde o en caso");
+    }
   }
   else if (m_currentToken.getLexeme().compare("continua") == 0)
   {
     advanceToken();
+    if (!m_semanticChecker.isInFor())
+    {
+      TokenLexeme lastToken = getLastToken();
+      m_errorReporter->writeError(lastToken.getLine(), lastToken.getRow(),
+            lastToken.getLexeme(), "continua solo es permitido en ciclo desde");
+    }
   }
   else
   {
@@ -391,6 +414,8 @@ void Parser::forStatement()
 #ifdef DEBUG
   cout << "::: entering forStatement()" << endl;
 #endif
+  m_semanticChecker.enterFor();
+
   if (m_errorReporter->getErrors() >= m_maxErrors)
     return;
   
@@ -442,6 +467,7 @@ void Parser::forStatement()
 
   block();
 
+  m_semanticChecker.exitFor();
 #ifdef DEBUG
   cout << "::: exit forStatement()" << endl;
 #endif
@@ -489,6 +515,10 @@ void Parser::functionDeclaration()
 
   checkLexeme("funcion");
   checkToken(TOKEN_IDEN);
+  if (getLastToken().getLexeme().compare("principal") == 0)
+  {
+    m_semanticChecker.setMainPresent(true);
+  }
   checkLexeme("(");
   parameterList();
   checkLexeme(")");
@@ -1129,6 +1159,12 @@ void Parser::advanceToken()
 {
   m_currentToken = m_scanner.getNextTokenLexeme();
   ++m_nTokensProcessed;
+}
+
+TokenLexeme Parser::getLastToken()
+{
+  m_scanner.moveTokenBackwards();
+  return m_scanner.getNextTokenLexeme();
 }
 
 bool Parser::isNativeDataType(const string& lexeme)

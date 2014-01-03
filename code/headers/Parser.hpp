@@ -5,10 +5,11 @@
 
 #include <string>
 
-#include "Scanner.hpp"
-#include "TokenLexeme.hpp"
 #include "ErrorReporter.hpp"
 #include "FileReader.hpp"
+#include "Scanner.hpp"
+#include "SemanticChecker.hpp"
+#include "TokenLexeme.hpp"
 
 class Parser
 {
@@ -52,20 +53,22 @@ private:
   void variablesDeclaration();
   void variablesList();
 
-  void advanceToken();
-  void checkToken(TokenType_t token);
-  void checkLexeme(const std::string& lexeme);
-  void checkNativeDataType();
-  void checkLiteral();
-  void ignoreNewLines();
-  bool isNativeDataType(const std::string& lexeme);
-  bool isLiteral(TokenType_t token);
+  void        advanceToken();
+  TokenLexeme getLastToken();
+  void        checkToken(TokenType_t token);
+  void        checkLexeme(const std::string& lexeme);
+  void        checkNativeDataType();
+  void        checkLiteral();
+  void        ignoreNewLines();
+  bool        isNativeDataType(const std::string& lexeme);
+  bool        isLiteral(TokenType_t token);
 
-  TokenLexeme    m_currentToken;
-  Scanner        m_scanner;
-  ErrorReporter* m_errorReporter;
-  int            m_maxErrors;
-  int            m_nTokensProcessed;
+  TokenLexeme     m_currentToken;
+  Scanner         m_scanner;
+  ErrorReporter*  m_errorReporter;
+  int             m_maxErrors;
+  int             m_nTokensProcessed;
+  SemanticChecker m_semanticChecker;
 };
 
 #endif /* PARSER_HPP */
