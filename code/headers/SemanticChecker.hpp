@@ -20,14 +20,18 @@ typedef enum
   TYPE_FLOAT,
   TYPE_CHAR,
   TYPE_STRING,
-  TYPE_BOOL
+  TYPE_BOOL,
+  TYPE_VOID
 } NativeType_t;
+
+typedef std::list<std::pair<int, NativeType_t> > ParametersList_t;
 
 typedef struct sd
 {
   sd() :
     type(),
     dimensions(),
+    isFunction(false),
     parametersList(),
     scope(),
     isConstant(false),
@@ -35,13 +39,15 @@ typedef struct sd
   {
   }
 
-  NativeType_t                             type;
-  std::vector<int>                         dimensions;
-  std::list<std::pair<int, NativeType_t> > parametersList;
-  std::string                              scope;
-  bool                                     isConstant;
-  size_t                                   line;
+  NativeType_t     type;
+  std::vector<int> dimensions;
+  bool             isFunction;
+  ParametersList_t parametersList;
+  std::string      scope;
+  bool             isConstant;
+  size_t           line;
 } SymbolData_t;
+
 
 class SemanticChecker
 {
@@ -56,18 +62,17 @@ public:
   void checkVariableNotDeclared(const TokenLexeme& token,
       const std::string& scope);
   void checkFunctionDeclared(const TokenLexeme& token,
-      std::list<std::pair<int, NativeType_t> > parametersList);
+                             ParametersList_t parametersList);
   void checkFunctionNotDeclared(const TokenLexeme& token,
-      std::list<std::pair<int, NativeType_t> > parametersList);
+                                ParametersList_t parametersList);
   void checkModifiable(const TokenLexeme& iden);
   void checkExpression(const std::string& expression, int line, int row);
   void checkDimensions(TokenLexeme& token, std::vector<int> sizes);
 
   std::string getTypeString(NativeType_t type);
-  std::string getParametersString(
-      std::list<std::pair<int, NativeType_t> > parametersList);
+  std::string getParametersString(ParametersList_t parametersList);
   std::string getFunctionType(const std::string& iden,
-      std::list<std::pair<int, NativeType_t> > parametersList);
+                              ParametersList_t parametersList);
   std::string getCurrentScope();
   bool        isInFor();
   bool        isMainPresent();
@@ -90,8 +95,8 @@ private:
   void checkExpressionType(const std::string& expression,
       NativeType_t expectedType);
   bool isSymbolPresent(const std::string& name);
-  bool parametersMatch(const std::string& name,
-      std::list<std::pair<int, NativeType_t> > parametersList);
+  bool parametersMatch(const std::string& name, 
+                       ParametersList_t parametersList);
 
   bool                                m_isMainPresent;
   int                                 m_forLevel;

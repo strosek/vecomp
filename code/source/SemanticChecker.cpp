@@ -116,7 +116,7 @@ void SemanticChecker::checkVariableNotDeclared(const TokenLexeme& token,
 }
 
 void SemanticChecker::checkFunctionDeclared(const TokenLexeme& token,
-    list<pair<int, NativeType_t> > parametersList)
+                                            ParametersList_t parametersList)
 {
   bool isErrorFound = false;
   string message;
@@ -142,7 +142,7 @@ void SemanticChecker::checkFunctionDeclared(const TokenLexeme& token,
 }
 
 void SemanticChecker::checkFunctionNotDeclared(const TokenLexeme& token,
-    list<pair<int, NativeType_t> > parametersList)
+                                               ParametersList_t parametersList)
 {
   string message;
   if (isSymbolPresent(token.getLexeme()))
@@ -159,12 +159,12 @@ void SemanticChecker::checkFunctionNotDeclared(const TokenLexeme& token,
 
 void SemanticChecker::checkModifiable(const TokenLexeme& token)
 {
-  if (m_symbolsTable.find(token.getLexeme()) != m_symbolsTable.end())
+  if (isSymbolPresent(token.getLexeme()))
   {
-    if (!m_symbolsTable[token.getLexeme()].isConstant)
+    if (m_symbolsTable[token.getLexeme()].isConstant)
     {
       m_errorReporter->writeError(token.getLine(), token.getRow(),
-                                  token.getLexeme(), "variable es constante");
+          token.getLexeme(), "no se puede modificar constante");
     }
   }
 }
@@ -203,7 +203,7 @@ void SemanticChecker::checkDimensions(TokenLexeme& token, vector<int> sizes)
 }
 
 string SemanticChecker::getFunctionType(const string& iden,
-    list<pair<int, NativeType_t> > parametersList)
+                                        ParametersList_t parametersList)
 {
   string returnValue;
 
@@ -294,7 +294,7 @@ bool SemanticChecker::isSymbolPresent(const string& name)
 }
 
 bool SemanticChecker::parametersMatch(const string& name,
-    list<pair<int, NativeType_t> > parametersList)
+                                      ParametersList_t parametersList)
 {
   if (isSymbolPresent(name))
   {
@@ -325,28 +325,39 @@ void SemanticChecker::addImport(const TokenLexeme& import)
 
 void SemanticChecker::printSymbolsTable()
 {
-  const int k_fieldWidth = 10;
-  const int k_nFields = 7;
+  const int k_fieldWidthLong = 20;
+  const int k_fieldWidthShort = 9;
+  const int k_parametersWidth = 40;
 
-  cout << setw(k_fieldWidth) << "NAME" << 
-      setw(k_fieldWidth) << "TYPE" << setw(k_fieldWidth) << "DIM" <<
-      setw(k_fieldWidth) << "PARAMS" << setw(k_fieldWidth) << "SCOPE" <<
-      setw(k_fieldWidth) << "CONST" << setw(k_fieldWidth) << "LINE" << endl;
-  setfill('=');
-  cout << setw(k_fieldWidth * k_nFields) << ' ' << endl;
-  setfill(' ');
+  cout << setw(k_fieldWidthLong) << "NAME" << 
+      setw(k_fieldWidthLong) << "TYPE" <<
+      setw(k_fieldWidthShort) << "DIM" << 
+      setw(k_fieldWidthShort) << "FUNCTION" <<
+      setw(k_parametersWidth) << "PARAMS" << 
+      setw(k_fieldWidthLong) << "SCOPE" <<
+      setw(k_fieldWidthShort) << "CONST" << 
+      setw(k_fieldWidthShort) << "LINE" << endl;
+  cout << endl;
 
   for (map<string, SymbolData_t>::iterator it = m_symbolsTable.begin();
        it != m_symbolsTable.end(); ++it)
   {
-    cout << setw(k_fieldWidth) << it->first;
-    cout << setw(k_fieldWidth) << getTypeString(it->second.type);
-    cout << setw(k_fieldWidth) << it->second.dimensions.size();
-    cout << setw(k_fieldWidth) <<
-        getParametersString(it->second.parametersList); 
-    cout << setw(k_fieldWidth) << it->second.scope;
-    cout << setw(k_fieldWidth) << it->second.isConstant;
-    cout << setw(k_fieldWidth) << it->second.line;
+    cout << setw(k_fieldWidthLong) << it->first;
+    cout << setw(k_fieldWidthLong) << getTypeString(it->second.type);
+    cout << setw(k_fieldWidthShort) << it->second.dimensions.size();
+    cout << setw(k_fieldWidthShort) << boolalpha << it->second.isFunction;
+    if (!it->second.parametersList.empty())
+    {
+      cout << setw(k_parametersWidth) <<
+          getParametersString(it->second.parametersList); 
+    }
+    else
+    {
+      cout << setw(k_parametersWidth) << "nada";
+    }
+    cout << setw(k_fieldWidthLong) << it->second.scope;
+    cout << setw(k_fieldWidthShort) << boolalpha << it->second.isConstant;
+    cout << setw(k_fieldWidthShort) << it->second.line;
     cout << endl;
   }
 }
@@ -361,16 +372,19 @@ string SemanticChecker::getTypeString(NativeType_t type)
       typeString = "entero";
       break;
     case TYPE_CHAR:
-      typeString = "car";
+      typeString = "caracter";
       break;
     case TYPE_FLOAT :
       typeString = "real";
       break;
     case TYPE_STRING :
-      typeString = "cadena";
+      typeString = "alfabetico";
       break;
     case TYPE_BOOL :
       typeString = "logico";
+      break;
+    case TYPE_VOID :
+      typeString = "nada";
       break;
     default :
       cout << "error: unkown type" << endl;
@@ -380,11 +394,10 @@ string SemanticChecker::getTypeString(NativeType_t type)
   return typeString;
 }
 
-string SemanticChecker::getParametersString(
-    list<pair<int, NativeType_t> > parametersList)
+string SemanticChecker::getParametersString(ParametersList_t parametersList)
 {
   stringstream stringBuilder;
-  for (list<pair<int, NativeType_t> >::iterator it = parametersList.begin();
+  for (ParametersList_t::iterator it = parametersList.begin();
        it != parametersList.end(); ++it)
   {
     stringBuilder << it->first << getTypeString(it->second);
