@@ -424,3 +424,19 @@ void SemanticChecker::addSymbols(
   }
 }
 
+void SemanticChecker::checkReturnType(TokenLexeme& token)
+{
+  // FIXME: key should have function/scope/name data
+//  if (m_symbolsTable[getCurrentScope()].type != getTypeFromString())
+//  {
+//    m_errorReporter->writeError(token.getLine(), token.getRow(),
+//        token.getLexeme(), "tipo de retorno no coincide con el declarado");
+//  }
+}
+
+void SemanticChecker::checkReturnShouldBeCalled(bool isCalled)
+{
+  // FIXME: key should have function/scope/name data
+  //if (m_symbolsTable[getCurrentScope()].type())
+}
+

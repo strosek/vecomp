@@ -67,6 +67,7 @@ private:
   NativeType_t getLiteralType(TokenType_t token);
   NativeType_t getTypeFromString(const std::string& typeString);
   void         addSymbolAndReset(const std::string& name, SymbolData_t data);
+  void         setCurrentSymbolsData();
 
   TokenLexeme                                      m_currentToken;
   Scanner                                          m_scanner;

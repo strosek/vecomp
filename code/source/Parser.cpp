@@ -354,6 +354,8 @@ void Parser::constant()
 
   m_currentSymbolData.type = getLiteralType(getLastToken().getToken());
 
+  m_currentSymbolName += "@";
+  m_currentSymbolName += m_semanticChecker.getCurrentScope();
   m_semanticChecker.addSymbol(m_currentSymbolName, m_currentSymbolData);
 #ifdef DEBUG
   cout << "::: exit constant()" << endl;
@@ -541,6 +543,9 @@ void Parser::functionDeclaration()
   }
 
   m_currentSymbolName = getLastToken().getLexeme();
+  m_currentSymbolName += "()@";
+  m_currentSymbolName += m_semanticChecker.getCurrentScope();
+
   m_currentSymbolData.isFunction = true;
   m_currentSymbolData.line = getLastToken().getLine();
   m_currentSymbolData.scope = m_semanticChecker.getCurrentScope();
@@ -679,26 +684,38 @@ void Parser::parameterList()
   if (m_errorReporter->getErrors() >= m_maxErrors)
     return;
 
-  int nTypeParameters = 0;
+  string nameWithScope;
+  int    nTypeParameters;
 
   advanceToken();
   while (m_currentToken.getLexeme().compare(")") != 0)
   {
-    nTypeParameters = 0;
-
     m_scanner.moveTokenBackwards();
+
+    nTypeParameters = 0;
     do
     {
       ++nTypeParameters;
+
       checkToken(TOKEN_IDEN);
+
+      nameWithScope = getLastToken().getLexeme();
+      nameWithScope += "@";
+      nameWithScope += m_semanticChecker.getCurrentScope();
+      m_currentSymbols.push_back(
+          make_pair(nameWithScope, SymbolData_t()));
+
       advanceToken();
     } while (m_currentToken.getLexeme().compare(",") == 0);
 
     m_scanner.moveTokenBackwards();
     checkNativeDataType();
 
-    m_currentSymbolData.parametersList.push_back(make_pair(
-          nTypeParameters, getTypeFromString(getLastToken().getLexeme())));
+    m_currentSymbolData.parametersList.push_back(
+        make_pair(nTypeParameters,
+        getTypeFromString(getLastToken().getLexeme())));
+
+    setCurrentSymbolsData();
 
     advanceToken();
   }
@@ -1081,12 +1098,16 @@ void Parser::variablesList()
 #ifdef DEBUG
   cout << "::: entering variablesList()" << endl;
 #endif
+  string nameWithScope;
   do
   {
     checkToken(TOKEN_IDEN);
 
+    nameWithScope = getLastToken().getLexeme();
+    nameWithScope += "@";
+    nameWithScope += m_semanticChecker.getCurrentScope();
     m_currentSymbols.push_back(
-        make_pair(getLastToken().getLexeme(), SymbolData_t()));
+        make_pair(nameWithScope, SymbolData_t()));
 
     advanceToken();
     if (m_currentToken.getLexeme().compare("[") == 0)
@@ -1107,6 +1128,9 @@ void Parser::variablesList()
   } while (m_currentToken.getLexeme().compare(",") == 0);
 
   checkNativeDataType();
+
+  setCurrentSymbolsData();
+
 #ifdef DEBUG
   cout << "::: exit variablesList()" << endl;
 #endif
@@ -1320,9 +1344,13 @@ NativeType_t Parser::getTypeFromString(const string& typeString)
   return type;
 }
 
-void Parser::addSymbolAndReset(const std::string& name, SymbolData_t data)
+void Parser::addSymbolAndReset(const string& name, SymbolData_t data)
 {
-  m_semanticChecker.addSymbol(name, data);
+  if (name.length() > 0)
+  {
+    m_semanticChecker.addSymbol(name, data);
+  }
+
   m_currentSymbolName = "";
   m_currentSymbolData.type = TYPE_VOID;
   m_currentSymbolData.dimensions.clear();
@@ -1330,6 +1358,19 @@ void Parser::addSymbolAndReset(const std::string& name, SymbolData_t data)
   m_currentSymbolData.isFunction = false;
   m_currentSymbolData.isConstant = false;
   m_currentSymbolData.line = 1;
-  m_currentSymbolData.scope = 1;
+  m_currentSymbolData.scope = "";
+}
+
+void Parser::setCurrentSymbolsData()
+{
+  for (list<pair<string, SymbolData_t> >::iterator it =
+       m_currentSymbols.begin(); it != m_currentSymbols.end(); ++it)
+  {
+    it->second.type = getTypeFromString(getLastToken().getLexeme());
+    it->second.line = getLastToken().getLine();
+    it->second.scope = m_semanticChecker.getCurrentScope();
+
+    m_semanticChecker.addSymbol(it->first, it->second);
+  }
 }
 

@@ -68,6 +68,8 @@ public:
   void checkModifiable(const TokenLexeme& iden);
   void checkExpression(const std::string& expression, int line, int row);
   void checkDimensions(TokenLexeme& token, std::vector<int> sizes);
+  void checkReturnType(TokenLexeme& token);
+  void checkReturnShouldBeCalled(bool isCalled);
 
   std::string getTypeString(NativeType_t type);
   std::string getParametersString(ParametersList_t parametersList);
@@ -77,10 +79,12 @@ public:
   bool        isInFor();
   bool        isMainPresent();
   bool        isInSwitch();
+  bool        isReturnCalled();
 
   void printSymbolsTable();
 
   void setMainPresent(bool isPresent);
+  void setReturnCalled(bool isCalled);
   void enterFor();
   void exitFor();
   void enterSwitch();
