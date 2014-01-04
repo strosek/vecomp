@@ -55,15 +55,18 @@ private:
   void variablesDeclaration();
   void variablesList();
 
-  void        advanceToken();
-  TokenLexeme getLastToken();
-  void        checkToken(TokenType_t token);
-  void        checkLexeme(const std::string& lexeme);
-  void        checkNativeDataType();
-  void        checkLiteral();
-  void        ignoreNewLines();
-  bool        isNativeDataType(const std::string& lexeme);
-  bool        isLiteral(TokenType_t token);
+  void         advanceToken();
+  TokenLexeme  getLastToken();
+  void         checkToken(TokenType_t token);
+  void         checkLexeme(const std::string& lexeme);
+  void         checkNativeDataType();
+  void         checkLiteral();
+  void         ignoreNewLines();
+  bool         isNativeDataType(const std::string& lexeme);
+  bool         isLiteral(TokenType_t token);
+  NativeType_t getLiteralType(TokenType_t token);
+  NativeType_t getTypeFromString(const std::string& typeString);
+  void         addSymbolAndReset(const std::string& name, SymbolData_t data);
 
   TokenLexeme                                      m_currentToken;
   Scanner                                          m_scanner;
@@ -71,6 +74,8 @@ private:
   int                                              m_maxErrors;
   int                                              m_nTokensProcessed;
   SemanticChecker                                  m_semanticChecker;
+  std::string                                      m_currentSymbolName;
+  SymbolData_t                                     m_currentSymbolData;
   std::list<std::pair<std::string, SymbolData_t> > m_currentSymbols;
 };
 

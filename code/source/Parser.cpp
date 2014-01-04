@@ -17,6 +17,8 @@ Parser::Parser(FileReader* fileReader, ErrorReporter* errorReporter) :
   m_maxErrors(5),
   m_nTokensProcessed(0),
   m_semanticChecker(SemanticChecker(errorReporter)),
+  m_currentSymbolName(),
+  m_currentSymbolData(),
   m_currentSymbols()
 {
   m_maxErrors = m_errorReporter->getMaxErrors();
@@ -48,6 +50,9 @@ void Parser::parse()
 #ifdef DEBUG
   cout << "expected tokens: " << m_scanner.getTokensProcessed() <<
       ", got: " << m_scanner.getMaxTokens() << endl;
+
+  cout << "\n::: Symbols table :::::::::::::::::::::::::::::::::::::::" << endl;
+  m_semanticChecker.printSymbolsTable();
 #endif
   if (m_scanner.getTokensProcessed() != m_scanner.getMaxTokens())
   {
@@ -218,6 +223,9 @@ void Parser::command()
       if (m_currentToken.getToken() == TOKEN_ASSIGNOP)
       {
         m_scanner.moveTokenBackwards();
+
+        m_semanticChecker.checkModifiable(getLastToken());
+
         assign();
       }
       else if (m_currentToken.getLexeme().compare("[") == 0)
@@ -335,9 +343,18 @@ void Parser::constant()
 
   checkToken(TOKEN_IDEN);
 
+  m_currentSymbolName = getLastToken().getLexeme();
+  m_currentSymbolData.scope = m_semanticChecker.getCurrentScope();
+  m_currentSymbolData.isConstant = true;
+  m_currentSymbolData.line = getLastToken().getLine();
+
   checkToken(TOKEN_ASSIGNOP);
 
   checkLiteral();
+
+  m_currentSymbolData.type = getLiteralType(getLastToken().getToken());
+
+  m_semanticChecker.addSymbol(m_currentSymbolName, m_currentSymbolData);
 #ifdef DEBUG
   cout << "::: exit constant()" << endl;
 #endif
@@ -523,12 +540,21 @@ void Parser::functionDeclaration()
     m_semanticChecker.setMainPresent(true);
   }
 
+  m_currentSymbolName = getLastToken().getLexeme();
+  m_currentSymbolData.isFunction = true;
+  m_currentSymbolData.line = getLastToken().getLine();
+  m_currentSymbolData.scope = m_semanticChecker.getCurrentScope();
+  m_currentSymbolData.isConstant = false;
+
   m_semanticChecker.enterToScope(getLastToken().getLexeme());
 
   checkLexeme("(");
   parameterList();
   checkLexeme(")");
   returnType();
+
+  addSymbolAndReset(m_currentSymbolName, m_currentSymbolData);
+
   block();
 
   m_semanticChecker.exitCurrentScope();
@@ -579,6 +605,9 @@ void Parser::import()
     do
     {
       checkToken(TOKEN_STRING);
+
+      m_semanticChecker.addImport(getLastToken());
+
       advanceToken();
     } while (m_currentToken.getToken() == TOKEN_NEWLINE);
 
@@ -650,18 +679,26 @@ void Parser::parameterList()
   if (m_errorReporter->getErrors() >= m_maxErrors)
     return;
 
+  int nTypeParameters = 0;
+
   advanceToken();
   while (m_currentToken.getLexeme().compare(")") != 0)
   {
+    nTypeParameters = 0;
+
     m_scanner.moveTokenBackwards();
     do
     {
+      ++nTypeParameters;
       checkToken(TOKEN_IDEN);
       advanceToken();
     } while (m_currentToken.getLexeme().compare(",") == 0);
 
     m_scanner.moveTokenBackwards();
     checkNativeDataType();
+
+    m_currentSymbolData.parametersList.push_back(make_pair(
+          nTypeParameters, getTypeFromString(getLastToken().getLexeme())));
 
     advanceToken();
   }
@@ -858,6 +895,8 @@ void Parser::returnType()
     {
       m_scanner.moveTokenBackwards();
       checkNativeDataType();
+
+      m_currentSymbolData.type = getTypeFromString(getLastToken().getLexeme());
     }
   }
   else
@@ -1184,9 +1223,10 @@ TokenLexeme Parser::getLastToken()
 
 bool Parser::isNativeDataType(const string& lexeme)
 {
-    if (lexeme.compare("entero") == 0 ||
-        lexeme.compare("real") == 0   ||
-        lexeme.compare("logico") == 0 ||
+    if (lexeme.compare("caracter") == 0 ||
+        lexeme.compare("entero") == 0   ||
+        lexeme.compare("real") == 0     ||
+        lexeme.compare("logico") == 0   ||
         lexeme.compare("alfabetico") == 0)
     {
       return true;
@@ -1207,5 +1247,89 @@ bool Parser::isLiteral(TokenType_t token)
   }
 
   return false;
+}
+
+
+NativeType_t Parser::getLiteralType(TokenType_t token)
+{
+  NativeType_t type;
+  switch (token)
+  {
+  case TOKEN_DEC :
+  case TOKEN_HEX :
+  case TOKEN_OCT :
+    type = TYPE_INTEGER;
+    break;
+  case TOKEN_FLOAT :
+    type = TYPE_FLOAT;
+    break;
+  case TOKEN_STRING :
+    type = TYPE_STRING;
+    break;
+  case TOKEN_CHARCONST :
+    type = TYPE_CHAR;
+    break;
+  case TOKEN_LOGICCONST :
+    type = TYPE_BOOL;
+    break;
+  case TOKEN_INVALID :
+  case TOKEN_IDEN :
+  case TOKEN_KEYWORD :
+  case TOKEN_ARITHOP :
+  case TOKEN_LOGICOP :
+  case TOKEN_RELOP :
+  case TOKEN_DELIMITER :
+  case TOKEN_LINECOMMENT :
+  case TOKEN_MULTICOMMENT :
+  case TOKEN_ASSIGNOP :
+  case TOKEN_NEWLINE :
+  default :
+    cout << "error: invalid native type" << endl;
+    break;
+  }
+
+  return type;
+}
+
+NativeType_t Parser::getTypeFromString(const string& typeString)
+{
+  NativeType_t type;
+
+  switch (typeString.at(0))
+  {
+  case 'e' :
+    type = TYPE_INTEGER;
+    break;
+  case 'r' :
+    type = TYPE_FLOAT;
+    break;
+  case 'a' :
+    type = TYPE_STRING;
+    break;
+  case 'c' :
+    type = TYPE_CHAR;
+    break;
+  case 'l' :
+    type = TYPE_BOOL;
+    break;
+  default :
+    cout << "error: invalid native type" << endl;
+    break;
+  }
+
+  return type;
+}
+
+void Parser::addSymbolAndReset(const std::string& name, SymbolData_t data)
+{
+  m_semanticChecker.addSymbol(name, data);
+  m_currentSymbolName = "";
+  m_currentSymbolData.type = TYPE_VOID;
+  m_currentSymbolData.dimensions.clear();
+  m_currentSymbolData.parametersList.clear();
+  m_currentSymbolData.isFunction = false;
+  m_currentSymbolData.isConstant = false;
+  m_currentSymbolData.line = 1;
+  m_currentSymbolData.scope = 1;
 }
 
