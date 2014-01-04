@@ -562,6 +562,8 @@ void Parser::functionDeclaration()
 
   block();
 
+  m_semanticChecker.checkReturnShouldBeCalled(getLastToken().getLine());
+
   m_semanticChecker.exitCurrentScope();
 #ifdef DEBUG
   cout << "::: exit functionDeclaration()" << endl;
@@ -868,6 +870,7 @@ void Parser::returnExpression()
   if (m_currentToken.getLexeme().compare(";") != 0 &&
       m_currentToken.getToken() != TOKEN_NEWLINE)
   {
+    m_semanticChecker.setReturnCalled(true);
     expression();
   }
 
@@ -887,6 +890,7 @@ void Parser::returnType()
   advanceToken();
   if (m_currentToken.getLexeme().compare("{") != 0)
   {
+    m_semanticChecker.setReturnRequired(true);
     if (m_currentToken.getLexeme().compare("(") == 0)
     {
       checkLexeme("(");
@@ -919,6 +923,8 @@ void Parser::returnType()
   else
   {
     m_scanner.moveTokenBackwards();
+
+    m_semanticChecker.setReturnRequired(false);
   }
 
 #ifdef DEBUG

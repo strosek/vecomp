@@ -69,7 +69,7 @@ public:
   void checkExpression(const std::string& expression, int line, int row);
   void checkDimensions(TokenLexeme& token, std::vector<int> sizes);
   void checkReturnType(TokenLexeme& token);
-  void checkReturnShouldBeCalled(bool isCalled);
+  void checkReturnShouldBeCalled(int functionEndLine);
 
   std::string getTypeString(NativeType_t type);
   std::string getParametersString(ParametersList_t parametersList);
@@ -85,6 +85,7 @@ public:
 
   void setMainPresent(bool isPresent);
   void setReturnCalled(bool isCalled);
+  void setReturnRequired(bool isRequired);
   void enterFor();
   void exitFor();
   void enterSwitch();
@@ -106,6 +107,7 @@ private:
   int                                 m_forLevel;
   int                                 m_switchLevel;
   bool                                m_isReturnCalled;
+  bool                                m_isReturnRequired;
 
   ErrorReporter *                     m_errorReporter;
   std::map<std::string, std::string>  m_expressionTypes;

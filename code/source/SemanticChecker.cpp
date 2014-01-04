@@ -14,6 +14,7 @@ SemanticChecker::SemanticChecker(ErrorReporter * errorReporter) :
   m_forLevel(0),
   m_switchLevel(0),
   m_isReturnCalled(false),
+  m_isReturnRequired(false),
   m_errorReporter(errorReporter),
   m_expressionTypes(),
   m_controlStack(),
@@ -248,9 +249,24 @@ bool SemanticChecker::isInSwitch()
   return false;
 }
 
+bool SemanticChecker::isReturnCalled()
+{
+  return m_isReturnCalled;
+}
+
 void SemanticChecker::setMainPresent(bool isPresent)
 {
   m_isMainPresent = isPresent;
+}
+
+void SemanticChecker::setReturnRequired(bool isRequired)
+{
+  m_isReturnRequired = isRequired;
+}
+
+void SemanticChecker::setReturnCalled(bool isCalled)
+{
+  m_isReturnCalled = isCalled;
 }
 
 void SemanticChecker::enterFor()
@@ -426,17 +442,22 @@ void SemanticChecker::addSymbols(
 
 void SemanticChecker::checkReturnType(TokenLexeme& token)
 {
-  // FIXME: key should have function/scope/name data
-//  if (m_symbolsTable[getCurrentScope()].type != getTypeFromString())
-//  {
-//    m_errorReporter->writeError(token.getLine(), token.getRow(),
-//        token.getLexeme(), "tipo de retorno no coincide con el declarado");
-//  }
 }
 
-void SemanticChecker::checkReturnShouldBeCalled(bool isCalled)
+void SemanticChecker::checkReturnShouldBeCalled(int functionEndLine)
 {
-  // FIXME: key should have function/scope/name data
-  //if (m_symbolsTable[getCurrentScope()].type())
+  if (m_isReturnRequired && !m_isReturnCalled)
+  {
+    m_errorReporter->writeError(functionEndLine, 1, "",
+        "funcion con tipo no puede omitir regresa");
+  }
+  else if (!m_isReturnRequired && m_isReturnCalled)
+  {
+    m_errorReporter->writeError(functionEndLine, 1, "",
+        "funcion sin tipo no puede regresar un valor");
+  }
+  
+  m_isReturnRequired = false;
+  m_isReturnCalled = false;
 }
 
