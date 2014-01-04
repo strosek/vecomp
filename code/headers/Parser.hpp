@@ -3,7 +3,9 @@
 #ifndef PARSER_HPP
 #define PARSER_HPP
 
+#include <list>
 #include <string>
+#include <utility>
 
 #include "ErrorReporter.hpp"
 #include "FileReader.hpp"
@@ -63,12 +65,13 @@ private:
   bool        isNativeDataType(const std::string& lexeme);
   bool        isLiteral(TokenType_t token);
 
-  TokenLexeme     m_currentToken;
-  Scanner         m_scanner;
-  ErrorReporter*  m_errorReporter;
-  int             m_maxErrors;
-  int             m_nTokensProcessed;
-  SemanticChecker m_semanticChecker;
+  TokenLexeme                                      m_currentToken;
+  Scanner                                          m_scanner;
+  ErrorReporter*                                   m_errorReporter;
+  int                                              m_maxErrors;
+  int                                              m_nTokensProcessed;
+  SemanticChecker                                  m_semanticChecker;
+  std::list<std::pair<std::string, SymbolData_t> > m_currentSymbols;
 };
 
 #endif /* PARSER_HPP */

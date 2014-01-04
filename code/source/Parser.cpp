@@ -16,7 +16,8 @@ Parser::Parser(FileReader* fileReader, ErrorReporter* errorReporter) :
   m_errorReporter(errorReporter),
   m_maxErrors(5),
   m_nTokensProcessed(0),
-  m_semanticChecker(SemanticChecker(errorReporter))
+  m_semanticChecker(SemanticChecker(errorReporter)),
+  m_currentSymbols()
 {
   m_maxErrors = m_errorReporter->getMaxErrors();
 }
@@ -351,6 +352,8 @@ void Parser::dimension()
     return;
 
   do {
+    m_currentSymbols.back().second.dimensions.push_back(0);
+
     checkLexeme("[");
     advanceToken();
     expression();
@@ -519,11 +522,16 @@ void Parser::functionDeclaration()
   {
     m_semanticChecker.setMainPresent(true);
   }
+
+  m_semanticChecker.enterToScope(getLastToken().getLexeme());
+
   checkLexeme("(");
   parameterList();
   checkLexeme(")");
   returnType();
   block();
+
+  m_semanticChecker.exitCurrentScope();
 #ifdef DEBUG
   cout << "::: exit functionDeclaration()" << endl;
 #endif
@@ -702,6 +710,8 @@ void Parser::program()
   if (m_errorReporter->getErrors() >= m_maxErrors)
     return;
 
+  m_semanticChecker.enterToScope("global");
+
   checkLexeme("paquete");
 
   checkLexeme("principal");
@@ -742,6 +752,8 @@ void Parser::program()
            m_currentToken.getLexeme().compare("importar")  == 0 ||
            m_currentToken.getLexeme().compare("const")  == 0    ||
            m_currentToken.getLexeme().compare("funcion")  == 0);
+
+  m_semanticChecker.exitCurrentScope();
 #ifdef DEBUG
   cout << "::: exit program()" << endl;
 #endif
@@ -1033,6 +1045,9 @@ void Parser::variablesList()
   do
   {
     checkToken(TOKEN_IDEN);
+
+    m_currentSymbols.push_back(
+        make_pair(getLastToken().getLexeme(), SymbolData_t()));
 
     advanceToken();
     if (m_currentToken.getLexeme().compare("[") == 0)
