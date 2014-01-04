@@ -2,6 +2,9 @@
 
 #include "../headers/SemanticChecker.hpp"
 
+#include <iomanip>
+#include <iostream>
+#include <sstream>
 #include <utility>
 
 using namespace std;
@@ -65,7 +68,7 @@ SemanticChecker::SemanticChecker(ErrorReporter * errorReporter) :
 }
 
 void SemanticChecker::checkVariableDeclared(const TokenLexeme& token,
-    const string& type, const string& scope)
+    const string& scope)
 {
   string message;
   bool isErrorFound = false;
@@ -73,11 +76,6 @@ void SemanticChecker::checkVariableDeclared(const TokenLexeme& token,
   if (!isSymbolPresent(token.getLexeme()))
   {
     message = "variable no declarada";
-    isErrorFound = true;
-  }
-  else if (m_symbolsTable[token.getLexeme()].type.compare(type) != 0)
-  {
-    message = "variable declarada con diferente tipo";
     isErrorFound = true;
   }
   else if (m_symbolsTable[token.getLexeme()].scope.compare(scope) != 0)
@@ -93,14 +91,38 @@ void SemanticChecker::checkVariableDeclared(const TokenLexeme& token,
   }
 }
 
+void SemanticChecker::checkVariableNotDeclared(const TokenLexeme& token,
+    const string& scope)
+{
+  string message;
+  bool isErrorFound = false;
+
+  if (isSymbolPresent(token.getLexeme()))
+  {
+    message = "variable ya declarada";
+    isErrorFound = true;
+  }
+  else if (m_symbolsTable[token.getLexeme()].scope.compare(scope) == 0)
+  {
+    message = "variable ya declarada en este alcance";
+    isErrorFound = true;
+  }
+
+  if (isErrorFound)
+  {
+    m_errorReporter->writeError(token.getLine(), token.getRow(),
+                                token.getLexeme(), message);
+  }
+}
+
 void SemanticChecker::checkFunctionDeclared(const TokenLexeme& token,
-                                            list<string> parametersTypes)
+    list<pair<int, NativeType_t> > parametersList)
 {
   bool isErrorFound = false;
   string message;
   if (isSymbolPresent(token.getLexeme()))
   {
-    if (!parametersMatch(token.getLexeme(), parametersTypes))
+    if (!parametersMatch(token.getLexeme(), parametersList))
     {
       isErrorFound = true;
       message = "funcion no declarada con esos parametros";
@@ -116,6 +138,22 @@ void SemanticChecker::checkFunctionDeclared(const TokenLexeme& token,
   {
     m_errorReporter->writeError(token.getLine(), token.getRow(),
                                 token.getLexeme(), message);
+  }
+}
+
+void SemanticChecker::checkFunctionNotDeclared(const TokenLexeme& token,
+    list<pair<int, NativeType_t> > parametersList)
+{
+  string message;
+  if (isSymbolPresent(token.getLexeme()))
+  {
+    if (parametersMatch(token.getLexeme(), parametersList))
+    {
+      message = "funcion ya declarada con esos parametros";
+
+      m_errorReporter->writeError(token.getLine(), token.getRow(),
+                                  token.getLexeme(), message);
+    }
   }
 }
 
@@ -141,8 +179,7 @@ void SemanticChecker::checkExpression(const string& expression,
   }
 }
 
-void SemanticChecker::checkDimensions(TokenLexeme& token, 
-                                      std::vector<int> sizes)
+void SemanticChecker::checkDimensions(TokenLexeme& token, vector<int> sizes)
 {
   if (isSymbolPresent(token.getLexeme()))
   {
@@ -166,13 +203,13 @@ void SemanticChecker::checkDimensions(TokenLexeme& token,
 }
 
 string SemanticChecker::getFunctionType(const string& iden,
-                                        list<string>& parametersTypes)
+    list<pair<int, NativeType_t> > parametersList)
 {
   string returnValue;
 
   if (isSymbolPresent(iden)) 
   {
-    if (parametersMatch(iden, parametersTypes))
+    if (parametersMatch(iden, parametersList))
     {
       returnValue = m_symbolsTable[iden].type;
     }
@@ -257,31 +294,17 @@ bool SemanticChecker::isSymbolPresent(const string& name)
 }
 
 bool SemanticChecker::parametersMatch(const string& name,
-                                      list<string>& parametersTypes)
+    list<pair<int, NativeType_t> > parametersList)
 {
-  if (m_symbolsTable.find(name) != m_symbolsTable.end())
+  if (isSymbolPresent(name))
   {
-    bool isErrorFound = false;
-    if (parametersTypes.size() == m_symbolsTable[name].parametersTypes.size())
+    if (parametersList.size() == m_symbolsTable[name].parametersList.size())
     {
-      list<string>& tableValues =
-          m_symbolsTable[name].parametersTypes;
+      string parametersInTable =
+          getParametersString(m_symbolsTable[name].parametersList);
+      string actualParameters = getParametersString(parametersList);
 
-      for (list<string>::iterator tableIt = tableValues.begin(),
-           checkIt = parametersTypes.begin();
-
-           tableIt != tableValues.end() && checkIt != parametersTypes.end() &&
-           !isErrorFound;
-
-           ++tableIt, ++checkIt)
-      {
-        if (tableIt->compare((*checkIt)) != 0)
-        {
-          isErrorFound = true;
-        }
-      }
-
-      if (isErrorFound)
+      if (parametersInTable.compare(actualParameters) != 0)
       {
         return false;
       }
@@ -297,6 +320,94 @@ void SemanticChecker::addImport(const TokenLexeme& import)
   {
     m_errorReporter->writeError(import.getLine(), import.getRow(),
         import.getLexeme(), "libreria importada repetida");
+  }
+}
+
+void SemanticChecker::printSymbolsTable()
+{
+  const int k_fieldWidth = 10;
+  const int k_nFields = 7;
+
+  cout << setw(k_fieldWidth) << "NAME" << 
+      setw(k_fieldWidth) << "TYPE" << setw(k_fieldWidth) << "DIM" <<
+      setw(k_fieldWidth) << "PARAMS" << setw(k_fieldWidth) << "SCOPE" <<
+      setw(k_fieldWidth) << "CONST" << setw(k_fieldWidth) << "LINE" << endl;
+  setfill('=');
+  cout << setw(k_fieldWidth * k_nFields) << ' ' << endl;
+  setfill(' ');
+
+  for (map<string, SymbolData_t>::iterator it = m_symbolsTable.begin();
+       it != m_symbolsTable.end(); ++it)
+  {
+    cout << setw(k_fieldWidth) << it->first;
+    cout << setw(k_fieldWidth) << getTypeString(it->second.type);
+    cout << setw(k_fieldWidth) << it->second.dimensions.size();
+    cout << setw(k_fieldWidth) <<
+        getParametersString(it->second.parametersList); 
+    cout << setw(k_fieldWidth) << it->second.scope;
+    cout << setw(k_fieldWidth) << it->second.isConstant;
+    cout << setw(k_fieldWidth) << it->second.line;
+    cout << endl;
+  }
+}
+
+string SemanticChecker::getTypeString(NativeType_t type)
+{
+  string typeString;
+
+  switch (type)
+  {
+    case TYPE_INTEGER :
+      typeString = "entero";
+      break;
+    case TYPE_CHAR:
+      typeString = "car";
+      break;
+    case TYPE_FLOAT :
+      typeString = "real";
+      break;
+    case TYPE_STRING :
+      typeString = "cadena";
+      break;
+    case TYPE_BOOL :
+      typeString = "logico";
+      break;
+    default :
+      cout << "error: unkown type" << endl;
+      break;
+  }
+
+  return typeString;
+}
+
+string SemanticChecker::getParametersString(
+    list<pair<int, NativeType_t> > parametersList)
+{
+  stringstream stringBuilder;
+  for (list<pair<int, NativeType_t> >::iterator it = parametersList.begin();
+       it != parametersList.end(); ++it)
+  {
+    stringBuilder << it->first << getTypeString(it->second);
+  }
+
+  return stringBuilder.str();
+}
+
+void SemanticChecker::addSymbol(const string& name, SymbolData_t data)
+{
+  if (!isSymbolPresent(name))
+  {
+    m_symbolsTable[name] = data;
+  }
+}
+
+void SemanticChecker::addSymbols(
+    list<pair<string, SymbolData_t> > symbols)
+{
+  for (list<pair<string, SymbolData_t> >::iterator it = symbols.begin();
+       it != symbols.end(); ++it)
+  {
+    addSymbol(it->first, it->second);
   }
 }
 

@@ -8,33 +8,40 @@
 #include <set>
 #include <stack>
 #include <string>
+#include <utility>
 #include <vector>
 
 #include "../headers/TokenLexeme.hpp"
 #include "../headers/ErrorReporter.hpp"
+
+typedef enum
+{
+  TYPE_INTEGER,
+  TYPE_FLOAT,
+  TYPE_CHAR,
+  TYPE_STRING,
+  TYPE_BOOL
+} NativeType_t;
 
 typedef struct sd
 {
   sd() :
     type(),
     dimensions(),
-    parametersTypes(),
-    returnType(),
+    parametersList(),
     scope(),
     isConstant(false),
     line(1)
   {
   }
 
-  std::string            type;
-  std::vector<int>       dimensions;
-  std::list<std::string> parametersTypes;
-  std::string            returnType;
-  std::string            scope;
-  bool                   isConstant;
-  size_t                 line;
+  NativeType_t                             type;
+  std::vector<int>                         dimensions;
+  std::list<std::pair<int, NativeType_t> > parametersList;
+  std::string                              scope;
+  bool                                     isConstant;
+  size_t                                   line;
 } SymbolData_t;
-
 
 class SemanticChecker
 {
@@ -44,35 +51,47 @@ public:
 
   SemanticChecker& operator=(const SemanticChecker& rhs);
 
-  void        checkVariableDeclared(const TokenLexeme& token, 
-                  const std::string& type, const std::string& scope);
-  void        checkFunctionDeclared(const TokenLexeme& token,
-                                    std::list<std::string> parametersTypes);
-  void        checkModifiable(const TokenLexeme& iden);
-  void        checkExpression(const std::string& expression, int line, int row);
-  void        checkDimensions(TokenLexeme& token, std::vector<int> sizes);
-  std::string getFunctionType(const std::string& iden,
-                              std::list<std::string>& parametersTypes);
+  void checkVariableDeclared(const TokenLexeme& token,
+      const std::string& scope);
+  void checkVariableNotDeclared(const TokenLexeme& token,
+      const std::string& scope);
+  void checkFunctionDeclared(const TokenLexeme& token,
+      std::list<std::pair<int, NativeType_t> > parametersList);
+  void checkFunctionNotDeclared(const TokenLexeme& token,
+      std::list<std::pair<int, NativeType_t> > parametersList);
+  void checkModifiable(const TokenLexeme& iden);
+  void checkExpression(const std::string& expression, int line, int row);
+  void checkDimensions(TokenLexeme& token, std::vector<int> sizes);
 
+  std::string getTypeString(NativeType_t type);
+  std::string getParametersString(
+      std::list<std::pair<int, NativeType_t> > parametersList);
+  std::string getFunctionType(const std::string& iden,
+      std::list<std::pair<int, NativeType_t> > parametersList);
   std::string getCurrentScope();
   bool        isInFor();
   bool        isMainPresent();
   bool        isInSwitch();
 
-  void        setMainPresent(bool isPresent);
-  void        enterFor();
-  void        exitFor();
-  void        enterSwitch();
-  void        exitSwitch();
-  void        enterToScope(const std::string& scope);
-  void        exitCurrentScope();
-  void        addImport(const TokenLexeme& import);
+  void printSymbolsTable();
+
+  void setMainPresent(bool isPresent);
+  void enterFor();
+  void exitFor();
+  void enterSwitch();
+  void exitSwitch();
+  void enterToScope(const std::string& scope);
+  void exitCurrentScope();
+  void addImport(const TokenLexeme& import);
+  void addSymbol(const std::string& name, SymbolData_t data);
+  void addSymbols(
+      const std::list<std::pair<std::string, SymbolData_t> > symbols);
 private:
   void checkExpressionType(const std::string& expression,
-                           const std::string& expectedType);
+      NativeType_t expectedType);
   bool isSymbolPresent(const std::string& name);
   bool parametersMatch(const std::string& name,
-                       std::list<std::string>& parametersTypes);
+      std::list<std::pair<int, NativeType_t> > parametersList);
 
   bool                                m_isMainPresent;
   int                                 m_forLevel;
