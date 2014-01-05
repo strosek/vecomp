@@ -72,6 +72,10 @@ void Parser::andOperation()
   do
   {
     notOperation();
+    if (m_currentToken.getLexeme().compare("&&") == 0)
+    {
+      m_semanticChecker.pushOperator('L');
+    }
   } while (m_currentToken.getLexeme().compare("&&") == 0);
 
 #ifdef DEBUG
@@ -660,6 +664,14 @@ void Parser::multiplication()
     {
       isOperatorFound = true;
       advanceToken();
+      if (m_currentToken.getLexeme().compare("%") == 0)
+      {
+        m_semanticChecker.pushOperator('M');
+      }
+      else
+      {
+        m_semanticChecker.pushOperator('A');
+      }
     }
   } while (isOperatorFound); 
 #ifdef DEBUG
@@ -677,6 +689,7 @@ void Parser::notOperation()
 
   if (m_currentToken.getLexeme().compare("!") == 0)
   {
+    m_semanticChecker.pushOperator('U');
     checkLexeme("!");
     relationalOperation();
   }
@@ -855,6 +868,8 @@ void Parser::relationalOperation()
   sumOperation();
   if (m_currentToken.getToken() == TOKEN_RELOP)
   {
+    m_semanticChecker.pushOperator('R');
+
     advanceToken();
     sumOperation();
   }
@@ -952,6 +967,8 @@ void Parser::sign()
   {
     m_scanner.moveTokenBackwards();
     checkLexeme("-");
+
+    m_semanticChecker.pushOperator('U');
   }
   term();
 
@@ -1045,6 +1062,7 @@ void Parser::term()
   else if (m_currentToken.getToken() == TOKEN_IDEN)
   {
     m_semanticChecker.pushOperand(m_currentToken);
+
     advanceToken();
     if (m_currentToken.getLexeme().compare("[") == 0)
     {
@@ -1060,6 +1078,10 @@ void Parser::term()
   }
   else if (isLiteral(m_currentToken.getToken()))
   {
+    m_semanticChecker.pushOperand(
+        m_semanticChecker.getTypeChar(
+        getLiteralType(m_currentToken.getToken())));
+
     advanceToken();
   }
   else {
@@ -1218,8 +1240,8 @@ void Parser::checkLiteral()
   {
     advanceToken();
 #ifdef DEBUG
-      cout << "::: checking for constant literal, got: " <<
-          m_currentToken.getLexeme() << endl;
+    cout << "::: checking for constant literal, got: " <<
+        m_currentToken.getLexeme() << endl;
 #endif
     if (!isLiteral(m_currentToken.getToken()))
     {

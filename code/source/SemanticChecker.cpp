@@ -453,6 +453,11 @@ string SemanticChecker::appendGlobalScope(string name)
   return name;
 }
 
+void SemanticChecker::pushOperand(char operand)
+{
+  m_typesStack.push(operand);
+}
+
 void SemanticChecker::pushOperand(TokenLexeme& token)
 {
   string symbol = getActualSymbol(token.getLexeme(), false);

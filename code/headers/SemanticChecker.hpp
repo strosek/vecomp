@@ -98,16 +98,17 @@ public:
   void addSymbol(const std::string& name, SymbolData_t data);
   void addSymbols(
       const std::list<std::pair<std::string, SymbolData_t> > symbols);
+  void pushOperand(char operand);
   void pushOperand(TokenLexeme& token);
   void pushOperand(TokenLexeme& token, ParametersList_t parameters);
   void pushOperator(char op);
+  char getTypeChar(NativeType_t type);
 private:
   void checkExpressionType(const std::string& expression,
       NativeType_t expectedType);
   bool isSymbolPresent(const std::string& name);
   bool parametersMatch(const std::string& name, 
                        ParametersList_t parametersList);
-  char getTypeChar(NativeType_t type);
 
   bool                                m_isMainPresent;
   int                                 m_forLevel;
