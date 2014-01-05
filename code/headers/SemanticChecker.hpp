@@ -76,6 +76,7 @@ public:
                               ParametersList_t parametersList);
   std::string appendCurrentScope(std::string name);
   std::string appendGlobalScope(std::string name);
+  std::string getActualSymbol(std::string iden, bool isFunction);
   std::string getCurrentScope();
   bool        isInFor();
   bool        isMainPresent();
@@ -97,6 +98,9 @@ public:
   void addSymbol(const std::string& name, SymbolData_t data);
   void addSymbols(
       const std::list<std::pair<std::string, SymbolData_t> > symbols);
+  void pushOperand(TokenLexeme& token);
+  void pushOperand(TokenLexeme& token, ParametersList_t parameters);
+  void pushOperator(TokenLexeme& token, bool isUnary);
 private:
   void checkExpressionType(const std::string& expression,
       NativeType_t expectedType);
@@ -115,6 +119,7 @@ private:
   std::stack<std::string>             m_controlStack;
   std::set<std::string>               m_imports;
   std::map<std::string, SymbolData_t> m_symbolsTable;
+  std::stack<char>                    m_typesStack;
 };
 
 #endif /* SEMANTICCHECKER_HPP */

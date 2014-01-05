@@ -19,7 +19,8 @@ SemanticChecker::SemanticChecker(ErrorReporter * errorReporter) :
   m_expressionTypes(),
   m_controlStack(),
   m_imports(),
-  m_symbolsTable()
+  m_symbolsTable(),
+  m_typesStack()
 {
   /* OPERATORS
    *
@@ -30,42 +31,46 @@ SemanticChecker::SemanticChecker(ErrorReporter * errorReporter) :
    * R = Relational (< > <= >=)
    * E = Equality (!= ==)
    * L = Logical (&& ||)
+   * U = Unary (-)
    *
    * VALUES
    *
-   * f = float
+   * r = real 
    * i = integer
    * b = boolean
    * s = string
    */
   m_expressionTypes["iSi"] = "i";
   m_expressionTypes["iAi"] = "i";
-  m_expressionTypes["iPi"] = "f";
+  m_expressionTypes["iPi"] = "r";
   m_expressionTypes["iMi"] = "i";
   m_expressionTypes["iRi"] = "b";
   m_expressionTypes["iEi"] = "b";
 
-  m_expressionTypes["fSf"] = "f";
-  m_expressionTypes["fAf"] = "f";
-  m_expressionTypes["fPf"] = "f";
-  m_expressionTypes["fRf"] = "b";
-  m_expressionTypes["fEf"] = "b";
+  m_expressionTypes["rSr"] = "r";
+  m_expressionTypes["rAr"] = "r";
+  m_expressionTypes["rPr"] = "r";
+  m_expressionTypes["rRr"] = "b";
+  m_expressionTypes["rEr"] = "b";
 
-  m_expressionTypes["fSi"] = "f";
-  m_expressionTypes["fAi"] = "f";
-  m_expressionTypes["fPi"] = "f";
-  m_expressionTypes["fRi"] = "b";
-  m_expressionTypes["fEi"] = "b";
-  m_expressionTypes["iSf"] = "f";
-  m_expressionTypes["iAf"] = "f";
-  m_expressionTypes["iPf"] = "f";
-  m_expressionTypes["iRf"] = "b";
-  m_expressionTypes["iEf"] = "b";
+  m_expressionTypes["rSi"] = "r";
+  m_expressionTypes["rAi"] = "r";
+  m_expressionTypes["rPi"] = "r";
+  m_expressionTypes["rRi"] = "b";
+  m_expressionTypes["rEi"] = "b";
+  m_expressionTypes["iSr"] = "r";
+  m_expressionTypes["iAr"] = "r";
+  m_expressionTypes["iPr"] = "r";
+  m_expressionTypes["iRr"] = "b";
+  m_expressionTypes["iEr"] = "b";
 
   m_expressionTypes["sRs"] = "b";
   m_expressionTypes["s+s"] = "s";
   m_expressionTypes["bLb"] = "b";
   m_expressionTypes["bEb"] = "b";
+
+  m_expressionTypes["Ui"] = "i";
+  m_expressionTypes["Ur"] = "r";
 }
 
 void SemanticChecker::checkVariableDeclared(const TokenLexeme& token)
@@ -455,5 +460,64 @@ string SemanticChecker::appendGlobalScope(string name)
   name += "@global";
 
   return name;
+}
+
+void SemanticChecker::pushOperand(TokenLexeme& token)
+{
+  string symbol = getActualSymbol(token.getLexeme(), false);
+
+  if (isSymbolPresent(symbol))
+  {
+    char type;
+    switch (m_symbolsTable[symbol].type)
+    {
+    case TYPE_INTEGER :
+    case TYPE_CHAR :
+      type = 'i';
+      break;
+    case TYPE_FLOAT:
+      type = 'r';
+      break;
+    case TYPE_STRING:
+      type = 's';
+      break;
+    case TYPE_BOOL:
+      type = 'b';
+      break;
+    }
+
+    m_typesStack.push(type);
+  }
+}
+
+void SemanticChecker::pushOperand(TokenLexeme& token,
+                                  ParametersList_t parameters)
+{
+}
+
+void SemanticChecker::pushOperator(TokenLexeme& token, bool isUnary)
+{
+}
+
+string SemanticChecker::getActualSymbol(string iden, bool isFunction)
+{
+  if (isFunction)
+  {
+    iden += "()";
+  }
+
+  string symbolName;
+
+  symbolName = appendCurrentScope(iden);
+  if (!isSymbolPresent(symbolName))
+  {
+    symbolName = appendGlobalScope(iden);
+    if (!isSymbolPresent(symbolName))
+    {
+      symbolName = iden;
+    }
+  }
+
+  return symbolName;
 }
 
