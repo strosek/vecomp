@@ -1287,7 +1287,7 @@ bool Parser::isLiteral(TokenType_t token)
 
 NativeType_t Parser::getLiteralType(TokenType_t token)
 {
-  NativeType_t type;
+  NativeType_t type = TYPE_VOID;
   switch (token)
   {
   case TOKEN_DEC :
@@ -1319,7 +1319,9 @@ NativeType_t Parser::getLiteralType(TokenType_t token)
   case TOKEN_ASSIGNOP :
   case TOKEN_NEWLINE :
   default :
+#ifdef DEBUG
     cout << "error: invalid native type" << endl;
+#endif
     break;
   }
 
@@ -1328,7 +1330,7 @@ NativeType_t Parser::getLiteralType(TokenType_t token)
 
 NativeType_t Parser::getTypeFromString(const string& typeString)
 {
-  NativeType_t type;
+  NativeType_t type = TYPE_VOID;
 
   switch (typeString.at(0))
   {
@@ -1348,7 +1350,9 @@ NativeType_t Parser::getTypeFromString(const string& typeString)
     type = TYPE_BOOL;
     break;
   default :
+#ifdef DEBUG
     cout << "error: invalid native type" << endl;
+#endif
     break;
   }
 
