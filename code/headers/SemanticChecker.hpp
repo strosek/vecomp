@@ -57,10 +57,8 @@ public:
 
   SemanticChecker& operator=(const SemanticChecker& rhs);
 
-  void checkVariableDeclared(const TokenLexeme& token,
-      const std::string& scope);
-  void checkVariableNotDeclared(const TokenLexeme& token,
-      const std::string& scope);
+  void checkVariableDeclared(const TokenLexeme& token);
+  void checkVariableNotDeclared(const TokenLexeme& token);
   void checkFunctionDeclared(const TokenLexeme& token,
                              ParametersList_t parametersList);
   void checkFunctionNotDeclared(const TokenLexeme& token,
@@ -70,6 +68,7 @@ public:
   void checkDimensions(TokenLexeme& token, std::vector<int> sizes);
   void checkReturnType(TokenLexeme& token);
   void checkReturnShouldBeCalled(int functionEndLine);
+  void checkImported(const std::string& package, int line, int row);
 
   std::string getTypeString(NativeType_t type);
   std::string getParametersString(ParametersList_t parametersList);
@@ -102,6 +101,8 @@ private:
   bool isSymbolPresent(const std::string& name);
   bool parametersMatch(const std::string& name, 
                        ParametersList_t parametersList);
+  std::string appendCurrentScope(std::string name);
+  std::string appendGlobalScope(std::string name);
 
   bool                                m_isMainPresent;
   int                                 m_forLevel;

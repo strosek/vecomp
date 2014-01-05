@@ -207,10 +207,14 @@ void Parser::command()
   {
     if (m_currentToken.getLexeme().compare("con") == 0)
     {
+      m_semanticChecker.checkImported("\"con\"", m_currentToken.getLine(),
+          m_currentToken.getRow());
       read();
     }
     else if (m_currentToken.getLexeme().compare("fmt") == 0)
     {
+      m_semanticChecker.checkImported("\"fmt\"", m_currentToken.getLine(),
+          m_currentToken.getRow());
       print();
     }
     else
@@ -225,6 +229,7 @@ void Parser::command()
         m_scanner.moveTokenBackwards();
 
         m_semanticChecker.checkModifiable(getLastToken());
+        m_semanticChecker.checkVariableDeclared(getLastToken());
 
         assign();
       }

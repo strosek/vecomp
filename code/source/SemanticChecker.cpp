@@ -68,51 +68,23 @@ SemanticChecker::SemanticChecker(ErrorReporter * errorReporter) :
   m_expressionTypes["bEb"] = "b";
 }
 
-void SemanticChecker::checkVariableDeclared(const TokenLexeme& token,
-    const string& scope)
+void SemanticChecker::checkVariableDeclared(const TokenLexeme& token)
 {
-  string message;
-  bool isErrorFound = false;
 
-  if (!isSymbolPresent(token.getLexeme()))
-  {
-    message = "variable no declarada";
-    isErrorFound = true;
-  }
-  else if (m_symbolsTable[token.getLexeme()].scope.compare(scope) != 0)
-  {
-    message = "variable no declarada en este alcance";
-    isErrorFound = true;
-  }
-
-  if (isErrorFound)
+  if (!isSymbolPresent(appendCurrentScope(token.getLexeme())) &&
+      !isSymbolPresent(appendGlobalScope(token.getLexeme())))
   {
     m_errorReporter->writeError(token.getLine(), token.getRow(),
-                                token.getLexeme(), message);
+                                token.getLexeme(), "variable no declarada");
   }
 }
 
-void SemanticChecker::checkVariableNotDeclared(const TokenLexeme& token,
-    const string& scope)
+void SemanticChecker::checkVariableNotDeclared(const TokenLexeme& token)
 {
-  string message;
-  bool isErrorFound = false;
-
   if (isSymbolPresent(token.getLexeme()))
   {
-    message = "variable ya declarada";
-    isErrorFound = true;
-  }
-  else if (m_symbolsTable[token.getLexeme()].scope.compare(scope) == 0)
-  {
-    message = "variable ya declarada en este alcance";
-    isErrorFound = true;
-  }
-
-  if (isErrorFound)
-  {
     m_errorReporter->writeError(token.getLine(), token.getRow(),
-                                token.getLexeme(), message);
+        token.getLexeme(), "variable ya declarada en este alcance");
   }
 }
 
@@ -200,6 +172,15 @@ void SemanticChecker::checkDimensions(TokenLexeme& token, vector<int> sizes)
       m_errorReporter->writeError(token.getLine(), token.getRow(),
           token.getLexeme(), "exceso de dimensiones");
     }
+  }
+}
+
+void SemanticChecker::checkImported(const std::string& package, int line,
+                                    int row)
+{
+  if (m_imports.find(package) == m_imports.end())
+  {
+    m_errorReporter->writeError(line, row, package, "libreria no importada");
   }
 }
 
@@ -440,10 +421,6 @@ void SemanticChecker::addSymbols(
   }
 }
 
-void SemanticChecker::checkReturnType(TokenLexeme& token)
-{
-}
-
 void SemanticChecker::checkReturnShouldBeCalled(int functionEndLine)
 {
   if (m_isReturnRequired && !m_isReturnCalled)
@@ -459,5 +436,20 @@ void SemanticChecker::checkReturnShouldBeCalled(int functionEndLine)
   
   m_isReturnRequired = false;
   m_isReturnCalled = false;
+}
+
+string SemanticChecker::appendCurrentScope(string name)
+{
+  name += "@";
+  name += getCurrentScope();
+
+  return name;
+}
+
+string SemanticChecker::appendGlobalScope(string name)
+{
+  name += "@global";
+
+  return name;
 }
 
