@@ -548,8 +548,6 @@ void Parser::functionDeclaration()
   }
 
   m_currentSymbolName = getLastToken().getLexeme();
-  m_currentSymbolName += "()@";
-  m_currentSymbolName += m_semanticChecker.getCurrentScope();
 
   m_currentSymbolData.isFunction = true;
   m_currentSymbolData.line = getLastToken().getLine();
@@ -562,6 +560,11 @@ void Parser::functionDeclaration()
   parameterList();
   checkLexeme(")");
   returnType();
+
+  m_currentSymbolName += "(";
+  m_currentSymbolName += m_semanticChecker.getParametersString(
+      m_currentSymbolData.parametersList);
+  m_currentSymbolName += ")@global";
 
   addSymbolAndReset(m_currentSymbolName, m_currentSymbolData);
 
@@ -1013,6 +1016,7 @@ void Parser::sumOperation()
     {
       isOperatorFound = true;
       advanceToken();
+      m_semanticChecker.pushOperator('A');
     }
   } while (isOperatorFound); 
 
@@ -1040,6 +1044,7 @@ void Parser::term()
   }
   else if (m_currentToken.getToken() == TOKEN_IDEN)
   {
+    m_semanticChecker.pushOperand(m_currentToken);
     advanceToken();
     if (m_currentToken.getLexeme().compare("[") == 0)
     {

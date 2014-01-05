@@ -40,37 +40,37 @@ SemanticChecker::SemanticChecker(ErrorReporter * errorReporter) :
    * b = boolean
    * s = string
    */
-  m_expressionTypes["iSi"] = "i";
-  m_expressionTypes["iAi"] = "i";
-  m_expressionTypes["iPi"] = "r";
-  m_expressionTypes["iMi"] = "i";
-  m_expressionTypes["iRi"] = "b";
-  m_expressionTypes["iEi"] = "b";
+  m_expressionTypes["iSi"] = 'i';
+  m_expressionTypes["iAi"] = 'i';
+  m_expressionTypes["iPi"] = 'r';
+  m_expressionTypes["iMi"] = 'i';
+  m_expressionTypes["iRi"] = 'b';
+  m_expressionTypes["iEi"] = 'b';
 
-  m_expressionTypes["rSr"] = "r";
-  m_expressionTypes["rAr"] = "r";
-  m_expressionTypes["rPr"] = "r";
-  m_expressionTypes["rRr"] = "b";
-  m_expressionTypes["rEr"] = "b";
+  m_expressionTypes["rSr"] = 'r';
+  m_expressionTypes["rAr"] = 'r';
+  m_expressionTypes["rPr"] = 'r';
+  m_expressionTypes["rRr"] = 'b';
+  m_expressionTypes["rEr"] = 'b';
 
-  m_expressionTypes["rSi"] = "r";
-  m_expressionTypes["rAi"] = "r";
-  m_expressionTypes["rPi"] = "r";
-  m_expressionTypes["rRi"] = "b";
-  m_expressionTypes["rEi"] = "b";
-  m_expressionTypes["iSr"] = "r";
-  m_expressionTypes["iAr"] = "r";
-  m_expressionTypes["iPr"] = "r";
-  m_expressionTypes["iRr"] = "b";
-  m_expressionTypes["iEr"] = "b";
+  m_expressionTypes["rSi"] = 'r';
+  m_expressionTypes["rAi"] = 'r';
+  m_expressionTypes["rPi"] = 'r';
+  m_expressionTypes["rRi"] = 'b';
+  m_expressionTypes["rEi"] = 'b';
+  m_expressionTypes["iSr"] = 'r';
+  m_expressionTypes["iAr"] = 'r';
+  m_expressionTypes["iPr"] = 'r';
+  m_expressionTypes["iRr"] = 'b';
+  m_expressionTypes["iEr"] = 'b';
 
-  m_expressionTypes["sRs"] = "b";
-  m_expressionTypes["s+s"] = "s";
-  m_expressionTypes["bLb"] = "b";
-  m_expressionTypes["bEb"] = "b";
+  m_expressionTypes["sRs"] = 'b';
+  m_expressionTypes["s+s"] = 's';
+  m_expressionTypes["bLb"] = 'b';
+  m_expressionTypes["bEb"] = 'b';
 
-  m_expressionTypes["Ui"] = "i";
-  m_expressionTypes["Ur"] = "r";
+  m_expressionTypes["Ui"] = 'i';
+  m_expressionTypes["Ur"] = 'r';
 }
 
 void SemanticChecker::checkVariableDeclared(const TokenLexeme& token)
@@ -148,16 +148,6 @@ void SemanticChecker::checkModifiable(const TokenLexeme& token)
       m_errorReporter->writeError(token.getLine(), token.getRow(),
           token.getLexeme(), "no se puede modificar constante");
     }
-  }
-}
-
-void SemanticChecker::checkExpression(const string& expression,
-                                      int line, int row)
-{
-  if (m_expressionTypes.find(expression) == m_expressionTypes.end())
-  {
-    m_errorReporter->writeError(line, row, " ",
-        "expresion con operandos de tipo invalido");
   }
 }
 
@@ -331,15 +321,14 @@ void SemanticChecker::addImport(const TokenLexeme& import)
 
 void SemanticChecker::printSymbolsTable()
 {
-  const int k_fieldWidthLong = 20;
+  const int k_fieldWidthLong = 30;
   const int k_fieldWidthShort = 9;
-  const int k_parametersWidth = 40;
 
   cout << setw(k_fieldWidthLong) << "NAME" << 
       setw(k_fieldWidthLong) << "TYPE" <<
       setw(k_fieldWidthShort) << "DIM" << 
       setw(k_fieldWidthShort) << "FUNCTION" <<
-      setw(k_parametersWidth) << "PARAMS" << 
+      setw(k_fieldWidthLong) << "PARAMS" << 
       setw(k_fieldWidthLong) << "SCOPE" <<
       setw(k_fieldWidthShort) << "CONST" << 
       setw(k_fieldWidthShort) << "LINE" << endl;
@@ -354,12 +343,12 @@ void SemanticChecker::printSymbolsTable()
     cout << setw(k_fieldWidthShort) << boolalpha << it->second.isFunction;
     if (!it->second.parametersList.empty())
     {
-      cout << setw(k_parametersWidth) <<
+      cout << setw(k_fieldWidthLong) <<
           getParametersString(it->second.parametersList); 
     }
     else
     {
-      cout << setw(k_parametersWidth) << "nada";
+      cout << setw(k_fieldWidthLong) << "nada";
     }
     cout << setw(k_fieldWidthLong) << it->second.scope;
     cout << setw(k_fieldWidthShort) << boolalpha << it->second.isConstant;
@@ -393,7 +382,9 @@ string SemanticChecker::getTypeString(NativeType_t type)
       typeString = "nada";
       break;
     default :
+#ifdef DEBUG
       cout << "error: unkown type" << endl;
+#endif
       break;
   }
 
@@ -468,25 +459,9 @@ void SemanticChecker::pushOperand(TokenLexeme& token)
 
   if (isSymbolPresent(symbol))
   {
-    char type;
-    switch (m_symbolsTable[symbol].type)
-    {
-    case TYPE_INTEGER :
-    case TYPE_CHAR :
-      type = 'i';
-      break;
-    case TYPE_FLOAT:
-      type = 'r';
-      break;
-    case TYPE_STRING:
-      type = 's';
-      break;
-    case TYPE_BOOL:
-      type = 'b';
-      break;
-    }
+    m_typesStack.push(getTypeChar(m_symbolsTable[symbol].type));
 
-    m_typesStack.push(type);
+    checkExpression(token.getLexeme(), token.getLine(), token.getRow());
   }
 }
 
@@ -495,8 +470,9 @@ void SemanticChecker::pushOperand(TokenLexeme& token,
 {
 }
 
-void SemanticChecker::pushOperator(TokenLexeme& token, bool isUnary)
+void SemanticChecker::pushOperator(char op)
 {
+  m_typesStack.push(op);
 }
 
 string SemanticChecker::getActualSymbol(string iden, bool isFunction)
@@ -519,5 +495,80 @@ string SemanticChecker::getActualSymbol(string iden, bool isFunction)
   }
 
   return symbolName;
+}
+
+char SemanticChecker::getTypeChar(NativeType_t type)
+{
+  char typeChar = 'n';
+
+  switch (type)
+  {
+  case TYPE_INTEGER :
+  case TYPE_CHAR :
+    typeChar = 'i';
+    break;
+  case TYPE_FLOAT :
+    typeChar = 'r';
+    break;
+  case TYPE_STRING :
+    typeChar = 's';
+    break;
+  case TYPE_BOOL :
+    typeChar = 'b';
+    break;
+  case TYPE_VOID :
+    typeChar = 'v';
+    break;
+  default :
+#ifdef DEBUG
+    cout << "error: invalid type" << endl;
+#endif
+    break;
+  }
+
+  return typeChar;
+}
+
+void SemanticChecker::checkExpression(const string& lexeme, int line, int row)
+{
+  string expression = "";
+  bool isStackComplete = false;
+  const int k_maxExpressionElements = 3;
+  if (m_typesStack.size() == k_maxExpressionElements)
+  {
+    expression += m_typesStack.top();
+    m_typesStack.pop();
+    expression += m_typesStack.top();
+    m_typesStack.pop();
+    expression += m_typesStack.top();
+    m_typesStack.pop();
+
+    isStackComplete = true;
+  }
+  else if (m_typesStack.top() == 'U')
+  {
+    expression += m_typesStack.top();
+    m_typesStack.pop();
+    expression += m_typesStack.top();
+    m_typesStack.pop();
+
+    isStackComplete = true;
+  }
+
+  if (isStackComplete)
+  {
+    if (m_expressionTypes.find(expression) != m_expressionTypes.end())
+    {
+      m_typesStack.push(m_expressionTypes[expression]);
+    }
+    else
+    {
+      cout << "::: checkexpression: " << expression << endl;
+      m_typesStack.push('n');
+
+      m_errorReporter->writeError(line, row, lexeme,
+          "tipo invalido en expresion");
+    }
+  }
 }
 

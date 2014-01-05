@@ -64,7 +64,7 @@ public:
   void checkFunctionNotDeclared(const TokenLexeme& token,
                                 ParametersList_t parametersList);
   void checkModifiable(const TokenLexeme& iden);
-  void checkExpression(const std::string& expression, int line, int row);
+  void checkExpression(const std::string& lexeme, int line, int row);
   void checkDimensions(TokenLexeme& token, std::vector<int> sizes);
   void checkReturnType(TokenLexeme& token);
   void checkReturnShouldBeCalled(int functionEndLine);
@@ -100,13 +100,14 @@ public:
       const std::list<std::pair<std::string, SymbolData_t> > symbols);
   void pushOperand(TokenLexeme& token);
   void pushOperand(TokenLexeme& token, ParametersList_t parameters);
-  void pushOperator(TokenLexeme& token, bool isUnary);
+  void pushOperator(char op);
 private:
   void checkExpressionType(const std::string& expression,
       NativeType_t expectedType);
   bool isSymbolPresent(const std::string& name);
   bool parametersMatch(const std::string& name, 
                        ParametersList_t parametersList);
+  char getTypeChar(NativeType_t type);
 
   bool                                m_isMainPresent;
   int                                 m_forLevel;
@@ -115,7 +116,7 @@ private:
   bool                                m_isReturnRequired;
 
   ErrorReporter *                     m_errorReporter;
-  std::map<std::string, std::string>  m_expressionTypes;
+  std::map<std::string, char>         m_expressionTypes;
   std::stack<std::string>             m_controlStack;
   std::set<std::string>               m_imports;
   std::map<std::string, SymbolData_t> m_symbolsTable;
