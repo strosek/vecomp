@@ -1114,11 +1114,11 @@ void Parser::variablesList()
   {
     checkToken(TOKEN_IDEN);
 
-    nameWithScope = getLastToken().getLexeme();
-    nameWithScope += "@";
-    nameWithScope += m_semanticChecker.getCurrentScope();
-    m_currentSymbols.push_back(
-        make_pair(nameWithScope, SymbolData_t()));
+    nameWithScope = 
+        m_semanticChecker.appendCurrentScope(getLastToken().getLexeme());
+    m_currentSymbols.push_back(make_pair(nameWithScope, SymbolData_t()));
+
+    m_semanticChecker.checkVariableNotDeclared(getLastToken());
 
     advanceToken();
     if (m_currentToken.getLexeme().compare("[") == 0)

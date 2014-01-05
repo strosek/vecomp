@@ -81,7 +81,7 @@ void SemanticChecker::checkVariableDeclared(const TokenLexeme& token)
 
 void SemanticChecker::checkVariableNotDeclared(const TokenLexeme& token)
 {
-  if (isSymbolPresent(token.getLexeme()))
+  if (isSymbolPresent(appendCurrentScope(token.getLexeme())))
   {
     m_errorReporter->writeError(token.getLine(), token.getRow(),
         token.getLexeme(), "variable ya declarada en este alcance");

@@ -74,6 +74,8 @@ public:
   std::string getParametersString(ParametersList_t parametersList);
   std::string getFunctionType(const std::string& iden,
                               ParametersList_t parametersList);
+  std::string appendCurrentScope(std::string name);
+  std::string appendGlobalScope(std::string name);
   std::string getCurrentScope();
   bool        isInFor();
   bool        isMainPresent();
@@ -101,8 +103,6 @@ private:
   bool isSymbolPresent(const std::string& name);
   bool parametersMatch(const std::string& name, 
                        ParametersList_t parametersList);
-  std::string appendCurrentScope(std::string name);
-  std::string appendGlobalScope(std::string name);
 
   bool                                m_isMainPresent;
   int                                 m_forLevel;
