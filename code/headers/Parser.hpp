@@ -78,6 +78,8 @@ private:
   std::string                                      m_currentSymbolName;
   SymbolData_t                                     m_currentSymbolData;
   std::list<std::pair<std::string, SymbolData_t> > m_currentSymbols;
+  std::pair<TokenLexeme, ParametersList_t>         m_currentFunction;
+  std::pair<TokenLexeme, int>                      m_currentDimensions;
 };
 
 #endif /* PARSER_HPP */

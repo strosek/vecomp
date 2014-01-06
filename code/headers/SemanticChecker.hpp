@@ -65,15 +65,19 @@ public:
                                 ParametersList_t parametersList);
   void checkModifiable(const TokenLexeme& iden);
   void checkExpression(const std::string& lexeme, int line, int row);
+  void checkExpressionType(char expectedType, const TokenLexeme& token);
   void checkDimensions(TokenLexeme& token, std::vector<int> sizes);
   void checkReturnType(TokenLexeme& token);
   void checkReturnShouldBeCalled(int functionEndLine);
   void checkImported(const std::string& package, int line, int row);
+  void clearTypesStack();
 
-  std::string getTypeString(NativeType_t type);
-  std::string getParametersString(ParametersList_t parametersList);
-  std::string getFunctionType(const std::string& iden,
+  NativeType_t getExpressionType();
+  std::string  getTypeString(NativeType_t type);
+  std::string  getParametersString(ParametersList_t parametersList);
+  std::string  getFunctionType(const std::string& iden,
                               ParametersList_t parametersList);
+
   std::string appendCurrentScope(std::string name);
   std::string appendGlobalScope(std::string name);
   std::string getActualSymbol(std::string iden, bool isFunction);
@@ -101,7 +105,6 @@ public:
   void pushOperand(char operand, int line, int row, const std::string& lexeme);
   void pushOperator(char op, int line, int row, const std::string& lexeme);
   void pushOperand(TokenLexeme& token);
-  void pushOperand(TokenLexeme& token, ParametersList_t parameters);
   char getTypeChar(NativeType_t type);
 private:
   void checkExpressionType(const std::string& expression,
@@ -109,6 +112,7 @@ private:
   bool isSymbolPresent(const std::string& name);
   bool parametersMatch(const std::string& name, 
                        ParametersList_t parametersList);
+  ParametersList_t getParametersListFromString(const std::string typesString);
 
   bool                                m_isMainPresent;
   int                                 m_forLevel;

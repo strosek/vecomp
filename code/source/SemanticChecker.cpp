@@ -465,11 +465,6 @@ void SemanticChecker::pushOperand(TokenLexeme& token)
   }
 }
 
-void SemanticChecker::pushOperand(TokenLexeme& token,
-                                  ParametersList_t parameters)
-{
-}
-
 void SemanticChecker::pushOperand(char operand, int line, int row,
                                   const string& lexeme)
 {
@@ -584,5 +579,112 @@ void SemanticChecker::checkExpression(const string& lexeme, int line, int row)
           "tipo invalido en expresion");
     }
   }
+}
+
+void SemanticChecker::checkExpressionType(char expectedType, 
+                                          const TokenLexeme& token)
+{
+  if (m_typesStack.top() != expectedType)
+  {
+    m_errorReporter->writeError(token.getLine(), token.getRow(), token.getLexeme(), 
+        "expresion resulta en tipo invalido");
+  }
+
+  clearTypesStack();
+}
+
+NativeType_t SemanticChecker::getExpressionType()
+{
+  NativeType_t type = TYPE_VOID;
+  switch (m_typesStack.top())
+  {
+  case 'i' :
+    type = TYPE_INTEGER;
+    break;
+  case 'r' :
+    type = TYPE_FLOAT;
+    break;
+  case 's' :
+    type = TYPE_STRING;
+    break;
+  case 'b' :
+    type = TYPE_BOOL;
+    break;
+  default :
+#ifdef DEBUG
+    cout << "error: unknown type" << endl;
+#endif
+    break;
+  }
+
+  clearTypesStack();
+
+  return type;
+}
+
+void SemanticChecker::clearTypesStack()
+{
+  while (!m_typesStack.empty())
+  {
+    m_typesStack.pop();
+  }
+}
+
+ParametersList_t SemanticChecker::getParametersListFromString(
+    const string typesString)
+{
+  int i, f, a, s, b;
+  i = f = a = s = b = 0;
+  ParametersList_t parametersList;
+
+  for (size_t i = 0; i < typesString.size(); ++i)
+  {
+    switch (typesString.at(i))
+    {
+    case 'i' :
+      ++i;
+      break;
+    case 'f' :
+      ++i;
+      break;
+    case 'a' :
+      ++i;
+      break;
+    case 's' :
+      ++i;
+      break;
+    case 'b' :
+      ++b;
+      break;
+    default :
+#ifdef DEBUG
+      cout << "error: unknown type" << endl;
+#endif
+      break;
+    }
+
+    if (i > 0)
+    {
+      parametersList.push_back(make_pair(i, TYPE_INTEGER));
+    }
+    if (f > 0)
+    {
+      parametersList.push_back(make_pair(f, TYPE_INTEGER));
+    }
+    if (a > 0)
+    {
+      parametersList.push_back(make_pair(a, TYPE_INTEGER));
+    }
+    if (s > 0)
+    {
+      parametersList.push_back(make_pair(s, TYPE_INTEGER));
+    }
+    if (b > 0)
+    {
+      parametersList.push_back(make_pair(b, TYPE_INTEGER));
+    }
+  }
+
+  return parametersList;
 }
 

@@ -19,7 +19,9 @@ Parser::Parser(FileReader* fileReader, ErrorReporter* errorReporter) :
   m_semanticChecker(SemanticChecker(errorReporter)),
   m_currentSymbolName(),
   m_currentSymbolData(),
-  m_currentSymbols()
+  m_currentSymbols(),
+  m_currentFunction(),
+  m_currentDimensions()
 {
   m_maxErrors = m_errorReporter->getMaxErrors();
 }
@@ -91,10 +93,13 @@ void Parser::argumentsList()
 #endif
 
   bool isOperatorFound = false;
+  string argumentTypes;
   do
   {
     isOperatorFound = false;
     expression();
+    argumentTypes += 
+        m_semanticChecker.getTypeChar(m_semanticChecker.getExpressionType());
 
     advanceToken();
     if (m_currentToken.getLexeme().compare(",") == 0)
@@ -102,7 +107,7 @@ void Parser::argumentsList()
       isOperatorFound = true;
       advanceToken();
     }
-  } while (isOperatorFound); 
+  } while (isOperatorFound);
 
   m_scanner.moveTokenBackwards();
 
@@ -247,6 +252,9 @@ void Parser::command()
       else if (m_currentToken.getLexeme().compare("(") == 0)
       {
         m_scanner.moveTokenBackwards();
+
+        m_currentFunction.first = getLastToken();
+
         functionCall();
       }
       else
@@ -1097,8 +1105,10 @@ void Parser::term()
   }
   else if (isLiteral(m_currentToken.getToken()))
   {
+#ifdef DEBUG
     cout << "literal token: " << m_semanticChecker.getTypeChar(
         getLiteralType(m_currentToken.getToken())) << endl;
+#endif
 
     m_semanticChecker.pushOperand(
         m_semanticChecker.getTypeChar(
