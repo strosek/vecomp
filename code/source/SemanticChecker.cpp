@@ -65,7 +65,7 @@ SemanticChecker::SemanticChecker(ErrorReporter * errorReporter) :
   m_expressionTypes["iEr"] = 'b';
 
   m_expressionTypes["sRs"] = 'b';
-  m_expressionTypes["s+s"] = 's';
+  m_expressionTypes["sSs"] = 's';
   m_expressionTypes["bLb"] = 'b';
   m_expressionTypes["bEb"] = 'b';
 
@@ -453,11 +453,6 @@ string SemanticChecker::appendGlobalScope(string name)
   return name;
 }
 
-void SemanticChecker::pushOperand(char operand)
-{
-  m_typesStack.push(operand);
-}
-
 void SemanticChecker::pushOperand(TokenLexeme& token)
 {
   string symbol = getActualSymbol(token.getLexeme(), false);
@@ -475,9 +470,20 @@ void SemanticChecker::pushOperand(TokenLexeme& token,
 {
 }
 
-void SemanticChecker::pushOperator(char op)
+void SemanticChecker::pushOperand(char operand, int line, int row,
+                                  const string& lexeme)
+{
+  m_typesStack.push(operand);
+
+  checkExpression(lexeme, line, row);
+}
+
+void SemanticChecker::pushOperator(char op, int line, int row, 
+                                   const string& lexeme)
 {
   m_typesStack.push(op);
+
+  checkExpression(lexeme, line, row);
 }
 
 string SemanticChecker::getActualSymbol(string iden, bool isFunction)
@@ -538,7 +544,7 @@ void SemanticChecker::checkExpression(const string& lexeme, int line, int row)
 {
   string expression = "";
   bool isStackComplete = false;
-  const int k_maxExpressionElements = 3;
+  const size_t k_maxExpressionElements = 3;
   if (m_typesStack.size() == k_maxExpressionElements)
   {
     expression += m_typesStack.top();
@@ -562,13 +568,16 @@ void SemanticChecker::checkExpression(const string& lexeme, int line, int row)
 
   if (isStackComplete)
   {
+#ifdef DEBUG
+    cout << "::: types in expression: " << expression << endl;
+#endif
+
     if (m_expressionTypes.find(expression) != m_expressionTypes.end())
     {
       m_typesStack.push(m_expressionTypes[expression]);
     }
     else
     {
-      cout << "::: checkexpression: " << expression << endl;
       m_typesStack.push('n');
 
       m_errorReporter->writeError(line, row, lexeme,

@@ -74,7 +74,8 @@ void Parser::andOperation()
     notOperation();
     if (m_currentToken.getLexeme().compare("&&") == 0)
     {
-      m_semanticChecker.pushOperator('L');
+      m_semanticChecker.pushOperator('L', m_currentToken.getLine(),
+          m_currentToken.getRow(), m_currentToken.getLexeme());
     }
   } while (m_currentToken.getLexeme().compare("&&") == 0);
 
@@ -666,11 +667,14 @@ void Parser::multiplication()
       advanceToken();
       if (m_currentToken.getLexeme().compare("%") == 0)
       {
-        m_semanticChecker.pushOperator('M');
+        m_semanticChecker.pushOperator('M', m_currentToken.getLine(),
+          m_currentToken.getRow(), m_currentToken.getLexeme());
       }
       else
       {
-        m_semanticChecker.pushOperator('A');
+        m_semanticChecker.pushOperator('A', m_currentToken.getLine(),
+          m_currentToken.getRow(), m_currentToken.getLexeme());
+;;
       }
     }
   } while (isOperatorFound); 
@@ -689,7 +693,8 @@ void Parser::notOperation()
 
   if (m_currentToken.getLexeme().compare("!") == 0)
   {
-    m_semanticChecker.pushOperator('U');
+    m_semanticChecker.pushOperator('U', m_currentToken.getLine(),
+      m_currentToken.getRow(), m_currentToken.getLexeme());
     checkLexeme("!");
     relationalOperation();
   }
@@ -868,7 +873,8 @@ void Parser::relationalOperation()
   sumOperation();
   if (m_currentToken.getToken() == TOKEN_RELOP)
   {
-    m_semanticChecker.pushOperator('R');
+    m_semanticChecker.pushOperator('R', m_currentToken.getLine(),
+      m_currentToken.getRow(), m_currentToken.getLexeme());
 
     advanceToken();
     sumOperation();
@@ -968,7 +974,8 @@ void Parser::sign()
     m_scanner.moveTokenBackwards();
     checkLexeme("-");
 
-    m_semanticChecker.pushOperator('U');
+    m_semanticChecker.pushOperator('U', m_currentToken.getLine(),
+      m_currentToken.getRow(), m_currentToken.getLexeme());
   }
   term();
 
@@ -1033,7 +1040,16 @@ void Parser::sumOperation()
     {
       isOperatorFound = true;
       advanceToken();
-      m_semanticChecker.pushOperator('A');
+      if (m_currentToken.getLexeme().compare("+") == 0)
+      {
+        m_semanticChecker.pushOperator('S', m_currentToken.getLine(),
+          m_currentToken.getRow(), m_currentToken.getLexeme());
+      }
+      else
+      {
+        m_semanticChecker.pushOperator('A', m_currentToken.getLine(),
+          m_currentToken.getRow(), m_currentToken.getLexeme());
+      }
     }
   } while (isOperatorFound); 
 
@@ -1067,6 +1083,9 @@ void Parser::term()
     if (m_currentToken.getLexeme().compare("[") == 0)
     {
       m_scanner.moveTokenBackwards();
+
+      m_semanticChecker.pushOperand(m_currentToken);
+
       dimension();
       advanceToken();
     }
@@ -1078,9 +1097,13 @@ void Parser::term()
   }
   else if (isLiteral(m_currentToken.getToken()))
   {
+    cout << "literal token: " << m_semanticChecker.getTypeChar(
+        getLiteralType(m_currentToken.getToken())) << endl;
+
     m_semanticChecker.pushOperand(
         m_semanticChecker.getTypeChar(
-        getLiteralType(m_currentToken.getToken())));
+        getLiteralType(m_currentToken.getToken())), m_currentToken.getLine(),
+        m_currentToken.getRow(), m_currentToken.getLexeme());
 
     advanceToken();
   }
