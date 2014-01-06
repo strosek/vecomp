@@ -80,7 +80,7 @@ public:
 
   std::string appendCurrentScope(std::string name);
   std::string appendGlobalScope(std::string name);
-  std::string getActualSymbol(std::string iden, bool isFunction);
+  std::string getActualSymbol(std::string iden);
   std::string getCurrentScope();
   bool        isInFor();
   bool        isMainPresent();
@@ -106,13 +106,13 @@ public:
   void pushOperator(char op, int line, int row, const std::string& lexeme);
   void pushOperand(TokenLexeme& token);
   char getTypeChar(NativeType_t type);
+  ParametersList_t getParametersListFromString(const std::string typesString);
 private:
   void checkExpressionType(const std::string& expression,
       NativeType_t expectedType);
   bool isSymbolPresent(const std::string& name);
   bool parametersMatch(const std::string& name, 
                        ParametersList_t parametersList);
-  ParametersList_t getParametersListFromString(const std::string typesString);
 
   bool                                m_isMainPresent;
   int                                 m_forLevel;

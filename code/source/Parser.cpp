@@ -109,6 +109,12 @@ void Parser::argumentsList()
     }
   } while (isOperatorFound);
 
+  m_currentFunction.second =
+      m_semanticChecker.getParametersListFromString(argumentTypes);
+
+  m_semanticChecker.checkFunctionDeclared(m_currentFunction.first,
+      m_currentFunction.second);
+
   m_scanner.moveTokenBackwards();
 
 #ifdef DEBUG
@@ -393,7 +399,11 @@ void Parser::dimension()
 
     checkLexeme("[");
     advanceToken();
+    TokenLexeme token = getLastToken();
     expression();
+
+    //m_semanticChecker.checkExpressionType('i', token);
+
     checkLexeme("]");
     advanceToken();
     if (m_currentToken.getLexeme().compare("[") == 0)

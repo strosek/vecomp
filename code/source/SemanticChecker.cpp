@@ -100,26 +100,19 @@ void SemanticChecker::checkVariableNotDeclared(const TokenLexeme& token)
 void SemanticChecker::checkFunctionDeclared(const TokenLexeme& token,
                                             ParametersList_t parametersList)
 {
-  bool isErrorFound = false;
-  string message;
-  if (isSymbolPresent(token.getLexeme()))
-  {
-    if (!parametersMatch(token.getLexeme(), parametersList))
-    {
-      isErrorFound = true;
-      message = "funcion no declarada con esos parametros";
-    }
-  }
-  else
-  {
-    isErrorFound = true;
-    message = "funcion no declarada";
-  }
+  string actualName = token.getLexeme();
+  actualName += "(";
+  actualName += getParametersString(parametersList);
+  actualName += ")";
+  actualName = appendGlobalScope(actualName);
 
-  if (isErrorFound)
+  if (isSymbolPresent(actualName))
   {
-    m_errorReporter->writeError(token.getLine(), token.getRow(),
-                                token.getLexeme(), message);
+    if (!parametersMatch(actualName, parametersList))
+    {
+      m_errorReporter->writeError(token.getLine(), token.getRow(),
+          token.getLexeme(), "funcion no declarada con esos parametros");
+    }
   }
 }
 
@@ -409,6 +402,11 @@ void SemanticChecker::addSymbol(const string& name, SymbolData_t data)
   {
     m_symbolsTable[name] = data;
   }
+  else if (data.isFunction)
+  {
+    m_errorReporter->writeError(data.line, 1, name, 
+        "funcion ya esta declarada con esos parametros");
+  }
 }
 
 void SemanticChecker::addSymbols(
@@ -455,7 +453,7 @@ string SemanticChecker::appendGlobalScope(string name)
 
 void SemanticChecker::pushOperand(TokenLexeme& token)
 {
-  string symbol = getActualSymbol(token.getLexeme(), false);
+  string symbol = getActualSymbol(token.getLexeme());
 
   if (isSymbolPresent(symbol))
   {
@@ -481,13 +479,8 @@ void SemanticChecker::pushOperator(char op, int line, int row,
   checkExpression(lexeme, line, row);
 }
 
-string SemanticChecker::getActualSymbol(string iden, bool isFunction)
+string SemanticChecker::getActualSymbol(string iden)
 {
-  if (isFunction)
-  {
-    iden += "()";
-  }
-
   string symbolName;
 
   symbolName = appendCurrentScope(iden);
@@ -584,10 +577,13 @@ void SemanticChecker::checkExpression(const string& lexeme, int line, int row)
 void SemanticChecker::checkExpressionType(char expectedType, 
                                           const TokenLexeme& token)
 {
-  if (m_typesStack.top() != expectedType)
+  if (!m_typesStack.empty())
   {
-    m_errorReporter->writeError(token.getLine(), token.getRow(), token.getLexeme(), 
-        "expresion resulta en tipo invalido");
+    if (m_typesStack.top() != expectedType)
+    {
+      m_errorReporter->writeError(token.getLine(), token.getRow(),
+          token.getLexeme(), "expresion resulta en tipo invalido");
+    }
   }
 
   clearTypesStack();
@@ -622,8 +618,7 @@ NativeType_t SemanticChecker::getExpressionType()
   return type;
 }
 
-void SemanticChecker::clearTypesStack()
-{
+void SemanticChecker::clearTypesStack() {
   while (!m_typesStack.empty())
   {
     m_typesStack.pop();
@@ -637,9 +632,9 @@ ParametersList_t SemanticChecker::getParametersListFromString(
   i = f = a = s = b = 0;
   ParametersList_t parametersList;
 
-  for (size_t i = 0; i < typesString.size(); ++i)
+  for (size_t iLetter = 0; iLetter < typesString.size(); ++iLetter)
   {
-    switch (typesString.at(i))
+    switch (typesString.at(iLetter))
     {
     case 'i' :
       ++i;
