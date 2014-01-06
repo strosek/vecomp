@@ -1,0 +1,13 @@
+paquete principal
+
+funcion main() {
+  var x entero;
+
+  x = x  + 9;
+}
+
+funcion main2() {
+  var x logico;
+}
+
+
