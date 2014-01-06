@@ -66,7 +66,7 @@ public:
   void checkModifiable(const TokenLexeme& iden);
   void checkExpression(const std::string& lexeme, int line, int row);
   void checkExpressionType(char expectedType, const TokenLexeme& token);
-  void checkDimensions(TokenLexeme& token, std::vector<int> sizes);
+  void checkDimensions(TokenLexeme& token, size_t size);
   void checkReturnType(TokenLexeme& token);
   void checkReturnShouldBeCalled(int functionEndLine);
   void checkImported(const std::string& package, int line, int row);

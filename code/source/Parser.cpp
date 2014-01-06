@@ -109,6 +109,7 @@ void Parser::argumentsList()
     }
   } while (isOperatorFound);
 
+  cout << "argumentTypes: " << argumentTypes << endl;
   m_currentFunction.second =
       m_semanticChecker.getParametersListFromString(argumentTypes);
 
@@ -252,6 +253,9 @@ void Parser::command()
       else if (m_currentToken.getLexeme().compare("[") == 0)
       {
         m_scanner.moveTokenBackwards();
+
+        m_currentDimensions.first = getLastToken();
+
         dimension();
         assign();
       }
@@ -395,6 +399,7 @@ void Parser::dimension()
     return;
 
   do {
+    ++(m_currentDimensions.second);
     m_currentSymbols.back().second.dimensions.push_back(0);
 
     checkLexeme("[");
@@ -411,6 +416,9 @@ void Parser::dimension()
       m_scanner.moveTokenBackwards();
     }
   } while (m_currentToken.getLexeme().compare("[") == 0);
+
+  m_semanticChecker.checkDimensions(m_currentDimensions.first,
+                                    m_currentDimensions.second);
 
   m_scanner.moveTokenBackwards();
 

@@ -32,6 +32,7 @@ SemanticChecker::SemanticChecker(ErrorReporter * errorReporter) :
    * E = Equality (!= ==)
    * L = Logical (&& ||)
    * U = Unary (-)
+   * T = assignmenT (= :=)
    *
    * VALUES
    *
@@ -144,22 +145,23 @@ void SemanticChecker::checkModifiable(const TokenLexeme& token)
   }
 }
 
-void SemanticChecker::checkDimensions(TokenLexeme& token, vector<int> sizes)
+void SemanticChecker::checkDimensions(TokenLexeme& token, size_t size)
 {
-  if (isSymbolPresent(token.getLexeme()))
+  string nameWithScope = appendCurrentScope(token.getLexeme());
+  cout << "dimensionsname: " << nameWithScope << endl;
+  if (isSymbolPresent(nameWithScope))
   {
-    string message;
-
-    if (m_symbolsTable[token.getLexeme()].dimensions.size() <= 0)
+    if (m_symbolsTable[nameWithScope].dimensions.size() <= 0)
     {
-      message = "variable no dimensionada";
+      m_errorReporter->writeError(token.getLine(), token.getRow(),
+          token.getLexeme(), "variable no dimensionada");
     }
-    else if (sizes.size() < m_symbolsTable[token.getLexeme()].dimensions.size())
+    else if (size < m_symbolsTable[nameWithScope].dimensions.size())
     {
       m_errorReporter->writeError(token.getLine(), token.getRow(),
           token.getLexeme(), "fatan dimensiones");
     }
-    else if (sizes.size() > m_symbolsTable[token.getLexeme()].dimensions.size())
+    else if (size > m_symbolsTable[token.getLexeme()].dimensions.size())
     {
       m_errorReporter->writeError(token.getLine(), token.getRow(),
           token.getLexeme(), "exceso de dimensiones");
