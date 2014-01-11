@@ -27,7 +27,7 @@ private:
   void argumentsList();
   void assign();
   void block();
-  void caseStatement();
+  void switchStatement();
   void command();
   void constant();
   void constantsDeclaration();
@@ -64,22 +64,13 @@ private:
   void         ignoreNewLines();
   bool         isNativeDataType(const std::string& lexeme);
   bool         isLiteral(TokenType_t token);
-  NativeType_t getLiteralType(TokenType_t token);
-  NativeType_t getTypeFromString(const std::string& typeString);
-  void         addSymbolAndReset(const std::string& name, SymbolData_t data);
-  void         setCurrentSymbolsData();
 
   TokenLexeme                                      m_currentToken;
   Scanner                                          m_scanner;
   ErrorReporter*                                   m_errorReporter;
-  int                                              m_maxErrors;
-  int                                              m_nTokensProcessed;
+  unsigned int                                     m_maxErrors;
+  size_t                                           m_nTokensProcessed;
   SemanticChecker                                  m_semanticChecker;
-  std::string                                      m_currentSymbolName;
-  SymbolData_t                                     m_currentSymbolData;
-  std::list<std::pair<std::string, SymbolData_t> > m_currentSymbols;
-  std::pair<TokenLexeme, ParametersList_t>         m_currentFunction;
-  std::pair<TokenLexeme, int>                      m_currentDimensions;
 };
 
 #endif /* PARSER_HPP */

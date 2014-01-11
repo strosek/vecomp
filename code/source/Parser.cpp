@@ -17,11 +17,6 @@ Parser::Parser(FileReader* fileReader, ErrorReporter* errorReporter) :
   m_maxErrors(5),
   m_nTokensProcessed(0),
   m_semanticChecker(SemanticChecker(errorReporter)),
-  m_currentSymbolName(),
-  m_currentSymbolData(),
-  m_currentSymbols(),
-  m_currentFunction(),
-  m_currentDimensions()
 {
   m_maxErrors = m_errorReporter->getMaxErrors();
 }
@@ -53,7 +48,7 @@ void Parser::parse()
   cout << "expected tokens: " << m_scanner.getTokensProcessed() <<
       ", got: " << m_scanner.getMaxTokens() << endl;
 
-  cout << "\n::: Symbols table :::::::::::::::::::::::::::::::::::::::" << endl;
+  cout << "\n::: Symbols table ::::::::::::::::::::::::::::::::::::::" << endl;
   m_semanticChecker.printSymbolsTable();
 #endif
   if (m_scanner.getTokensProcessed() != m_scanner.getMaxTokens())
@@ -74,11 +69,6 @@ void Parser::andOperation()
   do
   {
     notOperation();
-    if (m_currentToken.getLexeme().compare("&&") == 0)
-    {
-      m_semanticChecker.pushOperator('L', m_currentToken.getLine(),
-          m_currentToken.getRow(), m_currentToken.getLexeme());
-    }
   } while (m_currentToken.getLexeme().compare("&&") == 0);
 
 #ifdef DEBUG
@@ -98,8 +88,6 @@ void Parser::argumentsList()
   {
     isOperatorFound = false;
     expression();
-    argumentTypes += 
-        m_semanticChecker.getTypeChar(m_semanticChecker.getExpressionType());
 
     advanceToken();
     if (m_currentToken.getLexeme().compare(",") == 0)
@@ -108,13 +96,6 @@ void Parser::argumentsList()
       advanceToken();
     }
   } while (isOperatorFound);
-
-  cout << "argumentTypes: " << argumentTypes << endl;
-  m_currentFunction.second =
-      m_semanticChecker.getParametersListFromString(argumentTypes);
-
-  m_semanticChecker.checkFunctionDeclared(m_currentFunction.first,
-      m_currentFunction.second);
 
   m_scanner.moveTokenBackwards();
 
@@ -161,7 +142,7 @@ void Parser::block()
 #endif
 }
 
-void Parser::caseStatement()
+void Parser::switchStatement()
 {
 #ifdef DEBUG
   cout << "::: entering caseStatement()" << endl;
@@ -224,14 +205,10 @@ void Parser::command()
   {
     if (m_currentToken.getLexeme().compare("con") == 0)
     {
-      m_semanticChecker.checkImported("\"con\"", m_currentToken.getLine(),
-          m_currentToken.getRow());
       read();
     }
     else if (m_currentToken.getLexeme().compare("fmt") == 0)
     {
-      m_semanticChecker.checkImported("\"fmt\"", m_currentToken.getLine(),
-          m_currentToken.getRow());
       print();
     }
     else
@@ -244,9 +221,6 @@ void Parser::command()
       if (m_currentToken.getToken() == TOKEN_ASSIGNOP)
       {
         m_scanner.moveTokenBackwards();
-
-        m_semanticChecker.checkModifiable(getLastToken());
-        m_semanticChecker.checkVariableDeclared(getLastToken());
 
         assign();
       }
@@ -371,20 +345,10 @@ void Parser::constant()
 
   checkToken(TOKEN_IDEN);
 
-  m_currentSymbolName = getLastToken().getLexeme();
-  m_currentSymbolData.scope = m_semanticChecker.getCurrentScope();
-  m_currentSymbolData.isConstant = true;
-  m_currentSymbolData.line = getLastToken().getLine();
-
   checkToken(TOKEN_ASSIGNOP);
 
   checkLiteral();
 
-  m_currentSymbolData.type = getLiteralType(getLastToken().getToken());
-
-  m_currentSymbolName += "@";
-  m_currentSymbolName += m_semanticChecker.getCurrentScope();
-  m_semanticChecker.addSymbol(m_currentSymbolName, m_currentSymbolData);
 #ifdef DEBUG
   cout << "::: exit constant()" << endl;
 #endif
@@ -399,15 +363,9 @@ void Parser::dimension()
     return;
 
   do {
-    ++(m_currentDimensions.second);
-    m_currentSymbols.back().second.dimensions.push_back(0);
-
     checkLexeme("[");
     advanceToken();
-    TokenLexeme token = getLastToken();
     expression();
-
-    //m_semanticChecker.checkExpressionType('i', token);
 
     checkLexeme("]");
     advanceToken();
@@ -416,9 +374,6 @@ void Parser::dimension()
       m_scanner.moveTokenBackwards();
     }
   } while (m_currentToken.getLexeme().compare("[") == 0);
-
-  m_semanticChecker.checkDimensions(m_currentDimensions.first,
-                                    m_currentDimensions.second);
 
   m_scanner.moveTokenBackwards();
 
@@ -578,13 +533,6 @@ void Parser::functionDeclaration()
     m_semanticChecker.setMainPresent(true);
   }
 
-  m_currentSymbolName = getLastToken().getLexeme();
-
-  m_currentSymbolData.isFunction = true;
-  m_currentSymbolData.line = getLastToken().getLine();
-  m_currentSymbolData.scope = m_semanticChecker.getCurrentScope();
-  m_currentSymbolData.isConstant = false;
-
   m_semanticChecker.enterToScope(getLastToken().getLexeme());
 
   checkLexeme("(");
@@ -592,16 +540,9 @@ void Parser::functionDeclaration()
   checkLexeme(")");
   returnType();
 
-  m_currentSymbolName += "(";
-  m_currentSymbolName += m_semanticChecker.getParametersString(
-      m_currentSymbolData.parametersList);
-  m_currentSymbolName += ")@global";
-
   addSymbolAndReset(m_currentSymbolName, m_currentSymbolData);
 
   block();
-
-  m_semanticChecker.checkReturnShouldBeCalled(getLastToken().getLine());
 
   m_semanticChecker.exitCurrentScope();
 #ifdef DEBUG
@@ -652,8 +593,6 @@ void Parser::import()
     {
       checkToken(TOKEN_STRING);
 
-      m_semanticChecker.addImport(getLastToken());
-
       advanceToken();
     } while (m_currentToken.getToken() == TOKEN_NEWLINE);
 
@@ -691,17 +630,6 @@ void Parser::multiplication()
     {
       isOperatorFound = true;
       advanceToken();
-      if (m_currentToken.getLexeme().compare("%") == 0)
-      {
-        m_semanticChecker.pushOperator('M', m_currentToken.getLine(),
-          m_currentToken.getRow(), m_currentToken.getLexeme());
-      }
-      else
-      {
-        m_semanticChecker.pushOperator('A', m_currentToken.getLine(),
-          m_currentToken.getRow(), m_currentToken.getLexeme());
-;;
-      }
     }
   } while (isOperatorFound); 
 #ifdef DEBUG
@@ -719,8 +647,6 @@ void Parser::notOperation()
 
   if (m_currentToken.getLexeme().compare("!") == 0)
   {
-    m_semanticChecker.pushOperator('U', m_currentToken.getLine(),
-      m_currentToken.getRow(), m_currentToken.getLexeme());
     checkLexeme("!");
     relationalOperation();
   }
@@ -738,26 +664,14 @@ void Parser::parameterList()
   if (m_errorReporter->getErrors() >= m_maxErrors)
     return;
 
-  string nameWithScope;
-  int    nTypeParameters;
-
   advanceToken();
   while (m_currentToken.getLexeme().compare(")") != 0)
   {
     m_scanner.moveTokenBackwards();
 
-    nTypeParameters = 0;
     do
     {
-      ++nTypeParameters;
-
       checkToken(TOKEN_IDEN);
-
-      nameWithScope = getLastToken().getLexeme();
-      nameWithScope += "@";
-      nameWithScope += m_semanticChecker.getCurrentScope();
-      m_currentSymbols.push_back(
-          make_pair(nameWithScope, SymbolData_t()));
 
       advanceToken();
     } while (m_currentToken.getLexeme().compare(",") == 0);
@@ -899,9 +813,6 @@ void Parser::relationalOperation()
   sumOperation();
   if (m_currentToken.getToken() == TOKEN_RELOP)
   {
-    m_semanticChecker.pushOperator('R', m_currentToken.getLine(),
-      m_currentToken.getRow(), m_currentToken.getLexeme());
-
     advanceToken();
     sumOperation();
   }
@@ -925,7 +836,6 @@ void Parser::returnExpression()
   if (m_currentToken.getLexeme().compare(";") != 0 &&
       m_currentToken.getToken() != TOKEN_NEWLINE)
   {
-    m_semanticChecker.setReturnCalled(true);
     expression();
   }
 
@@ -945,7 +855,6 @@ void Parser::returnType()
   advanceToken();
   if (m_currentToken.getLexeme().compare("{") != 0)
   {
-    m_semanticChecker.setReturnRequired(true);
     if (m_currentToken.getLexeme().compare("(") == 0)
     {
       checkLexeme("(");
@@ -978,8 +887,6 @@ void Parser::returnType()
   else
   {
     m_scanner.moveTokenBackwards();
-
-    m_semanticChecker.setReturnRequired(false);
   }
 
 #ifdef DEBUG
@@ -999,9 +906,6 @@ void Parser::sign()
   {
     m_scanner.moveTokenBackwards();
     checkLexeme("-");
-
-    m_semanticChecker.pushOperator('U', m_currentToken.getLine(),
-      m_currentToken.getRow(), m_currentToken.getLexeme());
   }
   term();
 
@@ -1066,16 +970,6 @@ void Parser::sumOperation()
     {
       isOperatorFound = true;
       advanceToken();
-      if (m_currentToken.getLexeme().compare("+") == 0)
-      {
-        m_semanticChecker.pushOperator('S', m_currentToken.getLine(),
-          m_currentToken.getRow(), m_currentToken.getLexeme());
-      }
-      else
-      {
-        m_semanticChecker.pushOperator('A', m_currentToken.getLine(),
-          m_currentToken.getRow(), m_currentToken.getLexeme());
-      }
     }
   } while (isOperatorFound); 
 
@@ -1103,14 +997,10 @@ void Parser::term()
   }
   else if (m_currentToken.getToken() == TOKEN_IDEN)
   {
-    m_semanticChecker.pushOperand(m_currentToken);
-
     advanceToken();
     if (m_currentToken.getLexeme().compare("[") == 0)
     {
       m_scanner.moveTokenBackwards();
-
-      m_semanticChecker.pushOperand(m_currentToken);
 
       dimension();
       advanceToken();
@@ -1123,16 +1013,6 @@ void Parser::term()
   }
   else if (isLiteral(m_currentToken.getToken()))
   {
-#ifdef DEBUG
-    cout << "literal token: " << m_semanticChecker.getTypeChar(
-        getLiteralType(m_currentToken.getToken())) << endl;
-#endif
-
-    m_semanticChecker.pushOperand(
-        m_semanticChecker.getTypeChar(
-        getLiteralType(m_currentToken.getToken())), m_currentToken.getLine(),
-        m_currentToken.getRow(), m_currentToken.getLexeme());
-
     advanceToken();
   }
   else {
@@ -1191,12 +1071,6 @@ void Parser::variablesList()
   do
   {
     checkToken(TOKEN_IDEN);
-
-    nameWithScope = 
-        m_semanticChecker.appendCurrentScope(getLastToken().getLexeme());
-    m_currentSymbols.push_back(make_pair(nameWithScope, SymbolData_t()));
-
-    m_semanticChecker.checkVariableNotDeclared(getLastToken());
 
     advanceToken();
     if (m_currentToken.getLexeme().compare("[") == 0)
@@ -1360,110 +1234,5 @@ bool Parser::isLiteral(TokenType_t token)
   }
 
   return false;
-}
-
-
-NativeType_t Parser::getLiteralType(TokenType_t token)
-{
-  NativeType_t type = TYPE_VOID;
-  switch (token)
-  {
-  case TOKEN_DEC :
-  case TOKEN_HEX :
-  case TOKEN_OCT :
-    type = TYPE_INTEGER;
-    break;
-  case TOKEN_FLOAT :
-    type = TYPE_FLOAT;
-    break;
-  case TOKEN_STRING :
-    type = TYPE_STRING;
-    break;
-  case TOKEN_CHARCONST :
-    type = TYPE_CHAR;
-    break;
-  case TOKEN_LOGICCONST :
-    type = TYPE_BOOL;
-    break;
-  case TOKEN_INVALID :
-  case TOKEN_IDEN :
-  case TOKEN_KEYWORD :
-  case TOKEN_ARITHOP :
-  case TOKEN_LOGICOP :
-  case TOKEN_RELOP :
-  case TOKEN_DELIMITER :
-  case TOKEN_LINECOMMENT :
-  case TOKEN_MULTICOMMENT :
-  case TOKEN_ASSIGNOP :
-  case TOKEN_NEWLINE :
-  default :
-#ifdef DEBUG
-    cout << "error: invalid native type" << endl;
-#endif
-    break;
-  }
-
-  return type;
-}
-
-NativeType_t Parser::getTypeFromString(const string& typeString)
-{
-  NativeType_t type = TYPE_VOID;
-
-  switch (typeString.at(0))
-  {
-  case 'e' :
-    type = TYPE_INTEGER;
-    break;
-  case 'r' :
-    type = TYPE_FLOAT;
-    break;
-  case 'a' :
-    type = TYPE_STRING;
-    break;
-  case 'c' :
-    type = TYPE_CHAR;
-    break;
-  case 'l' :
-    type = TYPE_BOOL;
-    break;
-  default :
-#ifdef DEBUG
-    cout << "error: invalid native type" << endl;
-#endif
-    break;
-  }
-
-  return type;
-}
-
-void Parser::addSymbolAndReset(const string& name, SymbolData_t data)
-{
-  if (name.length() > 0)
-  {
-    m_semanticChecker.addSymbol(name, data);
-  }
-
-  m_currentSymbolName = "";
-  m_currentSymbolData.type = TYPE_VOID;
-  m_currentSymbolData.dimensions.clear();
-  m_currentSymbolData.parametersList.clear();
-  m_currentSymbolData.isFunction = false;
-  m_currentSymbolData.isConstant = false;
-  m_currentSymbolData.line = 1;
-  m_currentSymbolData.scope = "";
-}
-
-void Parser::setCurrentSymbolsData()
-{
-  for (list<pair<string, SymbolData_t> >::iterator it =
-       m_currentSymbols.begin(); it != m_currentSymbols.end(); ++it)
-  {
-    it->second.type = getTypeFromString(getLastToken().getLexeme());
-    it->second.line = getLastToken().getLine();
-    it->second.scope = m_semanticChecker.getCurrentScope();
-
-    m_semanticChecker.addSymbol(it->first, it->second);
-  }
 }
 
