@@ -8,7 +8,7 @@ CFLAGS := -Wall -Wextra -Weffc++ -Wswitch -Wshadow -Wc++11-compat --std=c++11 -D
 LFLAGS := -Wall -Wextra -Weffc++ -Wswitch -Wshadow -Wc++11-compat --std=c++11 -D DEBUG -g
 
 # Binary, Source, Include, Object Directories
-BDIR := ../binary
+BDIR := ../binaries
 SDIR := source
 IDIR := headers
 ODIR := object
