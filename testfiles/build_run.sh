@@ -4,14 +4,16 @@
 
 clear
 
-./build_debug.sh
+cd ../code
+make
 
 if [ $? -eq 0 ]; then
-  if [ -e errores.out ]; then
+  if [ -f errores.out ]; then
     rm errores.out
   fi
 
-  ../binaries/vecomp $1 
+  cd ../binaries
+  ../binaries/vecomp $1 2> errores.out
 fi
 
 if [ $? -eq 0 ]; then
