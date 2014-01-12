@@ -3,11 +3,11 @@
 #ifndef ERROR_REPORTER_HPP
 #define ERROR_REPORTER_HPP
 
-#include <fstream>
 #include <string>
 
 // Forward declaration to avoid class dependency problems
 class FileReader;
+
 #include "FileReader.hpp"
 #include "TokenLexeme.hpp"
 
@@ -16,12 +16,11 @@ class ErrorReporter
 {
 public:
   static ErrorReporter* getInstance();
-  static ErrorReporter* getInstance(const std::string& outFileName);
 
   ErrorReporter& operator=(const ErrorReporter& rhs);
 
   void writeError(const std::string& message);
-  void writeError(int line, int column, const std::string lexeme&, 
+  void writeError(int line, int column, const std::string& lexeme, 
                   const std::string& message);
   void writeLexicalError(int state, char currentChar,
                          const std::string& lexeme, int lineNo, int columnNo);
@@ -44,19 +43,16 @@ private:
   static const int WIDTH_LINE =   100;
 
   ErrorReporter();
-  ErrorReporter(const std::string& outFileName);
   ErrorReporter(const ErrorReporter& source);
   ~ErrorReporter();
 
   void writeErrorsFileHeader();
   void writeErrorsFileSeparator();
 
-  std::ofstream m_errorOut;
-  std::string   m_outFileName;
-  int           m_warnings;
-  int           m_errors;
-  int           m_maxErrors;
-  FileReader*   m_fileReader;
+  int          m_warnings;
+  int          m_errors;
+  int          m_maxErrors;
+  FileReader * m_fileReader;
 
   static ErrorReporter* m_instance;
 };

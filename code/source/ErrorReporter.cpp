@@ -3,28 +3,13 @@
 #include "../headers/ErrorReporter.hpp"
 
 #include <iomanip>
+#include <iostream>
 #include <sstream>
 #include <string>
-
-#ifdef DEBUG
-# include <iostream>
-#endif
 
 using namespace std;
 
 ErrorReporter::ErrorReporter() :
-  m_errorOut(),
-  m_outFileName("errores.out"),
-  m_warnings(0),
-  m_errors(0),
-  m_maxErrors(5),
-  m_fileReader(nullptr)
-{
-}
-
-ErrorReporter::ErrorReporter(const string& outFileName) :
-  m_errorOut(),
-  m_outFileName(outFileName),
   m_warnings(0),
   m_errors(0),
   m_maxErrors(5),
@@ -49,16 +34,6 @@ ErrorReporter* ErrorReporter::getInstance()
   return m_instance;
 }
 
-ErrorReporter* ErrorReporter::getInstance(const string& outFileName)
-{
-  if (m_instance == nullptr)
-  {
-    m_instance = new ErrorReporter(outFileName);
-    return m_instance; 
-  }
-  return m_instance;
-}
-
 void ErrorReporter::writeError(const string& message)
 {
   writeErrorsFileHeader();
@@ -68,7 +43,7 @@ void ErrorReporter::writeError(const string& message)
 #ifdef DEBUG
     cout << "::: writing error" << endl;
 #endif
-    m_errorOut << setw(WIDTH_NUMBER) << ' ' <<
+    cerr << setw(WIDTH_NUMBER) << ' ' <<
         setw(WIDTH_NUMBER) << ' ' <<
         setw(WIDTH_LEXEME) << ' ' << 
         setw(WIDTH_MESSAGE) << message <<
@@ -78,7 +53,7 @@ void ErrorReporter::writeError(const string& message)
   ++m_errors;
 }
 
-void ErrorReporter::writeError(int line, int column, const std::string lexeme,
+void ErrorReporter::writeError(int line, int column, const std::string& lexeme,
                                const std::string& message)
 {
   writeErrorsFileHeader();
@@ -88,12 +63,12 @@ void ErrorReporter::writeError(int line, int column, const std::string lexeme,
 #ifdef DEBUG
     cout << "::: writing error" << endl;
 #endif
-    m_errorOut << setw(WIDTH_NUMBER) << line <<
+    cerr << setw(WIDTH_NUMBER) << line <<
         setw(WIDTH_NUMBER) << column <<
         setw(WIDTH_LEXEME) << lexeme << 
         setw(WIDTH_MESSAGE) << message <<
         setw(WIDTH_LINE) << m_fileReader->getTextAtLine(line - 1);
-    m_errorOut.flush();
+    cerr.flush();
   }
 
   ++m_errors;
@@ -193,12 +168,12 @@ void ErrorReporter::writeLexicalError(int state, char currentChar,
 #ifdef DEBUG
     cout << "::: writing error" << endl;
 #endif
-    m_errorOut << setw(WIDTH_NUMBER) << line <<
+    cerr << setw(WIDTH_NUMBER) << line <<
         setw(WIDTH_NUMBER) << column <<
         setw(WIDTH_LEXEME) << lexeme << 
         setw(WIDTH_MESSAGE) << messageBuilder.str() <<
         setw(WIDTH_LINE) << m_fileReader->getTextAtLine(line - 1);
-    m_errorOut.flush();
+    cerr.flush();
   }
 
   ++m_errors;
@@ -219,12 +194,12 @@ void ErrorReporter::writeSyntaxError(const std::string& expectedLexeme,
 #ifdef DEBUG
     cout << "::: writing error" << endl;
 #endif
-    m_errorOut << setw(WIDTH_NUMBER) << line <<
+    cerr << setw(WIDTH_NUMBER) << line <<
         setw(WIDTH_NUMBER) << column <<
         setw(WIDTH_LEXEME) << actualLexeme << 
         setw(WIDTH_MESSAGE) << messageBuilder.str() <<
         setw(WIDTH_LINE) << m_fileReader->getTextAtLine(line - 1);
-    m_errorOut.flush();
+    cerr.flush();
   }
 
   ++m_errors;
@@ -247,12 +222,12 @@ void ErrorReporter::writeSyntaxError(TokenType_t expectedToken,
 #ifdef DEBUG
     cout << "::: writing error" << endl;
 #endif
-    m_errorOut << setw(WIDTH_NUMBER) << line <<
+    cerr << setw(WIDTH_NUMBER) << line <<
         setw(WIDTH_NUMBER) << column <<
         setw(WIDTH_LEXEME) << actualLexeme << 
         setw(WIDTH_MESSAGE) << messageBuilder.str() <<
         setw(WIDTH_LINE) << m_fileReader->getTextAtLine(line - 1);
-    m_errorOut.flush();
+    cerr.flush();
   }
 
   ++m_errors;
@@ -260,18 +235,13 @@ void ErrorReporter::writeSyntaxError(TokenType_t expectedToken,
 
 void ErrorReporter::writeErrorsFileHeader()
 {
-  if (!m_errorOut.is_open())
-  {
-    m_errorOut.open(m_outFileName, ios::trunc);
-
-    writeErrorsFileSeparator();
-    m_errorOut << setw(WIDTH_NUMBER) << "Linea" <<
-        setw(WIDTH_NUMBER) << "Columna" <<
-        setw(WIDTH_LEXEME) << "Lexema" << 
-        setw(WIDTH_MESSAGE) << "Mensaje de error" <<
-        setw(WIDTH_LINE) << "Linea" << endl;
-    writeErrorsFileSeparator();
-  }
+  writeErrorsFileSeparator();
+  cerr << setw(WIDTH_NUMBER) << "Linea" <<
+      setw(WIDTH_NUMBER) << "Columna" <<
+      setw(WIDTH_LEXEME) << "Lexema" << 
+      setw(WIDTH_MESSAGE) << "Mensaje de error" <<
+      setw(WIDTH_LINE) << "Linea" << endl;
+  writeErrorsFileSeparator();
 }
 
 void ErrorReporter::setFileReader(FileReader* fileReader)
@@ -301,7 +271,7 @@ int  ErrorReporter::getWarnings() const
 
 void ErrorReporter::endErrorsFile()
 {
-  m_errorOut << endl;
+  cerr << endl;
   writeErrorsFileSeparator();
 
   int totalErrors;
@@ -313,10 +283,8 @@ void ErrorReporter::endErrorsFile()
   {
     totalErrors = m_errors;
   }
-  m_errorOut << "errores: " << totalErrors << ", advertencias: " <<
+  cerr << "errores: " << totalErrors << ", advertencias: " <<
                 m_warnings << endl;
-
-  m_errorOut.close();
 }
 
 void ErrorReporter::writeErrorsFileSeparator()
@@ -324,8 +292,8 @@ void ErrorReporter::writeErrorsFileSeparator()
   for (int i = 0; 
        i < (WIDTH_NUMBER * 2 + WIDTH_LEXEME + WIDTH_MESSAGE + WIDTH_LINE); ++i)
   {
-    m_errorOut << '-';
+    cerr << '-';
   }
-  m_errorOut << endl;
+  cerr << endl;
 }
 

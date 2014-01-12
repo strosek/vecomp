@@ -8,6 +8,7 @@
 #include <string>
 
 #include "ErrorReporter.hpp"
+#include "SymbolsTable.hpp"
 #include "TokenLexeme.hpp"
 
 class SemanticChecker

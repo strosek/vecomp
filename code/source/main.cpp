@@ -1,14 +1,14 @@
 /* Main function definition for vecomp program */
 
-#include <iostream>
 #include <cstdio>
 #include <cstdlib>
 #include <iomanip>
+#include <iostream>
 
-#include "../headers/main.hpp"
-#include "../headers/FileReader.hpp"
 #include "../headers/ErrorReporter.hpp"
+#include "../headers/FileReader.hpp"
 #include "../headers/Parser.hpp"
+#include "../headers/main.hpp"
 
 using namespace std;
 
