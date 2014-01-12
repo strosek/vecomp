@@ -4,8 +4,8 @@
 
 # Environment macros: Compiler to use, Compile Flags, Link Flags
 CXX := g++
-CFLAGS := -Wall -Wextra -Weffc++ -Wswitch -Wshadow -Wc++11-compat --std=c++11 -O2 -D DEBUG -g
-LFLAGS := -Wall -Wextra -Weffc++ -Wswitch -Wshadow -Wc++11-compat --std=c++11 -O2 -D DEBUG -g
+CFLAGS := -Wall -Wextra -Weffc++ -Wswitch -Wshadow -Wc++11-compat --std=c++11 -D DEBUG -g
+LFLAGS := -Wall -Wextra -Weffc++ -Wswitch -Wshadow -Wc++11-compat --std=c++11 -D DEBUG -g
 
 # Binary, Source, Include, Object Directories
 BDIR := ../binary
@@ -14,7 +14,7 @@ IDIR := headers
 ODIR := object
 
 # Object files
-_OBJ := main.o SemanticChecker.o FunctionData.o VariableData.o SymbolData.o Parser.o Scanner.o FileReader.o TokenLexeme.o
+_OBJ := main.o CodeGenerator.o SemanticChecker.o SymbolsTable.o FunctionData.o VariableData.o SymbolData.o Parser.o Scanner.o FileReader.o TokenLexeme.o ErrorReporter.o
 OBJ := $(_OBJ:%.o=$(ODIR)/%.o)
 
 # Binary file (executable)
@@ -30,30 +30,30 @@ all: $(BIN)
 # Special to compile and execute
 .PHONY: exec
 exec: all
-        ./$(BIN)
+	./$(BIN)
 
 # Special to clean everything
 .PHONY: clean
 clean:
-        rm -f *~
-        rm -f -r $(ODIR)
-        rm -f -r $(BDIR)
+	rm -f *~
+	rm -f -r $(ODIR)
+	rm -f -r $(BDIR)
 
 ####################
 
 # Make Binary
 $(BIN): $(OBJ)
-        if [ ! -d $(BDIR) ]; then\
-                mkdir $(BDIR);\
-        fi
-        $(CXX) $(LFLAGS) $^ -o $@
-        touch $@
+	if [ ! -d $(BDIR) ]; then\
+		mkdir $(BDIR);\
+	fi
+	$(CXX) $(LFLAGS) $^ -o $@
+	touch $@
 
 # Make Objects
-$(ODIR)/%.o: $(SDIR)/%.cpp $(IDIR)/%.h
-        if [ ! -d $(ODIR) ]; then\
-                mkdir $(ODIR);\
-        fi
-        $(CXX) $(CFLAGS) $< -o $@
-        touch $@
+$(ODIR)/%.o: $(SDIR)/%.cpp $(IDIR)/%.hpp
+	if [ ! -d $(ODIR) ]; then\
+		mkdir $(ODIR);\
+	fi
+	$(CXX) $(CFLAGS) $< -o $@
+	touch $@
 
