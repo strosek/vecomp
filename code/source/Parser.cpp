@@ -16,7 +16,7 @@ Parser::Parser(FileReader* fileReader, ErrorReporter* errorReporter) :
   m_errorReporter(errorReporter),
   m_maxErrors(5),
   m_nTokensProcessed(0),
-  m_semanticChecker(SemanticChecker(errorReporter)),
+  m_semanticChecker(SemanticChecker(errorReporter))
 {
   m_maxErrors = m_errorReporter->getMaxErrors();
 }
@@ -47,9 +47,6 @@ void Parser::parse()
 #ifdef DEBUG
   cout << "expected tokens: " << m_scanner.getTokensProcessed() <<
       ", got: " << m_scanner.getMaxTokens() << endl;
-
-  cout << "\n::: Symbols table ::::::::::::::::::::::::::::::::::::::" << endl;
-  m_semanticChecker.printSymbolsTable();
 #endif
   if (m_scanner.getTokensProcessed() != m_scanner.getMaxTokens())
   {
@@ -228,16 +225,12 @@ void Parser::command()
       {
         m_scanner.moveTokenBackwards();
 
-        m_currentDimensions.first = getLastToken();
-
         dimension();
         assign();
       }
       else if (m_currentToken.getLexeme().compare("(") == 0)
       {
         m_scanner.moveTokenBackwards();
-
-        m_currentFunction.first = getLastToken();
 
         functionCall();
       }
@@ -260,7 +253,7 @@ void Parser::command()
   }
   else if (m_currentToken.getLexeme().compare("caso") == 0)
   {
-    caseStatement();
+    switchStatement();
   }
   else if (m_currentToken.getLexeme().compare("regresa") == 0)
   {
@@ -540,8 +533,6 @@ void Parser::functionDeclaration()
   checkLexeme(")");
   returnType();
 
-  addSymbolAndReset(m_currentSymbolName, m_currentSymbolData);
-
   block();
 
   m_semanticChecker.exitCurrentScope();
@@ -678,12 +669,6 @@ void Parser::parameterList()
 
     m_scanner.moveTokenBackwards();
     checkNativeDataType();
-
-    m_currentSymbolData.parametersList.push_back(
-        make_pair(nTypeParameters,
-        getTypeFromString(getLastToken().getLexeme())));
-
-    setCurrentSymbolsData();
 
     advanceToken();
   }
@@ -880,8 +865,6 @@ void Parser::returnType()
     {
       m_scanner.moveTokenBackwards();
       checkNativeDataType();
-
-      m_currentSymbolData.type = getTypeFromString(getLastToken().getLexeme());
     }
   }
   else
@@ -1091,8 +1074,6 @@ void Parser::variablesList()
   } while (m_currentToken.getLexeme().compare(",") == 0);
 
   checkNativeDataType();
-
-  setCurrentSymbolsData();
 
 #ifdef DEBUG
   cout << "::: exit variablesList()" << endl;

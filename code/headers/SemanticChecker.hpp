@@ -27,6 +27,9 @@ public:
   void exitFor();
   void exitSwitch();
   void setMainPresent(bool isPresent);
+  bool isMainPresent() const;
+  bool isInSwitch() const;
+  bool isInFor() const;
 
 private:
   ErrorReporter *                    m_errorReporter;

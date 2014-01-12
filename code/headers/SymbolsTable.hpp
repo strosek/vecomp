@@ -3,6 +3,8 @@
 
 #include "SymbolData.hpp"
 
+#include <map>
+
 class SymbolsTable
 {
 public:
