@@ -35,17 +35,16 @@ public:
   TokenLexeme(const TokenType_t token, const std::string& lexeme, 
               unsigned int line, unsigned int row);
   
-  void setToken(const TokenType_t token);
-  void setLexeme(const std::string& lexeme);
-  void setLine(unsigned int line);
-  void setRow(unsigned int row);
-  
-  TokenType_t  getToken() const;
-  std::string  getLexeme() const;
-  unsigned int getLine() const;
-  unsigned int getRow() const;
+  TokenType_t        getToken() const;
+  static std::string getTokenString(TokenType_t token);
+  std::string        getLexeme() const;
+  unsigned int       getLine() const;
+  unsigned int       getRow() const;
+  void               setLexeme(const std::string& lexeme);
+  void               setLine(unsigned int line);
+  void               setRow(unsigned int row);
+  void               setToken(const TokenType_t token);
 
-  static std::string  getTokenString(TokenType_t token);
 private:
   TokenType_t  m_token;
   std::string  m_lexeme;

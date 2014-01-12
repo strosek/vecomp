@@ -17,12 +17,13 @@ class FileReader
 public:
   static FileReader* getInstance();
 
+  FileReader&              operator=(const FileReader& rhs);
+
   void        readFile(const std::string& fileName);
   size_t      getTotalLines() const;
   std::string getTextAtLine(int line);
   void        setErrorReporter(ErrorReporter* errorRepoter);
 
-  FileReader&              operator=(const FileReader& rhs);
 private:
   FileReader();
   FileReader(const FileReader& source);

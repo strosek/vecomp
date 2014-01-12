@@ -3,13 +3,13 @@
 #ifndef SCANNER_HPP
 #define SCANNER_HPP
 
+#include <map>
 #include <string>
 #include <queue>
-#include <map>
 
-#include "TokenLexeme.hpp"
 #include "ErrorReporter.hpp"
 #include "FileReader.hpp"
+#include "TokenLexeme.hpp"
 
 #define N_KEYWORDS    20
 
@@ -138,12 +138,14 @@ public:
   Scanner(FileReader* fileReader, ErrorReporter* errorReporter);
   Scanner(const Scanner& source);
 
-  void        scan();
+  Scanner& operator=(const Scanner& rhs);
+
+  TokenLexeme getNextTokenLexeme();
   int         getMaxTokens() const;
   int         getTokensProcessed() const;
   void        moveTokenBackwards();
   void        moveTokenForward();
-  TokenLexeme getNextTokenLexeme();
+  void        scan();
 
 private:
   Transition_t getTransitionIndex(char character);
@@ -159,7 +161,6 @@ private:
   ErrorReporter*                    m_errorReporter;
   FileReader*                       m_fileReader;
 
-  Scanner& operator=(const Scanner& rhs);
 };
 
 #endif // SCANNER_HPP

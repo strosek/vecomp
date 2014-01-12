@@ -3,6 +3,8 @@
 #ifndef SYMBOLDATA_HPP
 #define SYMBOLDATA_HPP
 
+#include <string>
+
 typedef enum
 {
   TYPE_INTEGER,
@@ -13,11 +15,12 @@ typedef enum
   TYPE_VOID
 } NativeType_t;
 
-class Symbol
+class SymbolData
 {
 public:
   SymbolData();
-private:
+
+protected:
   std::string  name;
   std::string  scope;
   NativeType_t type;

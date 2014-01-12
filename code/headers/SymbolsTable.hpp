@@ -1,16 +1,18 @@
 #ifndef SYMBOLSTABLE_HPP
 #define SYMBOLSTABLE_HPP
 
-#include "Symbol.hpp"
+#include "SymbolData.hpp"
 
 class SymbolsTable
 {
 public:
   SymbolsTable();
 
-  search(std::string name, SymbolData data);
+  const SymbolData& search(std::string name, SymbolData data) const;
+
 private:
   std::multimap<std::string, SymbolData> m_symbolsMap;
 };
 
 #endif /* SYMBOLSTABLE_HPP included */
+

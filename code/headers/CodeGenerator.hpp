@@ -17,7 +17,9 @@ class CodeGenerator
 {
 public:
   CodeGenerator(const std::string& outputFileName);
+
   void writeClassFile();
+
 private:
   struct classFormat m_classFormat;
 };

@@ -10,14 +10,14 @@
 using namespace std;
 
 SemanticChecker::SemanticChecker(ErrorReporter * errorReporter) :
-  m_isMainPresent(false),
+  m_controlStack(),
+  m_errorReporter(errorReporter),
   m_forLevel(0),
-  m_switchLevel(0),
+  m_imports(),
+  m_isMainPresent(false),
   m_isReturnCalled(false),
   m_isReturnRequired(false),
-  m_errorReporter(errorReporter),
-  m_controlStack(),
-  m_imports(),
+  m_switchLevel(0),
   m_symbolsTable(),
 {
 }

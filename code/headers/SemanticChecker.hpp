@@ -7,8 +7,8 @@
 #include <stack>
 #include <string>
 
-#include "../headers/TokenLexeme.hpp"
-#include "../headers/ErrorReporter.hpp"
+#include "ErrorReporter.hpp"
+#include "TokenLexeme.hpp"
 
 class SemanticChecker
 {
@@ -18,27 +18,27 @@ public:
 
   SemanticChecker& operator=(const SemanticChecker& rhs);
 
-  void printSymbolsTable();
-
-  void setMainPresent(bool isPresent);
+  void addImport(const std::string& import);
   void enterFor();
-  void exitFor();
   void enterSwitch();
-  void exitSwitch();
   void enterToScope(const std::string& scope);
   void exitCurrentScope();
-  void addImport(const std::string& import);
-private:
-  bool                                m_isMainPresent;
-  int                                 m_forLevel;
-  int                                 m_switchLevel;
-  bool                                m_isReturnCalled;
-  bool                                m_isReturnRequired;
+  void exitFor();
+  void exitSwitch();
+  void setMainPresent(bool isPresent);
 
-  ErrorReporter *                     m_errorReporter;
-  std::stack<std::string>             m_controlStack;
-  std::set<std::string>               m_imports;
-  SymbolsTable                        m_symbolsTable;
+private:
+  ErrorReporter *                    m_errorReporter;
+  SymbolsTable                       m_symbolsTable;
+  bool                               m_isMainPresent;
+  bool                               m_isReturnCalled;
+  bool                               m_isReturnRequired;
+  int                                m_forLevel;
+  int                                m_switchLevel;
+  std::map<std::string, std::string> m_validExpressions;
+  std::set<std::string>              m_imports;
+  std::stack<std::string>            m_controlStack;
+  std::stack<std::string>            m_expressionTypes;
 };
 
 #endif /* SEMANTICCHECKER_HPP */

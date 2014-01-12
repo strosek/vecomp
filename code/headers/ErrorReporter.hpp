@@ -18,8 +18,10 @@ public:
   static ErrorReporter* getInstance();
   static ErrorReporter* getInstance(const std::string& outFileName);
 
+  ErrorReporter& operator=(const ErrorReporter& rhs);
+
   void writeError(const std::string& message);
-  void writeError(int line, int column, const std::string lexeme, 
+  void writeError(int line, int column, const std::string lexeme&, 
                   const std::string& message);
   void writeLexicalError(int state, char currentChar,
                          const std::string& lexeme, int lineNo, int columnNo);
@@ -35,7 +37,6 @@ public:
   int  getErrors() const;
   int  getWarnings() const;
 
-  ErrorReporter& operator=(const ErrorReporter& rhs);
 private:
   static const int WIDTH_NUMBER =   8;
   static const int WIDTH_LEXEME =  15;
