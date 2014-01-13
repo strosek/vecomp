@@ -15,6 +15,14 @@ typedef enum
   TYPE_VOID
 } NativeType_t;
 
+const char TYPECHAR_INTEGER = 'i';
+const char TYPECHAR_FLOAT =   'f';
+const char TYPECHAR_CHAR =    'c';
+const char TYPECHAR_STRING =  's';
+const char TYPECHAR_BOOL =    'b';
+const char TYPECHAR_VOID =    'v';
+const char TYPECHAR_INVALID = '~';
+
 class SymbolData
 {
 public:
