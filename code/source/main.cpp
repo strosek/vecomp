@@ -32,11 +32,6 @@ int main(int argc, char** argv)
 
     Parser parser(fileReader, errorReporter);
     parser.parse();
-
-    if (errorReporter->getErrors() > 0)
-    {
-      errorReporter->endErrorsFile();
-    }
   }
   else
   {
