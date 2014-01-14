@@ -36,8 +36,6 @@ ErrorReporter* ErrorReporter::getInstance()
 
 void ErrorReporter::writeError(const string& message)
 {
-  writeErrorsFileHeader();
-
   if (m_errors < m_maxErrors)
   {
 #ifdef DEBUG
@@ -56,8 +54,6 @@ void ErrorReporter::writeError(const string& message)
 void ErrorReporter::writeError(int line, int column, const std::string& lexeme,
                                const std::string& message)
 {
-  writeErrorsFileHeader();
-
   if (m_errors < m_maxErrors)
   {
 #ifdef DEBUG
@@ -78,8 +74,6 @@ void ErrorReporter::writeLexicalError(int state, char currentChar,
                                       const string& lexeme, int line,
                                       int column)
 {
-  writeErrorsFileHeader();
-
   ostringstream messageBuilder;
   switch (state)
   {
@@ -182,8 +176,6 @@ void ErrorReporter::writeLexicalError(int state, char currentChar,
 void ErrorReporter::writeSyntaxError(const std::string& expectedLexeme,
     const std::string& actualLexeme, int line, int column)
 {
-  writeErrorsFileHeader();
-
   ostringstream messageBuilder;
 
   messageBuilder << "se esperaba lexema: \"" << expectedLexeme <<
@@ -208,8 +200,6 @@ void ErrorReporter::writeSyntaxError(const std::string& expectedLexeme,
 void ErrorReporter::writeSyntaxError(TokenType_t expectedToken,
     TokenType_t actualToken, const string& actualLexeme, int line, int column)
 {
-  writeErrorsFileHeader();
-
   ostringstream messageBuilder;
 
   messageBuilder << "se esperaba token: \"" <<
@@ -233,17 +223,6 @@ void ErrorReporter::writeSyntaxError(TokenType_t expectedToken,
   ++m_errors;
 }
 
-void ErrorReporter::writeErrorsFileHeader()
-{
-  writeErrorsFileSeparator();
-  cerr << setw(WIDTH_NUMBER) << "Linea" <<
-      setw(WIDTH_NUMBER) << "Columna" <<
-      setw(WIDTH_LEXEME) << "Lexema" << 
-      setw(WIDTH_MESSAGE) << "Mensaje de error" <<
-      setw(WIDTH_LINE) << "Linea" << endl;
-  writeErrorsFileSeparator();
-}
-
 void ErrorReporter::setFileReader(FileReader* fileReader)
 {
   m_fileReader = fileReader;
@@ -254,46 +233,18 @@ void ErrorReporter::setMaxErrors(int maxErrors)
   m_maxErrors = maxErrors;
 }
 
-int  ErrorReporter::getMaxErrors() const
+unsigned int  ErrorReporter::getMaxErrors() const
 {
   return m_maxErrors;
 }
 
-int  ErrorReporter::getErrors() const
+unsigned int  ErrorReporter::getErrors() const
 {
   return m_errors;
 }
 
-int  ErrorReporter::getWarnings() const
+unsigned int  ErrorReporter::getWarnings() const
 {
   return m_warnings;
-}
-
-void ErrorReporter::endErrorsFile()
-{
-  cerr << endl;
-  writeErrorsFileSeparator();
-
-  int totalErrors;
-  if (m_errors > m_maxErrors)
-  {
-    totalErrors = m_maxErrors;
-  }
-  else
-  {
-    totalErrors = m_errors;
-  }
-  cerr << "errores: " << totalErrors << ", advertencias: " <<
-                m_warnings << endl;
-}
-
-void ErrorReporter::writeErrorsFileSeparator()
-{
-  for (int i = 0; 
-       i < (WIDTH_NUMBER * 2 + WIDTH_LEXEME + WIDTH_MESSAGE + WIDTH_LINE); ++i)
-  {
-    cerr << '-';
-  }
-  cerr << endl;
 }
 

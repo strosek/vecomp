@@ -28,13 +28,12 @@ public:
                         const std::string& actualLexeme, int line, int column);
   void writeSyntaxError(TokenType_t expectedToken, TokenType_t actualToken,
                         const std::string& actualLexeme, int line, int column);
-  void endErrorsFile();
 
   void setFileReader(FileReader* fileReader);
   void setMaxErrors(int maxErrors);
-  int  getMaxErrors() const;
-  int  getErrors() const;
-  int  getWarnings() const;
+  unsigned int  getMaxErrors() const;
+  unsigned int  getErrors() const;
+  unsigned int  getWarnings() const;
 
 private:
   static const int WIDTH_NUMBER =   8;
@@ -46,12 +45,9 @@ private:
   ErrorReporter(const ErrorReporter& source);
   ~ErrorReporter();
 
-  void writeErrorsFileHeader();
-  void writeErrorsFileSeparator();
-
-  int          m_warnings;
-  int          m_errors;
-  int          m_maxErrors;
+  unsigned int m_warnings;
+  unsigned int m_errors;
+  unsigned int m_maxErrors;
   FileReader * m_fileReader;
 
   static ErrorReporter* m_instance;
