@@ -32,28 +32,28 @@ public:
   void         exitCurrentScope();
   void         exitFor();
   void         exitSwitch();
-  void         pushOperand(const std::string& op);
-  void         pushOperator(const std::string& op);
+  void         pushOperand(char op);
+  void         pushOperator(char op);
   void         setMainPresent(bool isPresent);
   void         setReturnCalled(bool isCalled);
   void         setReturnRequired(bool isRequired);
 
 private:
-  std::string getTypeChar(NativeType_t type);
-  std::string getCharType(char typeChar);
+  NativeType_t getCharType(char typeChar) const;
+  char         getTypeChar(NativeType_t type) const;
 
-  ErrorReporter *                    m_errorReporter;
-  SymbolsTable                       m_symbolsTable;
-  bool                               m_isMainPresent;
-  bool                               m_isReturnCalled;
-  bool                               m_isReturnRequired;
-  int                                m_forLevel;
-  int                                m_switchLevel;
-  std::map<std::string, std::string> m_validExpressions;
-  std::set<std::string>              m_imports;
-  std::stack<std::string>            m_controlStack;
-  std::stack<std::string>            m_operators;
-  std::stack<std::string>            m_operands;
+  ErrorReporter *             m_errorReporter;
+  SymbolsTable                m_symbolsTable;
+  bool                        m_isMainPresent;
+  bool                        m_isReturnCalled;
+  bool                        m_isReturnRequired;
+  int                         m_forLevel;
+  int                         m_switchLevel;
+  std::map<std::string, char> m_validExpressions;
+  std::set<std::string>       m_imports;
+  std::stack<std::string>     m_controlStack;
+  std::stack<char>            m_operands;
+  std::stack<char>            m_operators;
 };
 
 #endif /* SEMANTICCHECKER_HPP */
