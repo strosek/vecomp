@@ -28,11 +28,23 @@ class SymbolData
 public:
   SymbolData();
 
-protected:
-  std::string  name;
-  std::string  scope;
+  void setDimensions(size_t dimensions);
+  void setLine(size_t line);
+  void setParameters(std::string& parameters);
+  void setScope(std::string& scope);
+  void setType(NativeType_t type);
+
+  NativeType_t getType() const;
+  size_t       getDimensions() const;
+  size_t       getLine() const;
+  std::string  getParameters() const;
+  std::string  getScope() const;
+private:
   NativeType_t type;
+  size_t       dimensions;
   size_t       line;
+  std::string  parameters;
+  std::string  scope;
 };
 
 #endif /* SYMBOL_HPP included */
