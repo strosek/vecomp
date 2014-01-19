@@ -40,11 +40,11 @@ public:
   std::string  getParameters() const;
   std::string  getScope() const;
 private:
-  NativeType_t type;
-  size_t       dimensions;
-  size_t       line;
-  std::string  parameters;
-  std::string  scope;
+  NativeType_t m_type;
+  size_t       m_dimensions;
+  size_t       m_line;
+  std::string  m_parameters;
+  std::string  m_scope;
 };
 
 #endif /* SYMBOL_HPP included */

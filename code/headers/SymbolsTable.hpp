@@ -10,7 +10,11 @@ class SymbolsTable
 public:
   SymbolsTable();
 
-  const SymbolData& search(std::string name, SymbolData data) const;
+  bool exists(std::string name);
+  bool search(std::string name, std::string parameters) const;
+  bool search(std::string name, std::string scope, size_t dimensions,
+              NativeType_t type) const;
+  void insert(std::string name, const SymbolData& data);
 
 private:
   std::multimap<std::string, SymbolData> m_symbolsMap;
