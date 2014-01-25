@@ -9,6 +9,7 @@
 
 // Forward declaration for avoind dependency problems.
 class ErrorReporter;
+
 #include "ErrorReporter.hpp"
 
 
@@ -20,6 +21,7 @@ public:
   FileReader&              operator=(const FileReader& rhs);
 
   void        readFile(const std::string& fileName);
+  std::string getCurrentFileName() const;
   size_t      getTotalLines() const;
   std::string getTextAtLine(int line);
   void        setErrorReporter(ErrorReporter* errorRepoter);
@@ -31,6 +33,7 @@ private:
 
   size_t                   m_nLines;
   std::vector<std::string> m_linesText;
+  std::string              m_currentFileName;
   ErrorReporter*           m_errorReporter;
 
   static FileReader* m_instance;

@@ -39,6 +39,8 @@ void FileReader::readFile(const std::string& fileName)
   ifstream file;
   file.open(fileName);
 
+  m_currentFileName = fileName;
+
   if (file.is_open())
   {
     string line;
@@ -62,6 +64,11 @@ void FileReader::readFile(const std::string& fileName)
 void FileReader::setErrorReporter(ErrorReporter* errorReporter)
 {
   m_errorReporter = errorReporter;
+}
+
+string FileReader::getCurrentFileName() const
+{
+  return m_currentFileName;
 }
 
 size_t FileReader::getTotalLines() const
