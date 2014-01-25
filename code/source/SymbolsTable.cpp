@@ -1,8 +1,10 @@
 /* Definition of member functions of class SymbolsTable */
 
-#include "../headers/SymbolsTable.cpp"
+#include "../headers/SymbolsTable.hpp"
 
 #include <utility>
+
+using namespace std;
 
 SymbolsTable::SymbolsTable() :
   m_symbolsMap()
@@ -11,25 +13,36 @@ SymbolsTable::SymbolsTable() :
 
 bool SymbolsTable::isPresent(string name, string parameters) const
 {
-  isFound = false;
+  bool isFound = false;
 
   return isFound;
 }
 
-bool SymbolsTable::isPresent(string name, string scope, string dimensions,
+bool SymbolsTable::isPresent(string name, string scope, size_t dimensions,
                              NativeType_t type) const
 {
-  isFound = false;
+  bool isFound = false;
 
   return isFound;
 }
 
-size_t SymbolsTable::getType() const
+NativeType_t SymbolsTable::getType(string name, string scope) const
 {
+  NativeType_t type = TYPE_VOID;
+  return type;
 }
 
-size_t SymbolsTable::getDimensions() const
+NativeType_t SymbolsTable::getFunctionType(string name, string parameters) const
 {
+  NativeType_t type = TYPE_VOID;
+  return type;
+}
+
+size_t SymbolsTable::getDimensions(string name, string parameters) const
+{
+  size_t dimensions = 0;
+
+  return dimensions;
 }
 
 void SymbolsTable::insert(string name, const SymbolData& data)
