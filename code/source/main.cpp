@@ -38,15 +38,34 @@ int main(int argc, char** argv)
     cerr << "uso:   vecomp <archivo>" << endl;
   }
 
-  int returnValue;
+  int returnValue = EXIT_SUCCESS;
+
   if (errorReporter == nullptr)
   {
     returnValue = EXIT_FAILURE;
   }
   else
   {
-    returnValue = errorReporter->getErrors() == 0 ? EXIT_SUCCESS :
-        EXIT_FAILURE;
+    if (errorReporter->getErrors() > 0)
+    {
+      unsigned int actualErrors = errorReporter->getErrors();
+      unsigned int reportedErrors = actualErrors;
+
+      if (actualErrors > errorReporter->getMaxErrors())
+      {
+        reportedErrors = errorReporter->getMaxErrors();
+      }
+
+      cerr << "\nCompilacion terminada con: " << reportedErrors <<
+          " errores, " << errorReporter->getWarnings() << " advertencias" <<
+          endl;
+
+      returnValue = EXIT_FAILURE;
+    }
+    else
+    {
+      returnValue = EXIT_SUCCESS;
+    }
   }
   
   return returnValue;

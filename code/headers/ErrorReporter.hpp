@@ -36,7 +36,6 @@ public:
   unsigned int  getWarnings() const;
 
 private:
-  static const int WIDTH_NUMBER =   8;
   static const int WIDTH_LEXEME =  15;
   static const int WIDTH_MESSAGE = 80;
   static const int WIDTH_LINE =   100;
