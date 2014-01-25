@@ -4,17 +4,17 @@
 
 # Environment macros: Compiler to use, Compile Flags, Link Flags
 CXX := clang++
-CFLAGS := -Wall -Wextra -Weffc++ -Wswitch -Wshadow -Wc++11-compat --std=c++11 -D DEBUG -g
+CFLAGS := -Wall -Wextra -Weffc++ -Wswitch -Wshadow -Wc++11-compat --std=c++11 -D DEBUG -g -c
 LFLAGS := -Wall -Wextra -Weffc++ -Wswitch -Wshadow -Wc++11-compat --std=c++11 -D DEBUG -g
 
 # Binary, Source, Include, Object Directories
 BDIR := ../binaries
 SDIR := source
 IDIR := headers
-ODIR := object
+ODIR := ../binaries/object
 
 # Object files
-_OBJ := main.o SemanticChecker.o SymbolsTable.o SymbolData.o Parser.o Scanner.o FileReader.o TokenLexeme.o ErrorReporter.o
+_OBJ := main.o Parser.o SemanticChecker.o SymbolsTable.o SymbolData.o Scanner.o FileReader.o TokenLexeme.o ErrorReporter.o
 OBJ := $(_OBJ:%.o=$(ODIR)/%.o)
 
 # Binary file (executable)
@@ -52,7 +52,7 @@ $(BIN): $(OBJ)
 # Make Objects
 $(ODIR)/%.o: $(SDIR)/%.cpp $(IDIR)/%.hpp
 	if [ ! -d $(ODIR) ]; then\
-		mkdir $(ODIR);\
+		mkdir -p $(ODIR);\
 	fi
 	$(CXX) $(CFLAGS) $< -o $@
 	touch $@
