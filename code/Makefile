@@ -3,7 +3,7 @@
 ###############################################################################
 
 # Environment macros: Compiler to use, Compile Flags, Link Flags
-CXX := g++
+CXX := clang++
 CFLAGS := -Wall -Wextra -Weffc++ -Wswitch -Wshadow -Wc++11-compat --std=c++11 -D DEBUG -g
 LFLAGS := -Wall -Wextra -Weffc++ -Wswitch -Wshadow -Wc++11-compat --std=c++11 -D DEBUG -g
 
