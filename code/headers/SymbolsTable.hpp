@@ -10,19 +10,25 @@ class SymbolsTable
 public:
   SymbolsTable();
 
-  bool         exists(std::string name);
-  bool         isPresent(std::string name, std::string parameters) const;
-  bool         isPresent(std::string name, std::string scope, size_t dimensions,
-                         NativeType_t type) const;
-  void         insert(std::string name, const SymbolData& data);
-  NativeType_t getType(std::string name, std::string scope) const;
-  NativeType_t getFunctionType(std::string name, std::string parameters) const;
-  size_t       getDimensions(std::string name, std::string parameters) const;
-  size_t       getFunctionDimensions(std::string name, 
-                                     std::string parameters) const;
+  bool         exists(const std::string& name);
+  bool         isPresent(const std::string& name,
+                         const std::string& parameters);
+  bool         isPresent(const std::string& name, const std::string& scope,
+                         size_t dimensions, NativeType_t type);
+  void         insert(const std::string& name, const SymbolData& data);
+  NativeType_t getType(const std::string& name, const std::string& scope);
+  NativeType_t getFunctionType(const std::string& name,
+                               const std::string& parameters);
+  size_t       getDimensions(const std::string& name,
+                             const std::string& parameters);
+  size_t       getFunctionDimensions(const std::string& name, 
+                                     const std::string& parameters);
 
 private:
   std::multimap<std::string, SymbolData> m_symbolsMap;
+
+  std::pair<std::multimap<std::string, SymbolData>::iterator,
+            std::multimap<std::string, SymbolData>::iterator > m_searchRange;
 };
 
 #endif /* SYMBOLSTABLE_HPP included */
