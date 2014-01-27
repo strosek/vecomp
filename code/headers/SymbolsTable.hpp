@@ -20,7 +20,7 @@ public:
   NativeType_t getFunctionType(const std::string& name,
                                const std::string& parameters);
   size_t       getDimensions(const std::string& name,
-                             const std::string& parameters);
+                             const std::string& scope);
   size_t       getFunctionDimensions(const std::string& name, 
                                      const std::string& parameters);
 
@@ -28,7 +28,7 @@ private:
   std::multimap<std::string, SymbolData> m_symbolsMap;
 
   std::pair<std::multimap<std::string, SymbolData>::iterator,
-            std::multimap<std::string, SymbolData>::iterator > m_searchRange;
+            std::multimap<std::string, SymbolData>::iterator> m_searchRange;
 };
 
 #endif /* SYMBOLSTABLE_HPP included */
