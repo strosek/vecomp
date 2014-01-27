@@ -135,9 +135,8 @@ static const int STATE_ACCEPT_ERROR = -2;
 class Scanner
 {
 public:
-  Scanner(FileReader* fileReader, ErrorReporter* errorReporter);
-  Scanner(const Scanner& source);
-
+  static Scanner* getInstance(FileReader* fileReader, 
+                              ErrorReporter* errorReporter);
   Scanner& operator=(const Scanner& rhs);
 
   TokenLexeme getNextTokenLexeme();
@@ -148,6 +147,10 @@ public:
   void        scan();
 
 private:
+  Scanner(FileReader* fileReader, ErrorReporter* errorReporter);
+  Scanner(const Scanner& source);
+  ~Scanner();
+
   Transition_t getTransitionIndex(char character);
   bool         isTerminalState(int state);
   void         buildKeywordsMap();
@@ -160,6 +163,8 @@ private:
   std::map<std::string, Keyword_t>  m_keywordsMap;
   ErrorReporter*                    m_errorReporter;
   FileReader*                       m_fileReader;
+
+  static Scanner*                          m_instance;
 
 };
 

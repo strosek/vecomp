@@ -66,7 +66,7 @@ private:
   void         ignoreNewLines();
 
   TokenLexeme                                      m_currentToken;
-  Scanner                                          m_scanner;
+  Scanner*                                         m_scanner;
   ErrorReporter*                                   m_errorReporter;
   unsigned int                                     m_maxErrors;
   size_t                                           m_nTokensProcessed;

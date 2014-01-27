@@ -25,6 +25,25 @@ Scanner::Scanner(FileReader* fileReader, ErrorReporter* errorReporter) :
   buildKeywordsMap();
 }
 
+
+Scanner::~Scanner()
+{
+  delete m_instance;
+}
+
+Scanner* Scanner::m_instance = nullptr;
+
+Scanner* Scanner::getInstance(FileReader* fileReader,
+                              ErrorReporter* errorReporter)
+{
+  if (m_instance == nullptr)
+  {
+    m_instance = new Scanner(fileReader, errorReporter);
+    return m_instance; 
+  }
+  return m_instance;
+}
+
 void Scanner::scan()
 {
   if (m_fileReader->getTotalLines() > 0)
