@@ -4,8 +4,8 @@
 
 # Environment macros: Compiler to use, Compile Flags, Link Flags
 CXX := clang++
-CFLAGS := -Wall -Wextra -Weffc++ -Wswitch -Wshadow -Wc++11-compat --std=c++11 -D DEBUG -g -c
-LFLAGS := -Wall -Wextra -Weffc++ -Wswitch -Wshadow -Wc++11-compat --std=c++11 -D DEBUG -g
+CFLAGS := -Wall -Wextra -Weffc++ -Wswitch -Wshadow -Wc++11-compat --std=c++11 -c
+LFLAGS := -Wall -Wextra -Weffc++ -Wswitch -Wshadow -Wc++11-compat --std=c++11
 
 # Binary, Source, Include, Object Directories
 BDIR := ../binaries
@@ -27,10 +27,12 @@ BIN := $(BDIR)/$(_BIN)
 .PHONY: all
 all: $(BIN)
 
-# Special to compile and execute
-.PHONY: exec
-exec: all
-	./$(BIN)
+debug: CFLAGS += -D DEBUG -g
+debug: LFLAGS += -D DEBUG -g
+debug: $(BIN)
+release: CFLAGS += -O2
+release: LFLAGS += -O2
+release: $(BIN)
 
 # Special to clean everything
 .PHONY: clean
