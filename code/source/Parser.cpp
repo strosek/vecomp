@@ -95,7 +95,7 @@ void Parser::argumentsList()
     }
   } while (isOperatorFound);
 
-  m_scanner->moveTokenBackwards();
+  m_scanner->moveBackwards();
 
 #ifdef DEBUG
   cout << "::: exit argumentsList()" << endl;
@@ -130,7 +130,7 @@ void Parser::block()
   advanceToken();
   if (m_currentToken.getLexeme().compare("}") != 0)
   {
-    m_scanner->moveTokenBackwards();
+    m_scanner->moveBackwards();
     statements();
   }
   ignoreNewLines();
@@ -173,7 +173,7 @@ void Parser::switchStatement()
     } while (m_currentToken.getLexeme().compare("valor") == 0 ||
              m_currentToken.getLexeme().compare("defecto") == 0);
 
-    m_scanner->moveTokenBackwards();
+    m_scanner->moveBackwards();
     statements();
   } while (m_currentToken.getLexeme().compare("valor") == 0 ||
            m_currentToken.getLexeme().compare("defecto") == 0);
@@ -212,26 +212,26 @@ void Parser::command()
     else
     {
       // FIXME: this should not need the double forward movement.
-      m_scanner->moveTokenForward();
+      m_scanner->moveForward();
       ++m_nTokensProcessed;
       advanceToken();
 
       if (m_currentToken.getToken() == TOKEN_ASSIGNOP)
       {
-        m_scanner->moveTokenBackwards();
+        m_scanner->moveBackwards();
 
         assign();
       }
       else if (m_currentToken.getLexeme().compare("[") == 0)
       {
-        m_scanner->moveTokenBackwards();
+        m_scanner->moveBackwards();
 
         dimension();
         assign();
       }
       else if (m_currentToken.getLexeme().compare("(") == 0)
       {
-        m_scanner->moveTokenBackwards();
+        m_scanner->moveBackwards();
 
         functionCall();
       }
@@ -270,7 +270,7 @@ void Parser::command()
 
     if (!m_semanticChecker.isInSwitch() && !m_semanticChecker.isInFor())
     {
-      TokenLexeme lastToken = getLastToken();
+      TokenLexeme lastToken = m_scanner->getLastToken();
       m_errorReporter->writeError(lastToken.getLine(), lastToken.getRow(),
             lastToken.getLexeme(),
             "interrumpe solo es permitido en ciclo desde o en caso");
@@ -281,7 +281,7 @@ void Parser::command()
     advanceToken();
     if (!m_semanticChecker.isInFor())
     {
-      TokenLexeme lastToken = getLastToken();
+      TokenLexeme lastToken = m_scanner->getLastToken();
       m_errorReporter->writeError(lastToken.getLine(), lastToken.getRow(),
             lastToken.getLexeme(), "continua solo es permitido en ciclo desde");
     }
@@ -365,11 +365,11 @@ void Parser::dimension()
     advanceToken();
     if (m_currentToken.getLexeme().compare("[") == 0)
     {
-      m_scanner->moveTokenBackwards();
+      m_scanner->moveBackwards();
     }
   } while (m_currentToken.getLexeme().compare("[") == 0);
 
-  m_scanner->moveTokenBackwards();
+  m_scanner->moveBackwards();
 
 #ifdef DEBUG
   cout << "::: exit dimension()" << endl;
@@ -409,7 +409,7 @@ void Parser::expression()
     andOperation();
   } while (m_currentToken.getLexeme().compare("||") == 0);
 
-  m_scanner->moveTokenBackwards();
+  m_scanner->moveBackwards();
 
 #ifdef DEBUG
   cout << "::: exit expression()" << endl;
@@ -440,7 +440,7 @@ void Parser::forStatement()
   }
   else
   {
-    m_scanner->moveTokenBackwards();
+    m_scanner->moveBackwards();
   }
 
   checkLexeme(";"); 
@@ -452,7 +452,7 @@ void Parser::forStatement()
   }
   else
   {
-    m_scanner->moveTokenBackwards();
+    m_scanner->moveBackwards();
   }
 
   checkLexeme(";");
@@ -469,7 +469,7 @@ void Parser::forStatement()
   }
   else
   {
-    m_scanner->moveTokenBackwards();
+    m_scanner->moveBackwards();
   }
 
   block();
@@ -502,7 +502,7 @@ void Parser::functionCall()
   }
   else
   {
-    m_scanner->moveTokenBackwards();
+    m_scanner->moveBackwards();
   }
 
   checkLexeme(")");
@@ -522,12 +522,12 @@ void Parser::functionDeclaration()
 
   checkLexeme("funcion");
   checkToken(TOKEN_IDEN);
-  if (getLastToken().getLexeme().compare("principal") == 0)
+  if (m_scanner->getLastToken().getLexeme().compare("principal") == 0)
   {
     m_semanticChecker.setMainPresent(true);
   }
 
-  m_semanticChecker.enterToScope(getLastToken().getLexeme());
+  m_semanticChecker.enterToScope(m_scanner->getLastToken().getLexeme());
 
   checkLexeme("(");
   parameterList();
@@ -659,7 +659,7 @@ void Parser::parameterList()
   advanceToken();
   while (m_currentToken.getLexeme().compare(")") != 0)
   {
-    m_scanner->moveTokenBackwards();
+    m_scanner->moveBackwards();
 
     do
     {
@@ -668,13 +668,13 @@ void Parser::parameterList()
       advanceToken();
     } while (m_currentToken.getLexeme().compare(",") == 0);
 
-    m_scanner->moveTokenBackwards();
+    m_scanner->moveBackwards();
     checkNativeDataType();
 
     advanceToken();
   }
 
-  m_scanner->moveTokenBackwards();
+  m_scanner->moveBackwards();
 #ifdef DEBUG
   cout << "::: exit parameterList()" << endl;
 #endif
@@ -864,13 +864,13 @@ void Parser::returnType()
     }
     else 
     {
-      m_scanner->moveTokenBackwards();
+      m_scanner->moveBackwards();
       checkNativeDataType();
     }
   }
   else
   {
-    m_scanner->moveTokenBackwards();
+    m_scanner->moveBackwards();
   }
 
 #ifdef DEBUG
@@ -888,7 +888,7 @@ void Parser::sign()
 
   if (m_currentToken.getLexeme().compare("-") == 0)
   {
-    m_scanner->moveTokenBackwards();
+    m_scanner->moveBackwards();
     checkLexeme("-");
   }
   term();
@@ -984,14 +984,14 @@ void Parser::term()
     advanceToken();
     if (m_currentToken.getLexeme().compare("[") == 0)
     {
-      m_scanner->moveTokenBackwards();
+      m_scanner->moveBackwards();
 
       dimension();
       advanceToken();
     }
     else if (m_currentToken.getLexeme().compare("(") == 0)
     {
-      m_scanner->moveTokenBackwards();
+      m_scanner->moveBackwards();
       functionCall();
     }
   }
@@ -1032,12 +1032,12 @@ void Parser::variablesDeclaration()
         m_currentToken.getLexeme() << endl;
 #endif
     } while (m_currentToken.getToken() == TOKEN_NEWLINE);
-    m_scanner->moveTokenBackwards();
+    m_scanner->moveBackwards();
     checkLexeme(")");
   }
   else
   {
-    m_scanner->moveTokenBackwards();
+    m_scanner->moveBackwards();
     variablesList();
   }
   advanceToken();
@@ -1059,7 +1059,7 @@ void Parser::variablesList()
     advanceToken();
     if (m_currentToken.getLexeme().compare("[") == 0)
     {
-      m_scanner->moveTokenBackwards();
+      m_scanner->moveBackwards();
       dimension();
       advanceToken();
     }
@@ -1070,7 +1070,7 @@ void Parser::variablesList()
 #endif
     if (m_currentToken.getLexeme().compare(",") != 0)
     {
-      m_scanner->moveTokenBackwards();
+      m_scanner->moveBackwards();
     }
   } while (m_currentToken.getLexeme().compare(",") == 0);
 
@@ -1171,7 +1171,7 @@ void Parser::ignoreNewLines()
   } while ((m_currentToken.getToken() == TOKEN_NEWLINE ||
             m_currentToken.getLexeme().compare(";") == 0));
 
-  m_scanner->moveTokenBackwards();
+  m_scanner->moveBackwards();
 
 #ifdef DEBUG
   cout << "::: stopped ignoring newlines()" << endl;
@@ -1180,14 +1180,8 @@ void Parser::ignoreNewLines()
 
 void Parser::advanceToken()
 {
-  m_currentToken = m_scanner->getNextTokenLexeme();
+  m_currentToken = m_scanner->getCurrentTokenAndAdvance();
   ++m_nTokensProcessed;
-}
-
-TokenLexeme Parser::getLastToken()
-{
-  m_scanner->moveTokenBackwards();
-  return m_scanner->getNextTokenLexeme();
 }
 
 bool Parser::isNativeDataType(const string& lexeme)

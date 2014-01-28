@@ -139,11 +139,14 @@ public:
                               ErrorReporter* errorReporter);
   Scanner& operator=(const Scanner& rhs);
 
-  TokenLexeme getNextTokenLexeme();
+  TokenLexeme getLastToken();
+  TokenLexeme getCurrentToken();
+  TokenLexeme getCurrentTokenAndAdvance();
+  TokenLexeme getNextToken();
   int         getMaxTokens() const;
   int         getTokensProcessed() const;
-  void        moveTokenBackwards();
-  void        moveTokenForward();
+  void        moveBackwards();
+  void        moveForward();
   void        scan();
 
 private:
@@ -157,7 +160,7 @@ private:
 
   size_t                            m_lineNo;
   size_t                            m_column;
-  size_t                            m_currentToken;
+  size_t                            m_currentIndex;
   int                               m_nTokens;
   std::vector<TokenLexeme>          m_tokensLexemes;
   std::map<std::string, Keyword_t>  m_keywordsMap;

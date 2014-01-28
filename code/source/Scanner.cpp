@@ -15,7 +15,7 @@ using namespace std;
 Scanner::Scanner(FileReader* fileReader, ErrorReporter* errorReporter) :
   m_lineNo(1),
   m_column(1),
-  m_currentToken(0),
+  m_currentIndex(0),
   m_nTokens(0),
   m_tokensLexemes(),
   m_keywordsMap(),
@@ -229,36 +229,75 @@ void Scanner::scan()
 #endif
 }
 
-void Scanner::moveTokenBackwards()
+void Scanner::moveBackwards()
 {
-#ifdef DEBUG
-  cout << "move backwards" << endl;
-#endif
-  --m_currentToken;
-}
-
-void Scanner::moveTokenForward()
-{
-#ifdef DEBUG
-  cout << "move forward" << endl;
-#endif
-  ++m_currentToken;
-}
-
-TokenLexeme Scanner::getNextTokenLexeme()
-{
-  TokenLexeme temporal;
-  if (m_currentToken < m_tokensLexemes.size())
+  if (m_currentIndex < m_tokensLexemes.size())
   {
-    temporal = m_tokensLexemes.at(m_currentToken);
-
 #ifdef DEBUG
-  cout << "::: advance token to position: " << m_currentToken << ", line: " <<
-      m_tokensLexemes.at(m_currentToken).getLine() << ":  " << 
-      m_tokensLexemes.at(m_currentToken).getLexeme() << endl;
+  cout << "::: move back token to position: " << m_currentIndex << ", line: " <<
+      m_tokensLexemes.at(m_currentIndex).getLine() << ":  " << 
+      m_tokensLexemes.at(m_currentIndex).getLexeme() << endl;
 #endif
   }
-  ++m_currentToken;
+
+  --m_currentIndex;
+}
+
+void Scanner::moveForward()
+{
+  if (m_currentIndex < m_tokensLexemes.size())
+  {
+#ifdef DEBUG
+    cout << "::: advance token to position: " << m_currentIndex << ", line: " <<
+        m_tokensLexemes.at(m_currentIndex).getLine() << ":  " << 
+        m_tokensLexemes.at(m_currentIndex).getLexeme() << endl;
+#endif
+    ++m_currentIndex;
+  }
+}
+
+TokenLexeme Scanner::getLastToken()
+{
+  TokenLexeme temporal;
+  if (m_currentIndex < m_tokensLexemes.size())
+  {
+    moveBackwards();
+    temporal = getCurrentToken();
+    moveForward();
+  }
+
+  return temporal;
+}
+
+TokenLexeme Scanner::getCurrentToken()
+{
+  TokenLexeme temporal;
+  if (m_currentIndex < m_tokensLexemes.size())
+  {
+    temporal = m_tokensLexemes.at(m_currentIndex);
+  }
+
+  return temporal;
+}
+
+TokenLexeme Scanner::getCurrentTokenAndAdvance()
+{
+  TokenLexeme temporal = getCurrentToken();
+
+  moveForward();
+
+  return temporal;
+}
+
+TokenLexeme Scanner::getNextToken()
+{
+  TokenLexeme temporal;
+  if (m_currentIndex < m_tokensLexemes.size())
+  {
+    moveForward();
+    temporal = getCurrentToken();
+    moveBackwards();
+  }
 
   return temporal;
 }
@@ -374,7 +413,7 @@ int Scanner::getMaxTokens() const
 
 int Scanner::getTokensProcessed() const
 {
-  return m_currentToken;
+  return m_currentIndex;
 }
 
 bool Scanner::isTerminalState(int state)

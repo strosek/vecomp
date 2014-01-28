@@ -55,7 +55,6 @@ private:
   void variablesDeclaration();
   void variablesList();
 
-  TokenLexeme  getLastToken();
   bool         isLiteral(TokenType_t token);
   bool         isNativeDataType(const std::string& lexeme);
   void         advanceToken();
