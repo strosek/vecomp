@@ -13,7 +13,8 @@ ErrorReporter::ErrorReporter() :
   m_warnings(0),
   m_errors(0),
   m_maxErrors(5),
-  m_fileReader(nullptr)
+  m_fileReader(nullptr),
+  m_scanner(nullptr)
 {
 }
 
@@ -29,8 +30,8 @@ ErrorReporter* ErrorReporter::getInstance()
   if (m_instance == nullptr)
   {
     m_instance = new ErrorReporter();
-    return m_instance; 
   }
+
   return m_instance;
 }
 
@@ -220,6 +221,11 @@ void ErrorReporter::writeSyntaxError(TokenType_t expectedToken,
 void ErrorReporter::setFileReader(FileReader* fileReader)
 {
   m_fileReader = fileReader;
+}
+
+void ErrorReporter::setScanner(Scanner* scanner)
+{
+  m_scanner = scanner;
 }
 
 void ErrorReporter::setMaxErrors(int maxErrors)

@@ -12,15 +12,15 @@
 using namespace std;
 
 
-Scanner::Scanner(FileReader* fileReader, ErrorReporter* errorReporter) :
+Scanner::Scanner() :
   m_lineNo(1),
   m_column(1),
   m_currentIndex(0),
   m_nTokens(0),
   m_tokensLexemes(),
   m_keywordsMap(),
-  m_errorReporter(errorReporter),
-  m_fileReader(fileReader)
+  m_errorReporter(nullptr),
+  m_fileReader(nullptr)
 {
   buildKeywordsMap();
 }
@@ -33,14 +33,13 @@ Scanner::~Scanner()
 
 Scanner* Scanner::m_instance = nullptr;
 
-Scanner* Scanner::getInstance(FileReader* fileReader,
-                              ErrorReporter* errorReporter)
+Scanner* Scanner::getInstance()
 {
   if (m_instance == nullptr)
   {
-    m_instance = new Scanner(fileReader, errorReporter);
-    return m_instance; 
+    m_instance = new Scanner();
   }
+
   return m_instance;
 }
 
@@ -227,6 +226,16 @@ void Scanner::scan()
     cout << i << ": " << m_tokensLexemes.at(i).getLexeme() << endl;
   }
 #endif
+}
+
+void Scanner::setErrorReporter(ErrorReporter* errorReporter)
+{
+  m_errorReporter = errorReporter;
+}
+
+void Scanner::setFileReader(FileReader* fileReader)
+{
+  m_fileReader = fileReader;
 }
 
 void Scanner::moveBackwards()

@@ -5,8 +5,9 @@
 
 #include <string>
 
-// Forward declaration to avoid class dependency problems
+// Forward declarations to avoid class dependency problems
 class FileReader;
+class Scanner;
 
 #include "FileReader.hpp"
 #include "TokenLexeme.hpp"
@@ -30,6 +31,7 @@ public:
                         const std::string& actualLexeme, int line, int column);
 
   void setFileReader(FileReader* fileReader);
+  void setScanner(Scanner* setScanner);
   void setMaxErrors(int maxErrors);
   unsigned int  getMaxErrors() const;
   unsigned int  getErrors() const;
@@ -47,7 +49,8 @@ private:
   unsigned int m_warnings;
   unsigned int m_errors;
   unsigned int m_maxErrors;
-  FileReader * m_fileReader;
+  FileReader*  m_fileReader;
+  Scanner*     m_scanner;
 
   static ErrorReporter* m_instance;
 };

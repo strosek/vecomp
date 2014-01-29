@@ -8,8 +8,8 @@
 
 using namespace std;
 
-SemanticChecker::SemanticChecker(ErrorReporter * errorReporter) :
-  m_errorReporter(errorReporter),
+SemanticChecker::SemanticChecker() :
+  m_errorReporter(),
   m_symbolsTable(),
   m_isMainPresent(false),
   m_isReturnCalled(false),
@@ -138,6 +138,11 @@ void SemanticChecker::setReturnCalled(bool isCalled)
 void SemanticChecker::setReturnRequired(bool isRequired)
 {
   m_isReturnRequired = isRequired;
+}
+
+void SemanticChecker::setErrorReporter(ErrorReporter* errorReporter)
+{
+  m_errorReporter = errorReporter;
 }
 
 NativeType_t SemanticChecker::getCharType(char typeChar) const

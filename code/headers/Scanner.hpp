@@ -135,8 +135,7 @@ static const int STATE_ACCEPT_ERROR = -2;
 class Scanner
 {
 public:
-  static Scanner* getInstance(FileReader* fileReader, 
-                              ErrorReporter* errorReporter);
+  static Scanner* getInstance();
   Scanner& operator=(const Scanner& rhs);
 
   TokenLexeme getLastToken();
@@ -148,9 +147,11 @@ public:
   void        moveBackwards();
   void        moveForward();
   void        scan();
+  void        setErrorReporter(ErrorReporter* errorReporter);
+  void        setFileReader(FileReader* fileReader);
 
 private:
-  Scanner(FileReader* fileReader, ErrorReporter* errorReporter);
+  Scanner();
   Scanner(const Scanner& source);
   ~Scanner();
 

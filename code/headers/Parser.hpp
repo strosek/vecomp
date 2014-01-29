@@ -8,7 +8,6 @@
 #include <utility>
 
 #include "ErrorReporter.hpp"
-#include "FileReader.hpp"
 #include "Scanner.hpp"
 #include "SemanticChecker.hpp"
 #include "TokenLexeme.hpp"
@@ -16,10 +15,13 @@
 class Parser
 {
 public:
-  Parser(FileReader* fileReader, ErrorReporter* errorReporter);
+  Parser();
   Parser(const Parser& source);
 
   void parse();
+
+  void setErrorReporter(ErrorReporter* errorReporter);
+  void setScanner(Scanner* scanner);
 
   Parser& operator=(const Parser& rhs);
 private:

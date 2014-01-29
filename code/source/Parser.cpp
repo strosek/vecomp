@@ -10,16 +10,25 @@
 
 using namespace std;
 
-Parser::Parser(FileReader* fileReader, ErrorReporter* errorReporter) :
+Parser::Parser() :
   m_currentToken(),
   m_scanner(nullptr),
-  m_errorReporter(errorReporter),
+  m_errorReporter(nullptr),
   m_maxErrors(5),
   m_nTokensProcessed(0),
-  m_semanticChecker(SemanticChecker(errorReporter))
+  m_semanticChecker()
 {
+}
+
+void Parser::setErrorReporter(ErrorReporter* errorReporter)
+{
+  m_errorReporter = errorReporter;
   m_maxErrors = m_errorReporter->getMaxErrors();
-  m_scanner = Scanner::getInstance(fileReader, errorReporter);
+}
+
+void Parser::setScanner(Scanner* scanner)
+{
+  m_scanner = scanner;
 }
 
 void Parser::parse()
@@ -38,6 +47,7 @@ void Parser::parse()
 #ifdef DEBUG
   cout << "::: Parsing ::::::::::::::::::::::::::::::::::::::::::::::" << endl;
 #endif
+  m_semanticChecker.setErrorReporter(m_errorReporter);
   program();
 
   if (!m_semanticChecker.isMainPresent())

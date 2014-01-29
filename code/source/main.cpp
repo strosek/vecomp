@@ -22,14 +22,22 @@ int main(int argc, char** argv)
     cout << argc << " "  << argv[0] << " " << argv[1] << endl;
 #endif
     errorReporter = ErrorReporter::getInstance();
+
     FileReader* fileReader = FileReader::getInstance();
+    Scanner* scanner = Scanner::getInstance();
 
     errorReporter->setFileReader(fileReader);
+    errorReporter->setScanner(scanner);
     fileReader->setErrorReporter(errorReporter);
+    scanner->setErrorReporter(errorReporter);
+    scanner->setFileReader(fileReader);
 
     fileReader->readFile(argv[1]);
 
-    Parser parser(fileReader, errorReporter);
+    Parser parser;
+    parser.setErrorReporter(errorReporter);
+    parser.setScanner(scanner);
+
     parser.parse();
   }
   else

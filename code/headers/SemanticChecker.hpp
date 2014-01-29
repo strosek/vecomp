@@ -14,7 +14,7 @@
 class SemanticChecker
 {
 public:
-  SemanticChecker(ErrorReporter* errorReporter);
+  SemanticChecker();
   SemanticChecker(const SemanticChecker& source);
 
   SemanticChecker& operator=(const SemanticChecker& rhs);
@@ -37,6 +37,8 @@ public:
   void         setMainPresent(bool isPresent);
   void         setReturnCalled(bool isCalled);
   void         setReturnRequired(bool isRequired);
+
+  void         setErrorReporter(ErrorReporter* errorReporter);
 
 private:
   NativeType_t getCharType(char typeChar) const;
