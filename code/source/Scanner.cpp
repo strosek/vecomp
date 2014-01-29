@@ -231,29 +231,30 @@ void Scanner::scan()
 
 void Scanner::moveBackwards()
 {
+#ifdef DEBUG
   if (m_currentIndex < m_tokensLexemes.size())
   {
-#ifdef DEBUG
   cout << "::: move back token to position: " << m_currentIndex << ", line: " <<
       m_tokensLexemes.at(m_currentIndex).getLine() << ":  " << 
       m_tokensLexemes.at(m_currentIndex).getLexeme() << endl;
-#endif
   }
+#endif
 
   --m_currentIndex;
 }
 
 void Scanner::moveForward()
 {
+#ifdef DEBUG
   if (m_currentIndex < m_tokensLexemes.size())
   {
-#ifdef DEBUG
     cout << "::: advance token to position: " << m_currentIndex << ", line: " <<
         m_tokensLexemes.at(m_currentIndex).getLine() << ":  " << 
         m_tokensLexemes.at(m_currentIndex).getLexeme() << endl;
-#endif
-    ++m_currentIndex;
   }
+#endif
+
+  ++m_currentIndex;
 }
 
 TokenLexeme Scanner::getLastToken()
