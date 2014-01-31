@@ -50,14 +50,17 @@ void ErrorReporter::writeError(const string& message)
   ++m_errors;
 }
 
-void ErrorReporter::writeError(int line, int column, const std::string& lexeme,
-                               const std::string& message)
+void ErrorReporter::writeErrorWithLine(const std::string& message)
 {
   if (m_errors < m_maxErrors)
   {
 #ifdef DEBUG
     cout << "::: writing error" << endl;
 #endif
+    unsigned int line =   m_scanner->getLastToken().getLine();
+    unsigned int column = m_scanner->getLastToken().getRow();
+    string lexeme = m_scanner->getLastToken().getLexeme();
+    
     cerr << "error: " << m_fileReader->getCurrentFileName() << ':' << line <<
         ':' << column << setw(WIDTH_LEXEME) << lexeme << 
         setw(WIDTH_MESSAGE) << message <<
@@ -170,19 +173,22 @@ void ErrorReporter::writeLexicalError(int state, char currentChar,
   ++m_errors;
 }
 
-void ErrorReporter::writeSyntaxError(const std::string& expectedLexeme,
-    const std::string& actualLexeme, int line, int column)
+void ErrorReporter::writeSyntaxError(const std::string& expectedLexeme)
 {
-  ostringstream messageBuilder;
-
-  messageBuilder << "se esperaba lexema: \"" << expectedLexeme <<
-                    "\", se recibio: \"" << actualLexeme << "\"";
-
   if (m_errors < m_maxErrors)
   {
 #ifdef DEBUG
     cout << "::: writing error" << endl;
 #endif
+    unsigned int line =   m_scanner->getLastToken().getLine();
+    unsigned int column = m_scanner->getLastToken().getRow();
+    string actualLexeme = m_scanner->getLastToken().getLexeme();
+
+    ostringstream messageBuilder;
+    messageBuilder << "se esperaba lexema: \"" << expectedLexeme <<
+                      "\", se recibio: \"" << actualLexeme << "\"";
+
+
     cerr << "error: " << m_fileReader->getCurrentFileName() << ':' << line <<
         ':' << column << setw(WIDTH_LEXEME) << actualLexeme << 
         setw(WIDTH_MESSAGE) << messageBuilder.str() <<
@@ -193,21 +199,25 @@ void ErrorReporter::writeSyntaxError(const std::string& expectedLexeme,
   ++m_errors;
 }
 
-void ErrorReporter::writeSyntaxError(TokenType_t expectedToken,
-    TokenType_t actualToken, const string& actualLexeme, int line, int column)
+void ErrorReporter::writeSyntaxError(TokenType_t expectedToken)
 {
-  ostringstream messageBuilder;
-
-  messageBuilder << "se esperaba token: \"" <<
-                    TokenLexeme::getTokenString(expectedToken) <<
-                    "\", se recibio: \"" <<
-                    TokenLexeme::getTokenString(actualToken) << "\"";
-
   if (m_errors < m_maxErrors)
   {
 #ifdef DEBUG
     cout << "::: writing error" << endl;
 #endif
+    unsigned int line = m_scanner->getLastToken().getLine();
+    unsigned int column = m_scanner->getLastToken().getRow();
+    TokenType_t actualToken = m_scanner->getLastToken().getToken();
+    string actualLexeme = m_scanner->getLastToken().getLexeme();
+
+    ostringstream messageBuilder;
+    messageBuilder << "se esperaba token: \"" <<
+                      TokenLexeme::getTokenString(expectedToken) <<
+                      "\", se recibio: \"" <<
+                      TokenLexeme::getTokenString(actualToken) << "\"";
+
+
     cerr << "error: " << m_fileReader->getCurrentFileName() << ':' << line <<
         ':' << column << setw(WIDTH_LEXEME) << actualLexeme << 
         setw(WIDTH_MESSAGE) << messageBuilder.str() <<

@@ -11,6 +11,7 @@ class Scanner;
 
 #include "FileReader.hpp"
 #include "TokenLexeme.hpp"
+#include "Scanner.hpp"
 
 
 class ErrorReporter
@@ -21,14 +22,11 @@ public:
   ErrorReporter& operator=(const ErrorReporter& rhs);
 
   void writeError(const std::string& message);
-  void writeError(int line, int column, const std::string& lexeme, 
-                  const std::string& message);
+  void writeErrorWithLine(const std::string& message);
   void writeLexicalError(int state, char currentChar,
                          const std::string& lexeme, int lineNo, int columnNo);
-  void writeSyntaxError(const std::string& expectedLexeme,
-                        const std::string& actualLexeme, int line, int column);
-  void writeSyntaxError(TokenType_t expectedToken, TokenType_t actualToken,
-                        const std::string& actualLexeme, int line, int column);
+  void writeSyntaxError(const std::string& expectedLexeme);
+  void writeSyntaxError(TokenType_t expectedToken);
 
   void setFileReader(FileReader* fileReader);
   void setScanner(Scanner* setScanner);

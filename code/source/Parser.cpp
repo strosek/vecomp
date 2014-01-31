@@ -247,10 +247,7 @@ void Parser::command()
       }
       else
       {
-        m_errorReporter->writeSyntaxError(
-            ":=, ( o [",
-            m_currentToken.getLexeme(), m_currentToken.getLine(),
-            m_currentToken.getRow());
+        m_errorReporter->writeSyntaxError(":=, ( o [");
       }
     }
   }
@@ -281,9 +278,8 @@ void Parser::command()
     if (!m_semanticChecker.isInSwitch() && !m_semanticChecker.isInFor())
     {
       TokenLexeme lastToken = m_scanner->getLastToken();
-      m_errorReporter->writeError(lastToken.getLine(), lastToken.getRow(),
-            lastToken.getLexeme(),
-            "interrumpe solo es permitido en ciclo desde o en caso");
+      m_errorReporter->writeErrorWithLine(
+          "interrumpe solo es permitido en ciclo desde o en caso");
     }
   }
   else if (m_currentToken.getLexeme().compare("continua") == 0)
@@ -292,15 +288,13 @@ void Parser::command()
     if (!m_semanticChecker.isInFor())
     {
       TokenLexeme lastToken = m_scanner->getLastToken();
-      m_errorReporter->writeError(lastToken.getLine(), lastToken.getRow(),
-            lastToken.getLexeme(), "continua solo es permitido en ciclo desde");
+      m_errorReporter->writeErrorWithLine(
+            "continua solo es permitido en ciclo desde");
     }
   }
   else
   {
-    m_errorReporter->writeError(m_currentToken.getLine(),
-        m_currentToken.getRow(), m_currentToken.getLexeme(),
-        "inicio de comando invalido");
+    m_errorReporter->writeErrorWithLine("inicio de comando invalido");
   }
 #ifdef DEBUG
   cout << "::: exit command()" << endl;
@@ -705,9 +699,7 @@ void Parser::print()
   if (m_currentToken.getLexeme().compare("Imprime") != 0 &&
       m_currentToken.getLexeme().compare("Imprimenl") != 0)
   {
-    m_errorReporter->writeSyntaxError("Imprime o Imprimenl",
-        m_currentToken.getLexeme(), m_currentToken.getLine(),
-        m_currentToken.getRow()); 
+    m_errorReporter->writeSyntaxError("Imprime o Imprimenl");
   }
   
   checkLexeme("(");
@@ -1010,9 +1002,7 @@ void Parser::term()
     advanceToken();
   }
   else {
-    m_errorReporter->writeSyntaxError("identificador o constante",
-            m_currentToken.getLexeme(), m_currentToken.getLine(),
-            m_currentToken.getRow());
+    m_errorReporter->writeSyntaxError("identificador o constante");
   }
 #ifdef DEBUG
   cout << "::: exit term()" << endl;
@@ -1104,9 +1094,7 @@ void Parser::checkToken(TokenType_t expectedToken)
 #endif
     if (m_currentToken.getToken() != expectedToken)
     {
-      m_errorReporter->writeSyntaxError(expectedToken,
-          m_currentToken.getToken(), m_currentToken.getLexeme(),
-          m_currentToken.getLine(), m_currentToken.getRow());
+      m_errorReporter->writeSyntaxError(expectedToken);
     }
   }
 }
@@ -1122,9 +1110,7 @@ void Parser::checkLexeme(const string& expectedLexeme)
 #endif
     if (m_currentToken.getLexeme().compare(expectedLexeme) != 0)
     {
-      m_errorReporter->writeSyntaxError(expectedLexeme,
-          m_currentToken.getLexeme(), m_currentToken.getLine(),
-          m_currentToken.getRow());
+      m_errorReporter->writeSyntaxError(expectedLexeme);
     }
   }
 }
@@ -1145,8 +1131,7 @@ void Parser::checkNativeDataType()
       message += TokenLexeme::getTokenString(m_currentToken.getToken());
       message += "\"";
 
-      m_errorReporter->writeError(m_currentToken.getLine(),
-          m_currentToken.getRow(), m_currentToken.getLexeme(), message);
+      m_errorReporter->writeErrorWithLine(message);
     }
   }
 }
@@ -1162,9 +1147,7 @@ void Parser::checkLiteral()
 #endif
     if (!isLiteral(m_currentToken.getToken()))
     {
-      m_errorReporter->writeSyntaxError("constante",
-          m_currentToken.getLexeme(), m_currentToken.getLine(),
-          m_currentToken.getRow());
+      m_errorReporter->writeSyntaxError("constante");
     }
   }
 }
