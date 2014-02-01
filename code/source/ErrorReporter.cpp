@@ -50,7 +50,7 @@ void ErrorReporter::writeError(const string& message)
   ++m_errors;
 }
 
-void ErrorReporter::writeErrorWithLine(const std::string& message)
+void ErrorReporter::writeErrorWithPosition(const std::string& message)
 {
   if (m_errors < m_maxErrors)
   {

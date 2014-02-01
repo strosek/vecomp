@@ -278,7 +278,7 @@ void Parser::command()
     if (!m_semanticChecker.isInSwitch() && !m_semanticChecker.isInFor())
     {
       TokenLexeme lastToken = m_scanner->getLastToken();
-      m_errorReporter->writeErrorWithLine(
+      m_errorReporter->writeErrorWithPosition(
           "interrumpe solo es permitido en ciclo desde o en caso");
     }
   }
@@ -288,13 +288,13 @@ void Parser::command()
     if (!m_semanticChecker.isInFor())
     {
       TokenLexeme lastToken = m_scanner->getLastToken();
-      m_errorReporter->writeErrorWithLine(
+      m_errorReporter->writeErrorWithPosition(
             "continua solo es permitido en ciclo desde");
     }
   }
   else
   {
-    m_errorReporter->writeErrorWithLine("inicio de comando invalido");
+    m_errorReporter->writeErrorWithPosition("inicio de comando invalido");
   }
 #ifdef DEBUG
   cout << "::: exit command()" << endl;
@@ -1131,7 +1131,7 @@ void Parser::checkNativeDataType()
       message += TokenLexeme::getTokenString(m_currentToken.getToken());
       message += "\"";
 
-      m_errorReporter->writeErrorWithLine(message);
+      m_errorReporter->writeErrorWithPosition(message);
     }
   }
 }

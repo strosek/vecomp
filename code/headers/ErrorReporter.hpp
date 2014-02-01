@@ -22,7 +22,7 @@ public:
   ErrorReporter& operator=(const ErrorReporter& rhs);
 
   void writeError(const std::string& message);
-  void writeErrorWithLine(const std::string& message);
+  void writeErrorWithPosition(const std::string& message);
   void writeLexicalError(int state, char currentChar,
                          const std::string& lexeme, int lineNo, int columnNo);
   void writeSyntaxError(const std::string& expectedLexeme);

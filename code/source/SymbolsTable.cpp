@@ -11,11 +11,16 @@ SymbolsTable::SymbolsTable() :
 {
 }
 
-bool SymbolsTable::isPresent(const string& name, const string& parameters)
+bool SymbolsTable::exists(const string& name)
+{
+  return m_symbolsMap.find(name) != m_symbolsMap.end();
+}
+
+void SymbolsTable::checkDeclared(const string& name, const string& parameters)
 {
   bool isFound = false;
 
-  if (m_symbolsMap.find(name) != m_symbolsMap.end())
+  if (exists(name))
   {
     m_searchRange = m_symbolsMap.equal_range(name);
     for (multimap<string, SymbolData>::iterator it = m_searchRange.first;
@@ -26,17 +31,25 @@ bool SymbolsTable::isPresent(const string& name, const string& parameters)
         isFound = true;
       }
     }
+    
+    if (!isFound)
+    {
+      m_errorReporter->writeErrorWithPosition(
+          "funcion no declarada con esos parametros");
+    }
   }
-
-  return isFound;
+  else
+  {
+    m_errorReporter->writeErrorWithPosition("funcion no declarada");
+  }
 }
 
-bool SymbolsTable::isPresent(const string& name, const string& scope,
-                             size_t dimensions, NativeType_t type)
+void SymbolsTable::checkDeclared(const string& name, const string& scope,
+                                 size_t dimensions, NativeType_t type)
 {
   bool isFound = false;
 
-  if (m_symbolsMap.find(name) != m_symbolsMap.end())
+  if (exists(name))
   {
     m_searchRange = m_symbolsMap.equal_range(name);
     for (multimap<string, SymbolData>::iterator it = m_searchRange.first;
@@ -50,8 +63,10 @@ bool SymbolsTable::isPresent(const string& name, const string& scope,
       }
     }
   }
-
-  return isFound;
+  else
+  {
+    m_errorReporter->writeErrorWithPosition("variable no declarada");
+  }
 }
 
 NativeType_t SymbolsTable::getType(const string& name,
@@ -153,5 +168,10 @@ size_t SymbolsTable::getFunctionDimensions(const string& name,
 void SymbolsTable::insert(const string& name, const SymbolData& data)
 {
   m_symbolsMap.insert(make_pair(name, data));
+}
+
+void SymbolsTable::setErrorReporter(ErrorReporter* errorReporter)
+{
+  m_errorReporter = errorReporter;
 }
 
