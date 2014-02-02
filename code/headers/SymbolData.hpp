@@ -33,17 +33,20 @@ public:
   void setParameters(std::string& parameters);
   void setScope(std::string& scope);
   void setType(NativeType_t type);
+  void setIsFunction(bool isFunction);
 
   NativeType_t getType() const;
   size_t       getDimensions() const;
   size_t       getLine() const;
   std::string  getParameters() const;
   std::string  getScope() const;
+  bool         isFunction() const;
 private:
   NativeType_t m_type;
   size_t       m_dimensions;
   size_t       m_line;
   std::string  m_parameters;
+  bool         m_isFunction;
   std::string  m_scope;
 };
 

@@ -9,6 +9,7 @@ SymbolData::SymbolData() :
   m_dimensions(0),
   m_line(1),
   m_parameters(),
+  m_isFunction(false),
   m_scope()
 {
 }
@@ -38,6 +39,10 @@ void SymbolData::setType(NativeType_t type)
   m_type = type;
 }
 
+void SymbolData::setIsFunction(bool isFunction)
+{
+  m_isFunction = isFunction;
+}
 
 NativeType_t SymbolData::getType() const
 {
@@ -62,5 +67,10 @@ string SymbolData::getParameters() const
 string SymbolData::getScope() const
 {
   return m_scope;
+}
+
+bool SymbolData::isFunction() const
+{
+  return m_isFunction;
 }
 
