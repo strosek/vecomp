@@ -16,34 +16,6 @@ bool SymbolsTable::exists(const string& name)
   return m_symbolsMap.find(name) != m_symbolsMap.end();
 }
 
-void SymbolsTable::checkDeclared(const string& name, const string& parameters)
-{
-  bool isFound = false;
-
-  if (exists(name))
-  {
-    m_searchRange = m_symbolsMap.equal_range(name);
-    for (multimap<string, SymbolData>::iterator it = m_searchRange.first;
-         it != m_searchRange.second && !isFound; ++it)
-    {
-      if (it->second.getParameters().compare(parameters) == 0)
-      {
-        isFound = true;
-      }
-    }
-    
-    if (!isFound)
-    {
-      m_errorReporter->writeErrorWithPosition(
-          "funcion no declarada con esos parametros");
-    }
-  }
-  else
-  {
-    m_errorReporter->writeErrorWithPosition("funcion no declarada");
-  }
-}
-
 void SymbolsTable::checkDeclared(const string& name, const string& scope,
                                  size_t dimensions, NativeType_t type)
 {
@@ -52,20 +24,132 @@ void SymbolsTable::checkDeclared(const string& name, const string& scope,
   if (exists(name))
   {
     m_searchRange = m_symbolsMap.equal_range(name);
-    for (multimap<string, SymbolData>::iterator it = m_searchRange.first;
+    bool isScopeMatched = false;
+    bool isTypeMatched = false;
+    multimap<string, SymbolData>::iterator it;
+    for (it = m_searchRange.first;
          it != m_searchRange.second && !isFound; ++it)
     {
-      if (it->second.getScope().compare(scope) == 0 &&
-          it->second.getDimensions() == dimensions  &&
-          it->second.getType() == type)
+      if (it->second.getScope().compare(scope) == 0)
+      {
+        isScopeMatched = true;
+      }
+      if (it->second.getType() == type)
+      {
+        isTypeMatched = true;
+      }
+
+      if (isScopeMatched && isTypeMatched && !it->second.isFunction())
       {
         isFound = true;
+      }
+    }
+
+    if (isFound)
+    {
+      if (it->second.getDimensions() < dimensions)
+      {
+        m_errorReporter->writeErrorWithPosition(
+            "faltan dimensiones en variable");
+      }
+      else if (it->second.getDimensions() > dimensions)
+      {
+        m_errorReporter->writeErrorWithPosition(
+            "exceso de dimensiones en variable");
+      }
+    }
+    else
+    {
+      if (!isScopeMatched)
+      {
+        m_errorReporter->writeErrorWithPosition(
+            "variable no declarada con en este alcance");
+      }
+
+      if (!isTypeMatched)
+      {
+        m_errorReporter->writeErrorWithPosition(
+            "variable no declarada con tipo ");
       }
     }
   }
   else
   {
     m_errorReporter->writeErrorWithPosition("variable no declarada");
+  }
+}
+
+void SymbolsTable::checkFunctionDeclared(const string& name,
+                                         const string& parameters)
+{
+  bool isFound = false;
+
+  if (exists(name))
+  {
+    m_searchRange = m_symbolsMap.equal_range(name);
+    for (multimap<string, SymbolData>::iterator it = m_searchRange.first;
+         it != m_searchRange.second && !isFound; ++it)
+    {
+      if (it->second.getParameters().compare(parameters) == 0 &&
+          it->second.isFunction())
+      {
+        isFound = true;
+      }
+    }
+    
+    if (!isFound)
+    {
+      m_errorReporter->writeErrorWithPosition(
+          "funcion declarada con diferente lista de parametros");
+    }
+  }
+  else
+  {
+    m_errorReporter->writeErrorWithPosition("funcion no declarada");
+  }
+}
+
+void SymbolsTable::checkDeclarable(const string& name,
+                                   const string& scope)
+{
+  if (exists(name))
+  {
+    bool isFound = false;
+
+    m_searchRange = m_symbolsMap.equal_range(name);
+    for (multimap<string, SymbolData>::iterator it = m_searchRange.first;
+         it != m_searchRange.second && !isFound; ++it)
+    {
+      if (it->second.getScope().compare(scope) == 0 &&
+          !it->second.isFunction())
+      {
+        isFound = true;
+        m_errorReporter->writeErrorWithPosition(
+            "variable ya declarada en este alcance");
+      }
+    }
+  }
+}
+
+void SymbolsTable::checkFunctionDeclarable(const string& name,
+                                           const string& parameters)
+{
+  if (exists(name))
+  {
+    bool isFound = false;
+
+    m_searchRange = m_symbolsMap.equal_range(name);
+    for (multimap<string, SymbolData>::iterator it = m_searchRange.first;
+         it != m_searchRange.second && !isFound; ++it)
+    {
+      if (it->second.getParameters().compare(parameters) == 0 &&
+          it->second.isFunction())
+      {
+        isFound = true;
+        m_errorReporter->writeErrorWithPosition(
+            "function ya declarada con esa lista de parametros");
+      }
+    }
   }
 }
 
@@ -167,6 +251,15 @@ size_t SymbolsTable::getFunctionDimensions(const string& name,
 
 void SymbolsTable::insert(const string& name, const SymbolData& data)
 {
+  if (data.isFunction())
+  {
+    checkFunctionDeclarable(name, data.getParameters());
+  }
+  else
+  {
+    checkDeclarable(name, data.getScope());
+  }
+
   m_symbolsMap.insert(make_pair(name, data));
 }
 
