@@ -70,6 +70,7 @@ private:
   Scanner*                                         m_scanner;
   ErrorReporter*                                   m_errorReporter;
   unsigned int                                     m_maxErrors;
+  unsigned int                                     m_maxRuleIterations;
   size_t                                           m_nTokensProcessed;
   SemanticChecker                                  m_semanticChecker;
 };

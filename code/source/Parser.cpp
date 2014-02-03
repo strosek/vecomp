@@ -15,6 +15,7 @@ Parser::Parser() :
   m_scanner(nullptr),
   m_errorReporter(nullptr),
   m_maxErrors(5),
+  m_maxRuleIterations(1000),
   m_nTokensProcessed(0),
   m_semanticChecker()
 {
@@ -74,10 +75,14 @@ void Parser::andOperation()
   if (m_errorReporter->getErrors() >= m_maxErrors)
     return;
 
+  unsigned int iterations = 0;
   do
   {
     notOperation();
-  } while (m_currentToken.getLexeme().compare("&&") == 0);
+
+    ++iterations;
+  } while (m_currentToken.getLexeme().compare("&&") == 0 &&
+           iterations < m_maxRuleIterations);
 
 #ifdef DEBUG
   cout << "::: exit andOperation()" << endl;
@@ -92,6 +97,8 @@ void Parser::argumentsList()
 
   bool isOperatorFound = false;
   string argumentTypes;
+
+  unsigned int iterations = 0;
   do
   {
     isOperatorFound = false;
@@ -103,7 +110,9 @@ void Parser::argumentsList()
       isOperatorFound = true;
       advanceToken();
     }
-  } while (isOperatorFound);
+
+    ++iterations;
+  } while (isOperatorFound && iterations < m_maxRuleIterations);
 
   m_scanner->moveBackwards();
 
@@ -314,6 +323,7 @@ void Parser::constantsDeclaration()
   advanceToken();
   if (m_currentToken.getLexeme().compare("(") == 0)
   {
+    unsigned int iterations = 0;
     do
     {
       constant();
@@ -322,7 +332,9 @@ void Parser::constantsDeclaration()
     cout << "::: current lexeme (line " << __LINE__ << "): " <<
         m_currentToken.getLexeme() << endl;
 #endif
-    } while (m_currentToken.getToken() == TOKEN_NEWLINE);
+      ++iterations;
+    } while (m_currentToken.getToken() == TOKEN_NEWLINE &&
+             iterations < m_maxRuleIterations);
   }
   else
   {
@@ -360,6 +372,7 @@ void Parser::dimension()
   if (m_errorReporter->getErrors() >= m_maxErrors)
     return;
 
+  unsigned int iterations = 0;
   do {
     checkLexeme("[");
     advanceToken();
@@ -371,7 +384,10 @@ void Parser::dimension()
     {
       m_scanner->moveBackwards();
     }
-  } while (m_currentToken.getLexeme().compare("[") == 0);
+
+    ++iterations;
+  } while (m_currentToken.getLexeme().compare("[") == 0 &&
+           iterations < m_maxRuleIterations);
 
   m_scanner->moveBackwards();
 
@@ -408,10 +424,14 @@ void Parser::expression()
   if (m_errorReporter->getErrors() >= m_maxErrors)
     return;
 
+  unsigned int iterations = 0;
   do
   {
     andOperation();
-  } while (m_currentToken.getLexeme().compare("||") == 0);
+
+    ++iterations;
+  } while (m_currentToken.getLexeme().compare("||") == 0 &&
+           iterations < m_maxRuleIterations);
 
   m_scanner->moveBackwards();
 
@@ -437,9 +457,13 @@ void Parser::forStatement()
   if (m_currentToken.getLexeme().compare(";") != 0)
   {
     assign();
-    while (m_currentToken.getLexeme().compare(",") == 0)
+    unsigned int iterations = 0;
+    while (m_currentToken.getLexeme().compare(",") == 0 &&
+           iterations < m_maxRuleIterations)
     {
       assign();
+      
+      ++iterations;
     }
   }
   else
@@ -465,10 +489,14 @@ void Parser::forStatement()
   if (m_currentToken.getLexeme().compare("{") != 0)
   {
     assign();
-    while (m_currentToken.getLexeme().compare(",") == 0)
+    unsigned int iterations = 0;
+    while (m_currentToken.getLexeme().compare(",") == 0 &&
+           iterations < m_maxRuleIterations)
     {
       assign();
       advanceToken();
+
+      ++iterations;
     }
   }
   else
@@ -585,12 +613,18 @@ void Parser::import()
   advanceToken();
   if (m_currentToken.getLexeme().compare("(") == 0)
   {
+    unsigned int iterations = 0;
     do
     {
       checkToken(TOKEN_STRING);
 
+      m_semanticChecker.addImport(m_scanner->getLastToken().getLexeme());
+
       advanceToken();
-    } while (m_currentToken.getToken() == TOKEN_NEWLINE);
+      
+      ++iterations;
+    } while (m_currentToken.getToken() == TOKEN_NEWLINE &&
+             iterations < m_maxRuleIterations);
 
 #ifdef DEBUG
     cout << "::: current lexeme (line " << __LINE__ << "): " <<
@@ -616,6 +650,7 @@ void Parser::multiplication()
     return;
 
   bool isOperatorFound = false;
+  unsigned int iterations = 0;
   do
   {
     isOperatorFound = false;
@@ -627,7 +662,9 @@ void Parser::multiplication()
       isOperatorFound = true;
       advanceToken();
     }
-  } while (isOperatorFound); 
+
+    ++iterations;
+  } while (isOperatorFound && iterations < m_maxRuleIterations); 
 #ifdef DEBUG
   cout << "::: exit multiplication()" << endl;
 #endif
@@ -660,8 +697,10 @@ void Parser::parameterList()
   if (m_errorReporter->getErrors() >= m_maxErrors)
     return;
 
+  unsigned int iterations = 0;
   advanceToken();
-  while (m_currentToken.getLexeme().compare(")") != 0)
+  while (m_currentToken.getLexeme().compare(")") != 0 &&
+         iterations < m_maxRuleIterations)
   {
     m_scanner->moveBackwards();
 
@@ -670,12 +709,17 @@ void Parser::parameterList()
       checkToken(TOKEN_IDEN);
 
       advanceToken();
-    } while (m_currentToken.getLexeme().compare(",") == 0);
+
+      ++iterations;
+    } while (m_currentToken.getLexeme().compare(",") == 0 &&
+             iterations < m_maxRuleIterations);
 
     m_scanner->moveBackwards();
     checkNativeDataType();
 
     advanceToken();
+
+    ++iterations;
   }
 
   m_scanner->moveBackwards();
@@ -693,6 +737,9 @@ void Parser::print()
     return;
 
   checkLexeme("fmt");
+
+  m_semanticChecker.checkImported("\"fmt\"");
+
   checkLexeme(".");
 
   advanceToken();
@@ -778,6 +825,9 @@ void Parser::read()
     return;
 
   checkLexeme("con");
+
+  m_semanticChecker.checkImported("\"con\"");
+
   checkLexeme(".");
   checkLexeme("Lee");
   checkLexeme("(");
@@ -849,13 +899,17 @@ void Parser::returnType()
       advanceToken();
       if (m_currentToken.getToken() == TOKEN_IDEN)
       {
+        unsigned int iterations = 0;
         do
         {
           checkToken(TOKEN_IDEN);
           variablesList();
           checkNativeDataType();
           advanceToken();
-        } while (m_currentToken.getLexeme().compare(",") == 0);
+
+          ++iterations;
+        } while (m_currentToken.getLexeme().compare(",") == 0 &&
+                 iterations < m_maxRuleIterations);
         checkLexeme(")");
       }
       else
@@ -911,6 +965,7 @@ void Parser::statements()
   if (m_currentToken.getLexeme().compare("}") != 0)
   {
     ignoreNewLines();
+    unsigned int iterations = 0;
     do
     {
       command();
@@ -924,14 +979,17 @@ void Parser::statements()
       cout << "::: current lexeme (line " << __LINE__ << "): " <<
           m_currentToken.getLexeme() << endl;
 #endif
-    } while (m_currentToken.getToken() == TOKEN_IDEN               ||
-             m_currentToken.getLexeme().compare("var") == 0        ||
-             m_currentToken.getLexeme().compare("si") == 0         ||
-             m_currentToken.getLexeme().compare("desde") == 0      ||
-             m_currentToken.getLexeme().compare("caso") == 0       ||
-             m_currentToken.getLexeme().compare("regresa") == 0    ||
-             m_currentToken.getLexeme().compare("interrumpe") == 0 ||
-             m_currentToken.getLexeme().compare("continua") == 0);
+
+      ++iterations;
+    } while ((m_currentToken.getToken() == TOKEN_IDEN               ||
+              m_currentToken.getLexeme().compare("var") == 0        ||
+              m_currentToken.getLexeme().compare("si") == 0         ||
+              m_currentToken.getLexeme().compare("desde") == 0      ||
+              m_currentToken.getLexeme().compare("caso") == 0       ||
+              m_currentToken.getLexeme().compare("regresa") == 0    ||
+              m_currentToken.getLexeme().compare("interrumpe") == 0 ||
+              m_currentToken.getLexeme().compare("continua") == 0)  &&
+              iterations < m_maxRuleIterations);
   }
 #ifdef DEBUG
   cout << "::: exit statements()" << endl;
@@ -947,6 +1005,7 @@ void Parser::sumOperation()
     return;
 
   bool isOperatorFound = false;
+  unsigned int iterations = 0;
   do
   {
     isOperatorFound = false;
@@ -957,7 +1016,9 @@ void Parser::sumOperation()
       isOperatorFound = true;
       advanceToken();
     }
-  } while (isOperatorFound); 
+
+    ++iterations;
+  } while (isOperatorFound && iterations < m_maxRuleIterations); 
 
 #ifdef DEBUG
   cout << "::: exit sumOperation()" << endl;
@@ -1022,6 +1083,7 @@ void Parser::variablesDeclaration()
   advanceToken();
   if (m_currentToken.getLexeme().compare("(") == 0)
   {
+    unsigned int iterations = 0;
     do
     {
       variablesList();
@@ -1031,7 +1093,10 @@ void Parser::variablesDeclaration()
     cout << "::: current lexeme (line " << __LINE__ << "): " <<
         m_currentToken.getLexeme() << endl;
 #endif
-    } while (m_currentToken.getToken() == TOKEN_NEWLINE);
+
+      ++iterations;
+    } while (m_currentToken.getToken() == TOKEN_NEWLINE &&
+             iterations < m_maxRuleIterations);
     m_scanner->moveBackwards();
     checkLexeme(")");
   }
@@ -1052,6 +1117,7 @@ void Parser::variablesList()
   cout << "::: entering variablesList()" << endl;
 #endif
   string nameWithScope;
+  unsigned int iterations = 0;
   do
   {
     checkToken(TOKEN_IDEN);
@@ -1072,7 +1138,8 @@ void Parser::variablesList()
     {
       m_scanner->moveBackwards();
     }
-  } while (m_currentToken.getLexeme().compare(",") == 0);
+  } while (m_currentToken.getLexeme().compare(",") == 0 &&
+           iterations < m_maxRuleIterations);
 
   checkNativeDataType();
 
@@ -1158,11 +1225,15 @@ void Parser::ignoreNewLines()
   cout << "::: ignoring newlines()" << endl;
 #endif
 
+  unsigned int iterations = 0;
   do
   {
     advanceToken();
+
+    ++iterations;
   } while ((m_currentToken.getToken() == TOKEN_NEWLINE ||
-            m_currentToken.getLexeme().compare(";") == 0));
+            m_currentToken.getLexeme().compare(";") == 0) &&
+            iterations < m_maxRuleIterations);
 
   m_scanner->moveBackwards();
 
