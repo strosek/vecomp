@@ -28,6 +28,7 @@ public:
   void         checkExpressionType(NativeType_t expectedType);
   void         checkDeclared(const std::string& name, const SymbolData& data);
   void         checkImported(const std::string& import);
+  void         checkReturnRequired();
   void         enterFor();
   void         enterSwitch();
   void         enterToScope(const std::string& scope);

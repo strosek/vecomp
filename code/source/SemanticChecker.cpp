@@ -118,6 +118,23 @@ void SemanticChecker::checkImported(const string& import)
   }
 }
 
+void SemanticChecker::checkReturnRequired()
+{
+  if (m_isReturnRequired && !m_isReturnCalled)
+  {
+    m_errorReporter->writeErrorWithPosition(
+        "funcion con tipo no llama a regresa");
+  }
+  else if (!m_isReturnRequired && m_isReturnCalled)
+  {
+    m_errorReporter->writeErrorWithPosition(
+        "funcion sin tipo llama a regresa con tipo");
+  }
+
+  m_isReturnCalled = false;
+  m_isReturnRequired = false;
+}
+
 void SemanticChecker::enterFor()
 {
   ++m_forLevel;
