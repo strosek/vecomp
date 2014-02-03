@@ -68,8 +68,10 @@ void SymbolsTable::checkDeclared(const string& name, const string& scope,
 
       if (!isTypeMatched)
       {
-        m_errorReporter->writeErrorWithPosition(
-            "variable no declarada con tipo ");
+        string message = "variable no declarada con tipo: \"";
+        message += SymbolData::getTypeString(it->second.getType());
+        message += "\"";
+        m_errorReporter->writeErrorWithPosition(message);
       }
     }
   }
