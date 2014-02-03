@@ -42,7 +42,7 @@ void ErrorReporter::writeError(const string& message)
 #ifdef DEBUG
     cout << "::: writing error" << endl;
 #endif
-    cerr << "error: " << m_fileReader->getCurrentFileName() << ':' <<
+    cerr << m_fileReader->getCurrentFileName() << ':' << " error: " <<
         setw(WIDTH_LEXEME) << ' ' << setw(WIDTH_MESSAGE) << message <<
         setw(WIDTH_LINE) << ' ' << endl;
   }
@@ -61,8 +61,8 @@ void ErrorReporter::writeErrorWithPosition(const std::string& message)
     unsigned int column = m_scanner->getLastToken().getRow();
     string lexeme = m_scanner->getLastToken().getLexeme();
     
-    cerr << "error: " << m_fileReader->getCurrentFileName() << ':' << line <<
-        ':' << column << setw(WIDTH_LEXEME) << lexeme << 
+    cerr << m_fileReader->getCurrentFileName() << ':' << line <<
+        ':' << column << " error: " << setw(WIDTH_LEXEME) << lexeme << 
         setw(WIDTH_MESSAGE) << message <<
         setw(WIDTH_LINE) << m_fileReader->getTextAtLine(line - 1);
     cerr.flush();
@@ -163,8 +163,8 @@ void ErrorReporter::writeLexicalError(int state, char currentChar,
 #ifdef DEBUG
     cout << "::: writing error" << endl;
 #endif
-    cerr << "error: " << m_fileReader->getCurrentFileName() << ':' << line <<
-        ':' << column << setw(WIDTH_LEXEME) << lexeme << 
+    cerr << m_fileReader->getCurrentFileName() << ':' << line <<
+        ':' << column << " error: " << setw(WIDTH_LEXEME) << lexeme << 
         setw(WIDTH_MESSAGE) << messageBuilder.str() <<
         setw(WIDTH_LINE) << m_fileReader->getTextAtLine(line - 1);
     cerr.flush();
@@ -189,8 +189,8 @@ void ErrorReporter::writeSyntaxError(const std::string& expectedLexeme)
                       "\", se recibio: \"" << actualLexeme << "\"";
 
 
-    cerr << "error: " << m_fileReader->getCurrentFileName() << ':' << line <<
-        ':' << column << setw(WIDTH_LEXEME) << actualLexeme << 
+    cerr << m_fileReader->getCurrentFileName() << ':' << line <<
+        ':' << column << " error: " << setw(WIDTH_LEXEME) << actualLexeme << 
         setw(WIDTH_MESSAGE) << messageBuilder.str() <<
         setw(WIDTH_LINE) << m_fileReader->getTextAtLine(line - 1);
     cerr.flush();
@@ -218,8 +218,8 @@ void ErrorReporter::writeSyntaxError(TokenType_t expectedToken)
                       TokenLexeme::getTokenString(actualToken) << "\"";
 
 
-    cerr << "error: " << m_fileReader->getCurrentFileName() << ':' << line <<
-        ':' << column << setw(WIDTH_LEXEME) << actualLexeme << 
+    cerr << m_fileReader->getCurrentFileName() << ':' << line <<
+        ':' << column << " error: " << setw(WIDTH_LEXEME) << actualLexeme << 
         setw(WIDTH_MESSAGE) << messageBuilder.str() <<
         setw(WIDTH_LINE) << m_fileReader->getTextAtLine(line - 1);
     cerr.flush();
