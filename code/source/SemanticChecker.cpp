@@ -66,14 +66,44 @@ void SemanticChecker::addImport(const string& import)
   m_imports.insert(import);
 }
 
+void SemanticChecker::declare(const string& name, const SymbolData& data)
+{
+  if (data.isFunction())
+  {
+    m_symbolsTable.checkFunctionDeclarable(name, data.getParameters());
+  }
+  else
+  {
+    m_symbolsTable.checkDeclarable(name, data.getScope());
+  }
+
+  m_symbolsTable.insert(name, data);
+}
+
 void SemanticChecker::checkExpressionType(NativeType_t expectedType)
 {
   if (!m_operands.empty())
   {
     if (expectedType != m_operands.top())
     {
-      // TODO: write error
+      string message = "tipo de expresion no esperado, se esperaba: \"";
+      message += SymbolData::getTypeString(expectedType);
+      message += "\"";
+      m_errorReporter->writeErrorWithPosition(message);
     }
+  }
+}
+
+void SemanticChecker::checkDeclared(const string& name, const SymbolData& data)
+{
+  if (data.isFunction())
+  {
+    m_symbolsTable.checkFunctionDeclared(name, data.getParameters());
+  }
+  else
+  {
+    m_symbolsTable.checkDeclared(name, data.getScope(), data.getDimensions(),
+                                 data.getType());
   }
 }
 
@@ -81,7 +111,10 @@ void SemanticChecker::checkImported(const string& import)
 {
   if (m_imports.find(import) == m_imports.end())
   {
-    // TODO: Write error
+    string message = "no se ha importado la libreria: \"";
+    message += import;
+    message += "\"";
+    m_errorReporter->writeErrorWithPosition(message);
   }
 }
 
