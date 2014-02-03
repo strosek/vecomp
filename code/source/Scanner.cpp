@@ -243,9 +243,9 @@ void Scanner::moveBackwards()
 #ifdef DEBUG
   if (m_currentIndex < m_tokensLexemes.size())
   {
-  cout << "::: move back token to position: " << m_currentIndex << ", line: " <<
-      m_tokensLexemes.at(m_currentIndex).getLine() << ":  " << 
-      m_tokensLexemes.at(m_currentIndex).getLexeme() << endl;
+    cout << "::: move back token to position: " << m_currentIndex << 
+        ", line: " << m_tokensLexemes.at(m_currentIndex).getLine() << ":  " << 
+        m_tokensLexemes.at(m_currentIndex).getLexeme() << endl;
   }
 #endif
 
