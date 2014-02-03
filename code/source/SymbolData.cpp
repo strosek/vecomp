@@ -2,6 +2,10 @@
 
 #include "../headers/SymbolData.hpp"
 
+#ifdef DEBUG
+# include <iostream>
+#endif
+
 using namespace std;
 
 SymbolData::SymbolData() :
@@ -72,5 +76,38 @@ string SymbolData::getScope() const
 bool SymbolData::isFunction() const
 {
   return m_isFunction;
+}
+
+string SymbolData::getTypeString(NativeType_t type)
+{
+  string typeString;
+  switch (type)
+  {
+  case TYPE_VOID :
+    typeString = "nada";
+    break;
+  case TYPE_INTEGER :
+    typeString = "entero";
+    break;
+  case TYPE_FLOAT :
+    typeString = "real";
+    break;
+  case TYPE_CHAR :
+    typeString = "caracter";
+    break;
+  case TYPE_STRING :
+    typeString = "alfabetico";
+    break;
+  case TYPE_BOOL :
+    typeString = "logico";
+    break;
+  default :
+#ifdef DEBUG
+    cout << "typo de dato invalido" << endl;
+#endif
+    break;
+  }
+
+  return typeString;
 }
 

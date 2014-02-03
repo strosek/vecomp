@@ -41,6 +41,9 @@ public:
   std::string  getParameters() const;
   std::string  getScope() const;
   bool         isFunction() const;
+
+  static std::string  getTypeString(NativeType_t type);
+
 private:
   NativeType_t m_type;
   size_t       m_dimensions;
