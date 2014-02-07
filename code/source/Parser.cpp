@@ -776,6 +776,7 @@ void Parser::program()
   checkLexeme("principal");
  
   ignoreNewLines();
+  unsigned int iterations = 0;
   do
   {
     if (m_currentToken.getLexeme().compare("importar") == 0)
@@ -807,10 +808,13 @@ void Parser::program()
     cout << "::: current lexeme (line " << __LINE__ << "): " <<
         m_currentToken.getLexeme() << endl;
 #endif
-  } while (m_currentToken.getLexeme().compare("var") == 0       ||
-           m_currentToken.getLexeme().compare("importar")  == 0 ||
-           m_currentToken.getLexeme().compare("const")  == 0    ||
-           m_currentToken.getLexeme().compare("funcion")  == 0);
+
+    ++iterations;
+  } while ((m_currentToken.getLexeme().compare("var") == 0       ||
+            m_currentToken.getLexeme().compare("importar")  == 0 ||
+            m_currentToken.getLexeme().compare("const")  == 0    ||
+            m_currentToken.getLexeme().compare("funcion")  == 0) &&
+            iterations < m_maxRuleIterations);
 
   m_semanticChecker.exitCurrentScope();
 #ifdef DEBUG
@@ -1146,6 +1150,7 @@ void Parser::variablesList()
     {
       m_scanner->moveBackwards();
     }
+    ++iterations;
   } while (m_currentToken.getLexeme().compare(",") == 0 &&
            iterations < m_maxRuleIterations);
 
