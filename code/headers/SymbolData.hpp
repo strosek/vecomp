@@ -12,7 +12,8 @@ typedef enum
   TYPE_CHAR,
   TYPE_STRING,
   TYPE_BOOL,
-  TYPE_VOID
+  TYPE_VOID,
+  TYPE_INVALID,
 } NativeType_t;
 
 const char TYPECHAR_INTEGER = 'i';
@@ -23,10 +24,23 @@ const char TYPECHAR_BOOL =    'b';
 const char TYPECHAR_VOID =    'v';
 const char TYPECHAR_INVALID = '~';
 
+const std::string TYPESTRING_INTEGER = "entero";
+const std::string TYPESTRING_FLOAT =   "real";
+const std::string TYPESTRING_CHAR =    "caracter";
+const std::string TYPESTRING_STRING =  "alfabetico";
+const std::string TYPESTRING_BOOL =    "logico";
+const std::string TYPESTRING_VOID =    "nada";
+const std::string TYPESTRING_INVALID = "invalido";
+
 class SymbolData
 {
 public:
   SymbolData();
+
+  static std::string  getTypeString(NativeType_t type);
+  static NativeType_t getStringType(const std::string& typeString);
+  static char         getTypeChar(NativeType_t type);
+  static NativeType_t getCharType(char typeChar);
 
   void setDimensions(size_t dimensions);
   void setLine(size_t line);
@@ -41,8 +55,6 @@ public:
   std::string  getParameters() const;
   std::string  getScope() const;
   bool         isFunction() const;
-
-  static std::string  getTypeString(NativeType_t type);
 
 private:
   NativeType_t m_type;

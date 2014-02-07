@@ -30,7 +30,7 @@ NativeType_t SemanticChecker::getExpressionType()
 
   if (!m_operands.empty())
   {
-    type = getCharType(m_operands.top());
+    type = SymbolData::getCharType(m_operands.top());
   }
 
   return type;
@@ -195,74 +195,4 @@ void SemanticChecker::setErrorReporter(ErrorReporter* errorReporter)
   m_errorReporter = errorReporter;
 }
 
-NativeType_t SemanticChecker::getCharType(char typeChar) const
-{
-  NativeType_t type = TYPE_VOID;
-
-  switch (typeChar)
-  {
-  case TYPECHAR_INTEGER :
-    type = TYPE_INTEGER;
-    break;
-  case TYPECHAR_FLOAT :
-    type = TYPE_FLOAT;
-    break;
-  case TYPECHAR_CHAR :
-    type = TYPE_CHAR;
-    break;
-  case TYPECHAR_STRING :
-    type = TYPE_STRING;
-    break;
-  case TYPECHAR_BOOL :
-    type = TYPE_BOOL;
-    break;
-  case TYPECHAR_VOID :
-    type = TYPE_VOID;
-    break;
-  case TYPECHAR_INVALID :
-    type = TYPE_VOID;
-    break;
-  default :
-#ifdef DEBUG
-    cout << "error: invalid char type" << endl;
-#endif
-    break;
-  } 
-
-  return type;
-}
-
-char SemanticChecker::getTypeChar(NativeType_t type) const
-{
-  char typeChar = TYPECHAR_INVALID;
-
-  switch (type)
-  {
-  case TYPE_VOID :
-    typeChar = TYPECHAR_VOID;
-    break;
-  case TYPE_INTEGER:
-    typeChar = TYPECHAR_INTEGER;
-    break;
-  case TYPE_CHAR:
-    typeChar = TYPECHAR_CHAR;
-    break;
-  case TYPE_FLOAT :
-    typeChar = TYPECHAR_CHAR;
-    break;
-  case TYPE_STRING :
-    typeChar = TYPECHAR_STRING;
-    break;
-  case TYPE_BOOL :
-    typeChar = TYPECHAR_BOOL;
-    break;
-  default :
-#ifdef DEBUG
-    cout << "error: invalid native type" << endl;
-#endif
-    break;
-  }
-
-  return typeChar;
-}
 

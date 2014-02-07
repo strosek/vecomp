@@ -44,9 +44,6 @@ public:
   void         setErrorReporter(ErrorReporter* errorReporter);
 
 private:
-  NativeType_t getCharType(char typeChar) const;
-  char         getTypeChar(NativeType_t type) const;
-
   ErrorReporter *             m_errorReporter;
   SymbolsTable                m_symbolsTable;
   bool                        m_isMainPresent;

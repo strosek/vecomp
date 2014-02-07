@@ -18,6 +18,147 @@ SymbolData::SymbolData() :
 {
 }
 
+NativeType_t SymbolData::getStringType(const std::string& typeString)
+{
+  NativeType_t type = TYPE_INVALID;
+
+  if (typeString.compare(TYPESTRING_INTEGER) == 0)
+  {
+    type = TYPE_INTEGER;
+  }
+  else if (typeString.compare(TYPESTRING_FLOAT) == 0)
+  {
+    type = TYPE_FLOAT;
+  }
+  else if (typeString.compare(TYPESTRING_STRING) == 0)
+  {
+    type = TYPE_STRING;
+  }
+  else if (typeString.compare(TYPESTRING_BOOL) == 0)
+  {
+    type = TYPE_BOOL;
+  }
+  else if (typeString.compare(TYPESTRING_CHAR) == 0)
+  {
+    type = TYPE_CHAR;
+  }
+  else if (typeString.compare(TYPESTRING_VOID) == 0)
+  {
+    type = TYPE_VOID;
+  }
+  else if (typeString.compare(TYPESTRING_INVALID) == 0)
+  {
+    type = TYPE_INVALID;
+  }
+
+  return type;
+}
+
+NativeType_t SymbolData::getCharType(char typeChar)
+{
+  NativeType_t type = TYPE_VOID;
+
+  switch (typeChar)
+  {
+  case TYPECHAR_INTEGER :
+    type = TYPE_INTEGER;
+    break;
+  case TYPECHAR_FLOAT :
+    type = TYPE_FLOAT;
+    break;
+  case TYPECHAR_CHAR :
+    type = TYPE_CHAR;
+    break;
+  case TYPECHAR_STRING :
+    type = TYPE_STRING;
+    break;
+  case TYPECHAR_BOOL :
+    type = TYPE_BOOL;
+    break;
+  case TYPECHAR_VOID :
+    type = TYPE_VOID;
+    break;
+  case TYPECHAR_INVALID :
+    type = TYPE_INVALID;
+    break;
+  default :
+#ifdef DEBUG
+    cout << "error: invalid char type" << endl;
+#endif
+    break;
+  } 
+
+  return type;
+}
+
+char SymbolData::getTypeChar(NativeType_t type)
+{
+  char typeChar = TYPECHAR_INVALID;
+
+  switch (type)
+  {
+  case TYPE_VOID :
+    typeChar = TYPECHAR_VOID;
+    break;
+  case TYPE_INTEGER:
+    typeChar = TYPECHAR_INTEGER;
+    break;
+  case TYPE_CHAR:
+    typeChar = TYPECHAR_CHAR;
+    break;
+  case TYPE_FLOAT :
+    typeChar = TYPECHAR_FLOAT;
+    break;
+  case TYPE_STRING :
+    typeChar = TYPECHAR_STRING;
+    break;
+  case TYPE_BOOL :
+    typeChar = TYPECHAR_BOOL;
+    break;
+  default :
+#ifdef DEBUG
+    cout << "error: invalid native type" << endl;
+#endif
+    break;
+  }
+
+  return typeChar;
+}
+
+string SymbolData::getTypeString(NativeType_t type)
+{
+  string typeString;
+  switch (type)
+  {
+  case TYPE_VOID :
+    typeString = TYPESTRING_VOID;
+    break;
+  case TYPE_INTEGER :
+    typeString = TYPESTRING_INTEGER;
+    break;
+  case TYPE_FLOAT :
+    typeString = TYPESTRING_FLOAT;
+    break;
+  case TYPE_CHAR :
+    typeString = TYPESTRING_CHAR;
+    break;
+  case TYPE_STRING :
+    typeString = TYPESTRING_CHAR;
+    break;
+  case TYPE_BOOL :
+    typeString = TYPESTRING_BOOL;
+    break;
+  case TYPE_INVALID :
+  default :
+#ifdef DEBUG
+    cout << "error: invalid native data type" << endl;
+#endif
+    break;
+  }
+
+  return typeString;
+}
+
 void SymbolData::setDimensions(size_t dimensions)
 {
   m_dimensions = dimensions;
@@ -76,38 +217,5 @@ string SymbolData::getScope() const
 bool SymbolData::isFunction() const
 {
   return m_isFunction;
-}
-
-string SymbolData::getTypeString(NativeType_t type)
-{
-  string typeString;
-  switch (type)
-  {
-  case TYPE_VOID :
-    typeString = "nada";
-    break;
-  case TYPE_INTEGER :
-    typeString = "entero";
-    break;
-  case TYPE_FLOAT :
-    typeString = "real";
-    break;
-  case TYPE_CHAR :
-    typeString = "caracter";
-    break;
-  case TYPE_STRING :
-    typeString = "alfabetico";
-    break;
-  case TYPE_BOOL :
-    typeString = "logico";
-    break;
-  default :
-#ifdef DEBUG
-    cout << "typo de dato invalido" << endl;
-#endif
-    break;
-  }
-
-  return typeString;
 }
 
