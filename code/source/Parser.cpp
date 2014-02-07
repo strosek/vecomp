@@ -17,7 +17,8 @@ Parser::Parser() :
   m_maxErrors(5),
   m_maxRuleIterations(1000),
   m_nTokensProcessed(0),
-  m_semanticChecker()
+  m_semanticChecker(),
+  m_symbolData()
 {
 }
 
@@ -65,6 +66,8 @@ void Parser::parse()
     m_errorReporter->writeError(
         "codigo incompleto, cantidad de tokens incongruente");
   }
+
+  m_semanticChecker.printSymbolsTable();
 }
 
 void Parser::andOperation()
@@ -554,6 +557,9 @@ void Parser::functionDeclaration()
 
   checkLexeme("funcion");
   checkToken(TOKEN_IDEN);
+
+  m_symbolData.setName(m_scanner->getLastToken().getLexeme());
+
   if (m_scanner->getLastToken().getLexeme().compare("principal") == 0)
   {
     m_semanticChecker.setMainPresent(true);

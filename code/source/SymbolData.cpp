@@ -9,7 +9,8 @@
 using namespace std;
 
 SymbolData::SymbolData() :
-  m_type(),
+  m_name(),
+  m_type(TYPE_INVALID),
   m_dimensions(0),
   m_line(1),
   m_parameters(),
@@ -159,6 +160,11 @@ string SymbolData::getTypeString(NativeType_t type)
   return typeString;
 }
 
+void SymbolData::setName(const string& name)
+{
+  m_name = name;
+}
+
 void SymbolData::setDimensions(size_t dimensions)
 {
   m_dimensions = dimensions;
@@ -187,6 +193,22 @@ void SymbolData::setType(NativeType_t type)
 void SymbolData::setIsFunction(bool isFunction)
 {
   m_isFunction = isFunction;
+}
+
+void SymbolData::reset()
+{
+  m_name.clear();
+  m_type = TYPE_INVALID;
+  m_dimensions = 0;
+  m_line = 1;
+  m_parameters.clear();
+  m_isFunction = false;
+  m_scope.clear();
+}
+
+string SymbolData::getName() const
+{
+  return m_name;
 }
 
 NativeType_t SymbolData::getType() const

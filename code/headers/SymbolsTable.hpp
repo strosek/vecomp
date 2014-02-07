@@ -4,6 +4,7 @@
 #include "SymbolData.hpp"
 #include "ErrorReporter.hpp"
 
+#include <iostream>
 #include <map>
 
 class SymbolsTable
@@ -29,6 +30,9 @@ public:
   size_t       getFunctionDimensions(const std::string& name, 
                                      const std::string& parameters);
   void         setErrorReporter(ErrorReporter* errorReporter);
+
+  friend std::ostream& operator<<(std::ostream& out,
+                                  const SymbolsTable& symbolsTable);
 
 private:
   ErrorReporter*                         m_errorReporter;

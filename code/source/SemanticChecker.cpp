@@ -66,18 +66,19 @@ void SemanticChecker::addImport(const string& import)
   m_imports.insert(import);
 }
 
-void SemanticChecker::declare(const string& name, const SymbolData& data)
+void SemanticChecker::declare(const SymbolData& data)
 {
   if (data.isFunction())
   {
-    m_symbolsTable.checkFunctionDeclarable(name, data.getParameters());
+    m_symbolsTable.checkFunctionDeclarable(data.getName(), 
+                                           data.getParameters());
   }
   else
   {
-    m_symbolsTable.checkDeclarable(name, data.getScope());
+    m_symbolsTable.checkDeclarable(data.getName(), data.getScope());
   }
 
-  m_symbolsTable.insert(name, data);
+  m_symbolsTable.insert(data.getName(), data);
 }
 
 void SemanticChecker::checkExpressionType(NativeType_t expectedType)
@@ -94,16 +95,16 @@ void SemanticChecker::checkExpressionType(NativeType_t expectedType)
   }
 }
 
-void SemanticChecker::checkDeclared(const string& name, const SymbolData& data)
+void SemanticChecker::checkDeclared(const SymbolData& data)
 {
   if (data.isFunction())
   {
-    m_symbolsTable.checkFunctionDeclared(name, data.getParameters());
+    m_symbolsTable.checkFunctionDeclared(data.getName(), data.getParameters());
   }
   else
   {
-    m_symbolsTable.checkDeclared(name, data.getScope(), data.getDimensions(),
-                                 data.getType());
+    m_symbolsTable.checkDeclared(data.getName(), data.getScope(),
+                                 data.getDimensions(), data.getType());
   }
 }
 
@@ -190,9 +191,13 @@ void SemanticChecker::setReturnRequired(bool isRequired)
   m_isReturnRequired = isRequired;
 }
 
+void SemanticChecker::printSymbolsTable() const
+{
+  cout << m_symbolsTable;
+}
+
 void SemanticChecker::setErrorReporter(ErrorReporter* errorReporter)
 {
   m_errorReporter = errorReporter;
 }
-
 

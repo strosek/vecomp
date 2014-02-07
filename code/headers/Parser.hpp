@@ -57,22 +57,23 @@ private:
   void variablesDeclaration();
   void variablesList();
 
-  bool         isLiteral(TokenType_t token);
-  bool         isNativeDataType(const std::string& lexeme);
-  void         advanceToken();
-  void         checkLexeme(const std::string& lexeme);
-  void         checkLiteral();
-  void         checkNativeDataType();
-  void         checkToken(TokenType_t token);
-  void         ignoreNewLines();
+  bool isLiteral(TokenType_t token);
+  bool isNativeDataType(const std::string& lexeme);
+  void advanceToken();
+  void checkLexeme(const std::string& lexeme);
+  void checkLiteral();
+  void checkNativeDataType();
+  void checkToken(TokenType_t token);
+  void ignoreNewLines();
 
-  TokenLexeme                                      m_currentToken;
-  Scanner*                                         m_scanner;
-  ErrorReporter*                                   m_errorReporter;
-  unsigned int                                     m_maxErrors;
-  unsigned int                                     m_maxRuleIterations;
-  size_t                                           m_nTokensProcessed;
-  SemanticChecker                                  m_semanticChecker;
+  TokenLexeme     m_currentToken;
+  Scanner*        m_scanner;
+  ErrorReporter*  m_errorReporter;
+  unsigned int    m_maxErrors;
+  unsigned int    m_maxRuleIterations;
+  size_t          m_nTokensProcessed;
+  SemanticChecker m_semanticChecker;
+  SymbolData      m_symbolData;
 };
 
 #endif /* PARSER_HPP */

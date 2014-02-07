@@ -24,9 +24,9 @@ public:
   bool         isInSwitch() const;
   bool         isMainPresent() const;
   void         addImport(const std::string& import);
-  void         declare(const std::string& name, const SymbolData& data);
+  void         declare(const SymbolData& data);
   void         checkExpressionType(NativeType_t expectedType);
-  void         checkDeclared(const std::string& name, const SymbolData& data);
+  void         checkDeclared(const SymbolData& data);
   void         checkImported(const std::string& import);
   void         checkReturnRequired();
   void         enterFor();
@@ -41,6 +41,7 @@ public:
   void         setReturnCalled(bool isCalled);
   void         setReturnRequired(bool isRequired);
 
+  void         printSymbolsTable() const;
   void         setErrorReporter(ErrorReporter* errorReporter);
 
 private:

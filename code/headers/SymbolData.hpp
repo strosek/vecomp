@@ -42,13 +42,16 @@ public:
   static char         getTypeChar(NativeType_t type);
   static NativeType_t getCharType(char typeChar);
 
+  void setName(const std::string& name);
   void setDimensions(size_t dimensions);
   void setLine(size_t line);
   void setParameters(std::string& parameters);
   void setScope(std::string& scope);
   void setType(NativeType_t type);
   void setIsFunction(bool isFunction);
+  void reset();
 
+  std::string  getName() const;
   NativeType_t getType() const;
   size_t       getDimensions() const;
   size_t       getLine() const;
@@ -57,6 +60,7 @@ public:
   bool         isFunction() const;
 
 private:
+  std::string  m_name;
   NativeType_t m_type;
   size_t       m_dimensions;
   size_t       m_line;

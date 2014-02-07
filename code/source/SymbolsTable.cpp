@@ -3,6 +3,7 @@
 #include "../headers/SymbolsTable.hpp"
 
 #include <utility>
+#include <iomanip>
 
 using namespace std;
 
@@ -268,5 +269,22 @@ void SymbolsTable::insert(const string& name, const SymbolData& data)
 void SymbolsTable::setErrorReporter(ErrorReporter* errorReporter)
 {
   m_errorReporter = errorReporter;
+}
+
+ostream& operator<<(ostream& out, const SymbolsTable& symbolsTable)
+{
+  out << "::: SYMBOLS TABLE ::::::::::::::::::::::::::::::::::::::::::::::::";
+  out << "\n";
+
+  for (multimap<string, SymbolData>::const_iterator it = 
+       symbolsTable.m_symbolsMap.cbegin();
+       it != symbolsTable.m_symbolsMap.cend(); ++it)
+  {
+    out << it->second.getScope();
+    out << "\n";
+  }
+  out.flush();
+
+  return out;
 }
 
