@@ -180,6 +180,11 @@ void SymbolData::setParameters(string& parameters)
   m_parameters = parameters;
 }
 
+void SymbolData::addParameter(NativeType_t parameter)
+{
+  m_parameters.push_back(getTypeChar(parameter));
+}
+
 void SymbolData::setScope(string& scope)
 {
   m_scope = scope;

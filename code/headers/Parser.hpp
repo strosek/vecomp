@@ -65,15 +65,17 @@ private:
   void checkNativeDataType();
   void checkToken(TokenType_t token);
   void ignoreNewLines();
+  void resolveVariableTypes(NativeType_t type);
 
-  TokenLexeme     m_currentToken;
-  Scanner*        m_scanner;
-  ErrorReporter*  m_errorReporter;
-  unsigned int    m_maxErrors;
-  unsigned int    m_maxRuleIterations;
-  size_t          m_nTokensProcessed;
-  SemanticChecker m_semanticChecker;
-  SymbolData      m_symbolData;
+  TokenLexeme            m_currentToken;
+  Scanner*               m_scanner;
+  ErrorReporter*         m_errorReporter;
+  unsigned int           m_maxErrors;
+  unsigned int           m_maxRuleIterations;
+  size_t                 m_nTokensProcessed;
+  SemanticChecker        m_semanticChecker;
+  SymbolData             m_function;
+  std::queue<SymbolData> m_variables;
 };
 
 #endif /* PARSER_HPP */

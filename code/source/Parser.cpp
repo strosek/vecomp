@@ -18,7 +18,8 @@ Parser::Parser() :
   m_maxRuleIterations(1000),
   m_nTokensProcessed(0),
   m_semanticChecker(),
-  m_symbolData()
+  m_function(),
+  m_variables()
 {
 }
 
@@ -67,7 +68,9 @@ void Parser::parse()
         "codigo incompleto, cantidad de tokens incongruente");
   }
 
+#ifdef DEBUG
   m_semanticChecker.printSymbolsTable();
+#endif
 }
 
 void Parser::andOperation()
@@ -558,7 +561,7 @@ void Parser::functionDeclaration()
   checkLexeme("funcion");
   checkToken(TOKEN_IDEN);
 
-  m_symbolData.setName(m_scanner->getLastToken().getLexeme());
+  m_function.setName(m_scanner->getLastToken().getLexeme());
 
   if (m_scanner->getLastToken().getLexeme().compare("principal") == 0)
   {
@@ -706,10 +709,13 @@ void Parser::parameterList()
     return;
 
   unsigned int iterations = 0;
+  unsigned int nTypeParameters = 0;
+  NativeType_t parameterType = TYPE_INVALID;
   advanceToken();
   while (m_currentToken.getLexeme().compare(")") != 0 &&
          iterations < m_maxRuleIterations)
   {
+    nTypeParameters = 0;
     m_scanner->moveBackwards();
 
     do
@@ -718,12 +724,20 @@ void Parser::parameterList()
 
       advanceToken();
 
+      ++nTypeParameters;
       ++iterations;
     } while (m_currentToken.getLexeme().compare(",") == 0 &&
              iterations < m_maxRuleIterations);
 
     m_scanner->moveBackwards();
     checkNativeDataType();
+
+    parameterType =
+        SymbolData::getStringType(m_scanner->getLastToken().getLexeme());
+    for (unsigned int i = 0; i < nTypeParameters; ++i)
+    {
+      m_function.addParameter(parameterType);
+    }
 
     advanceToken();
 
@@ -1269,11 +1283,11 @@ void Parser::advanceToken()
 
 bool Parser::isNativeDataType(const string& lexeme)
 {
-    if (lexeme.compare("caracter") == 0 ||
-        lexeme.compare("entero") == 0   ||
-        lexeme.compare("real") == 0     ||
-        lexeme.compare("logico") == 0   ||
-        lexeme.compare("alfabetico") == 0)
+    if (lexeme.compare(TYPESTRING_CHAR) == 0    ||
+        lexeme.compare(TYPESTRING_INTEGER) == 0 ||
+        lexeme.compare(TYPESTRING_FLOAT) == 0   ||
+        lexeme.compare(TYPESTRING_BOOL) == 0    ||
+        lexeme.compare(TYPESTRING_STRING) == 0)
     {
       return true;
     }
@@ -1293,5 +1307,14 @@ bool Parser::isLiteral(TokenType_t token)
   }
 
   return false;
+}
+
+void Parser::resolveVariableTypes(NativeType_t type)
+{
+  while (!m_variables.empty())
+  {
+    m_variables.front().setType(type);
+    m_variables.pop();
+  }
 }
 
