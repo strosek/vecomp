@@ -65,7 +65,7 @@ private:
   void checkNativeDataType();
   void checkToken(TokenType_t token);
   void ignoreNewLines();
-  void resolveVariableTypes(NativeType_t type);
+  void resolveVariablesType(NativeType_t type);
 
   TokenLexeme            m_currentToken;
   Scanner*               m_scanner;

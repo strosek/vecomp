@@ -361,9 +361,17 @@ void Parser::constant()
 
   checkToken(TOKEN_IDEN);
 
+  SymbolData variable;
+  variable.setName(m_scanner->getLastToken().getLexeme());
+  variable.setLine(m_scanner->getLastToken().getLine());
+  variable.setIsConstant(true);
+  m_variables.push(variable);
+
   checkToken(TOKEN_ASSIGNOP);
 
   checkLiteral();
+  resolveVariablesType(
+      SymbolData::getLiteralType(m_scanner->getLastToken().getToken()));
 
 #ifdef DEBUG
   cout << "::: exit constant()" << endl;
@@ -379,7 +387,9 @@ void Parser::dimension()
     return;
 
   unsigned int iterations = 0;
+  size_t dimensions = 0;
   do {
+    ++dimensions;
     checkLexeme("[");
     advanceToken();
     expression();
@@ -394,6 +404,8 @@ void Parser::dimension()
     ++iterations;
   } while (m_currentToken.getLexeme().compare("[") == 0 &&
            iterations < m_maxRuleIterations);
+  
+  m_variables.front().setDimensions(dimensions);
 
   m_scanner->moveBackwards();
 
@@ -562,6 +574,8 @@ void Parser::functionDeclaration()
   checkToken(TOKEN_IDEN);
 
   m_function.setName(m_scanner->getLastToken().getLexeme());
+  m_function.setLine(m_scanner->getLastToken().getLine());
+  m_function.setIsFunction(true);
 
   if (m_scanner->getLastToken().getLexeme().compare("principal") == 0)
   {
@@ -574,6 +588,9 @@ void Parser::functionDeclaration()
   parameterList();
   checkLexeme(")");
   returnType();
+
+  m_semanticChecker.declare(m_function);
+  m_function.reset();
 
   block();
 
@@ -722,6 +739,11 @@ void Parser::parameterList()
     {
       checkToken(TOKEN_IDEN);
 
+      SymbolData variable;
+      variable.setName(m_scanner->getLastToken().getLexeme());
+      variable.setLine(m_scanner->getLastToken().getLine());
+      m_variables.push(variable);
+
       advanceToken();
 
       ++nTypeParameters;
@@ -739,6 +761,8 @@ void Parser::parameterList()
       m_function.addParameter(parameterType);
     }
 
+    resolveVariablesType(parameterType);
+
     advanceToken();
 
     ++iterations;
@@ -753,7 +777,7 @@ void Parser::parameterList()
 void Parser::print()
 {
 #ifdef DEBUG
-  cout << "::: entering print()" << endl;
+    cout << "::: entering print()" << endl;
 #endif
   if (m_errorReporter->getErrors() >= m_maxErrors)
     return;
@@ -952,6 +976,9 @@ void Parser::returnType()
     {
       m_scanner->moveBackwards();
       checkNativeDataType();
+
+      m_function.setType(
+          SymbolData::getStringType(m_scanner->getLastToken().getLexeme()));
     }
   }
   else
@@ -1152,7 +1179,13 @@ void Parser::variablesList()
   unsigned int iterations = 0;
   do
   {
+
     checkToken(TOKEN_IDEN);
+
+    SymbolData variable;
+    variable.setName(m_scanner->getLastToken().getLexeme());
+    variable.setLine(m_scanner->getLastToken().getLine());
+    m_variables.push(variable);
 
     advanceToken();
     if (m_currentToken.getLexeme().compare("[") == 0)
@@ -1175,6 +1208,10 @@ void Parser::variablesList()
            iterations < m_maxRuleIterations);
 
   checkNativeDataType();
+
+  NativeType_t parameterType =
+      SymbolData::getStringType(m_scanner->getLastToken().getLexeme());
+  resolveVariablesType(parameterType);
 
 #ifdef DEBUG
   cout << "::: exit variablesList()" << endl;
@@ -1309,11 +1346,17 @@ bool Parser::isLiteral(TokenType_t token)
   return false;
 }
 
-void Parser::resolveVariableTypes(NativeType_t type)
+void Parser::resolveVariablesType(NativeType_t type)
 {
   while (!m_variables.empty())
   {
     m_variables.front().setType(type);
+#ifdef DEBUG
+    cout << "::: size of m_variables: " << m_variables.size() << endl; 
+    cout << "::: declaring variable: " << m_variables.front().getName() <<
+      " in line: " << m_variables.front().getLine() << endl;
+#endif
+    m_semanticChecker.declare(m_variables.front());
     m_variables.pop();
   }
 }
