@@ -273,14 +273,35 @@ void SymbolsTable::setErrorReporter(ErrorReporter* errorReporter)
 
 ostream& operator<<(ostream& out, const SymbolsTable& symbolsTable)
 {
-  out << "::: SYMBOLS TABLE ::::::::::::::::::::::::::::::::::::::::::::::::";
-  out << "\n";
+  static const size_t WIDTH_IDEN =   12;
+  static const size_t WIDTH_NUMBER =  5;
+  static const size_t WIDTH_TYPE =   12;
+  static const size_t WIDTH_PARAMS =  8;
+  static const size_t WIDTH_BOOL =    6;
+
+  out << "------------------------------------------------------------------\n";
+  out << setw(WIDTH_IDEN) << "NAME" <<
+      setw(WIDTH_IDEN) << "SCOPE" <<
+      setw(WIDTH_TYPE) << "TYPE" <<
+      setw(WIDTH_BOOL) << "FUNC" <<
+      setw(WIDTH_PARAMS) << "PARAMS" <<
+      setw(WIDTH_NUMBER) << "DIM" <<
+      setw(WIDTH_BOOL) << "CONST" <<
+      setw(WIDTH_NUMBER) << "LN" << "\n";
+  out << "------------------------------------------------------------------\n";
 
   for (multimap<string, SymbolData>::const_iterator it = 
        symbolsTable.m_symbolsMap.cbegin();
        it != symbolsTable.m_symbolsMap.cend(); ++it)
   {
-    out << it->second.getScope();
+    out << setw(WIDTH_IDEN) << it->second.getName() <<
+        setw(WIDTH_IDEN) << it->second.getScope() <<
+        setw(WIDTH_TYPE) << SymbolData::getTypeString(it->second.getType()) <<
+        setw(WIDTH_BOOL) << boolalpha << it->second.isFunction() <<
+        setw(WIDTH_PARAMS) << it->second.getParameters() <<
+        setw(WIDTH_NUMBER) << it->second.getDimensions() <<
+        setw(WIDTH_BOOL) << boolalpha << it->second.isConstant() <<
+        setw(WIDTH_NUMBER) << it->second.getLine();
     out << "\n";
   }
   out.flush();
