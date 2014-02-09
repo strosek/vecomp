@@ -24,7 +24,7 @@ public:
   bool         isInSwitch() const;
   bool         isMainPresent() const;
   void         addImport(const std::string& import);
-  void         declare(const SymbolData& data);
+  void         declare(SymbolData& data);
   void         checkExpressionType(NativeType_t expectedType);
   void         checkDeclared(const SymbolData& data);
   void         checkImported(const std::string& import);

@@ -66,15 +66,18 @@ void SemanticChecker::addImport(const string& import)
   m_imports.insert(import);
 }
 
-void SemanticChecker::declare(const SymbolData& data)
+void SemanticChecker::declare(SymbolData& data)
 {
   if (data.isFunction())
   {
+    string scope = "global";
+    data.setScope(scope);
     m_symbolsTable.checkFunctionDeclarable(data.getName(), 
                                            data.getParameters());
   }
   else
   {
+    data.setScope(m_controlStack.top());
     m_symbolsTable.checkDeclarable(data.getName(), data.getScope());
   }
 
@@ -199,5 +202,6 @@ void SemanticChecker::printSymbolsTable() const
 void SemanticChecker::setErrorReporter(ErrorReporter* errorReporter)
 {
   m_errorReporter = errorReporter;
+  m_symbolsTable.setErrorReporter(errorReporter);
 }
 
