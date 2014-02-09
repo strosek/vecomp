@@ -5,6 +5,8 @@
 
 #include <string>
 
+#include "TokenLexeme.hpp"
+
 typedef enum
 {
   TYPE_INTEGER,
@@ -41,6 +43,7 @@ public:
   static NativeType_t getStringType(const std::string& typeString);
   static char         getTypeChar(NativeType_t type);
   static NativeType_t getCharType(char typeChar);
+  static NativeType_t getLiteralType(TokenType_t typeChar);
 
   void setName(const std::string& name);
   void setDimensions(size_t dimensions);
@@ -50,6 +53,7 @@ public:
   void setScope(std::string& scope);
   void setType(NativeType_t type);
   void setIsFunction(bool isFunction);
+  void setIsConstant(bool isConstant);
   void reset();
 
   std::string  getName() const;
@@ -59,6 +63,7 @@ public:
   std::string  getParameters() const;
   std::string  getScope() const;
   bool         isFunction() const;
+  bool         isConstant() const;
 
 private:
   std::string  m_name;
@@ -67,6 +72,7 @@ private:
   size_t       m_line;
   std::string  m_parameters;
   bool         m_isFunction;
+  bool         m_isConstant;
   std::string  m_scope;
 };
 

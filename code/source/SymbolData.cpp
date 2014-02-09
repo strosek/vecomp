@@ -15,6 +15,7 @@ SymbolData::SymbolData() :
   m_line(1),
   m_parameters(),
   m_isFunction(false),
+  m_isConstant(false),
   m_scope()
 {
 }
@@ -51,6 +52,39 @@ NativeType_t SymbolData::getStringType(const std::string& typeString)
   {
     type = TYPE_INVALID;
   }
+
+  return type;
+}
+
+NativeType_t SymbolData::getLiteralType(TokenType_t token)
+{
+  NativeType_t type = TYPE_VOID;
+
+  switch (token)
+  {
+  case TOKEN_DEC :
+  case TOKEN_HEX :
+  case TOKEN_OCT :
+    type = TYPE_INTEGER;
+    break;
+  case TOKEN_FLOAT:
+    type = TYPE_FLOAT;
+    break;
+  case TOKEN_CHARCONST :
+    type = TYPE_CHAR;
+    break;
+  case TOKEN_STRING :
+    type = TYPE_STRING;
+    break;
+  case TOKEN_LOGICCONST :
+    type = TYPE_BOOL;
+    break;
+  default :
+#ifdef DEBUG
+    cout << "error: invalid literal type" << endl;
+#endif
+    break;
+  } 
 
   return type;
 }
@@ -144,7 +178,7 @@ string SymbolData::getTypeString(NativeType_t type)
     typeString = TYPESTRING_CHAR;
     break;
   case TYPE_STRING :
-    typeString = TYPESTRING_CHAR;
+    typeString = TYPESTRING_STRING;
     break;
   case TYPE_BOOL :
     typeString = TYPESTRING_BOOL;
@@ -200,14 +234,20 @@ void SymbolData::setIsFunction(bool isFunction)
   m_isFunction = isFunction;
 }
 
+void SymbolData::setIsConstant(bool isConstant)
+{
+  m_isConstant = isConstant;
+}
+
 void SymbolData::reset()
 {
   m_name.clear();
-  m_type = TYPE_INVALID;
+  m_type = TYPE_VOID;
   m_dimensions = 0;
   m_line = 1;
   m_parameters.clear();
   m_isFunction = false;
+  m_isConstant = false;
   m_scope.clear();
 }
 
@@ -244,5 +284,10 @@ string SymbolData::getScope() const
 bool SymbolData::isFunction() const
 {
   return m_isFunction;
+}
+
+bool SymbolData::isConstant() const
+{
+  return m_isConstant;
 }
 
