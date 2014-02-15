@@ -19,18 +19,45 @@ SemanticChecker::SemanticChecker() :
   m_validExpressions(),
   m_imports(),
   m_controlStack(),
-  m_operands(),
-  m_operators()
+  m_operations()
 {
+  m_validExpressions["cPc"] = 'c';
+  m_validExpressions["cPf"] = 'f';
+  m_validExpressions["cPi"] = 'i';
+  m_validExpressions["fPc"] = 'f';
+  m_validExpressions["fPf"] = 'f';
+  m_validExpressions["fPi"] = 'f';
+  m_validExpressions["iPc"] = 'i';
+  m_validExpressions["iPf"] = 'f';
+  m_validExpressions["iPi"] = 'i';
+
+  m_validExpressions["cMc"] = 'c';
+  m_validExpressions["cMf"] = 'f';
+  m_validExpressions["cMi"] = 'i';
+  m_validExpressions["fMc"] = 'f';
+  m_validExpressions["fMf"] = 'f';
+  m_validExpressions["fMi"] = 'f';
+  m_validExpressions["iMc"] = 'i';
+  m_validExpressions["iMf"] = 'f';
+  m_validExpressions["iMi"] = 'i';
+
+  m_validExpressions["sPs"] = 's';
+
+  m_validExpressions["bRb"] = 'b';
+
+  m_validExpressions["Mc"]  = 'c';
+  m_validExpressions["Mf"]  = 'f';
+  m_validExpressions["Mi"]  = 'i';
+  m_validExpressions["Nb"]  = 'b';
 }
 
 NativeType_t SemanticChecker::getExpressionType()
 {
   NativeType_t type = TYPE_VOID;
 
-  if (!m_operands.empty())
+  if (!m_operations.empty())
   {
-    type = SymbolData::getCharType(m_operands.top());
+    type = SymbolData::getCharType(m_operations.top());
   }
 
   return type;
@@ -86,9 +113,9 @@ void SemanticChecker::declare(SymbolData& data)
 
 void SemanticChecker::checkExpressionType(NativeType_t expectedType)
 {
-  if (!m_operands.empty())
+  if (!m_operations.empty())
   {
-    if (expectedType != m_operands.top())
+    if (expectedType != m_operations.top())
     {
       string message = "tipo de expresion no esperado, se esperaba: \"";
       message += SymbolData::getTypeString(expectedType);
@@ -171,12 +198,12 @@ void SemanticChecker::exitSwitch()
 
 void SemanticChecker::pushOperand(char op)
 {
-  m_operators.push(op);
+  m_operations.push(op);
 }
 
 void SemanticChecker::pushOperator(char op)
 {
-  m_operands.push(op);
+  m_operations.push(op);
 }
 
 void SemanticChecker::setMainPresent(bool isPresent)

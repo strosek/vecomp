@@ -11,6 +11,13 @@
 #include "SymbolsTable.hpp"
 #include "TokenLexeme.hpp"
 
+const char OPERATOR_ARITH = 'A'; // * / % ^
+const char OPERATOR_LOGIC = 'L'; // && ||
+const char OPERATOR_MINUS = 'M'; // -
+const char OPERATOR_NOT =   'N'; // !
+const char OPERATOR_PLUS =  'P'; // +
+const char OPERATOR_REL =   'R'; // < > <= >= != ==
+
 class SemanticChecker
 {
 public:
@@ -55,8 +62,7 @@ private:
   std::map<std::string, char> m_validExpressions;
   std::set<std::string>       m_imports;
   std::stack<std::string>     m_controlStack;
-  std::stack<char>            m_operands;
-  std::stack<char>            m_operators;
+  std::stack<char>            m_operations;
 };
 
 #endif /* SEMANTICCHECKER_HPP */
