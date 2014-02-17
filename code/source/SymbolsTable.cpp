@@ -156,8 +156,8 @@ void SymbolsTable::checkFunctionDeclarable(const string& name,
   }
 }
 
-NativeType_t SymbolsTable::getType(const string& name,
-                                   const string& scope)
+NativeType_t SymbolsTable::getVariableType(const string& name,
+                                           const string& scope)
 {
   NativeType_t type = TYPE_VOID;
 

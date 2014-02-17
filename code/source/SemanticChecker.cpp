@@ -63,6 +63,25 @@ NativeType_t SemanticChecker::getExpressionType()
   return type;
 }
 
+void SemanticChecker::pushVariableType(const string& name)
+{
+  if (m_symbolsTable.exists(name))
+  {
+#ifdef DEBUG
+    cout << "pushing type: " <<
+        SymbolData::getTypeChar(
+        m_symbolsTable.getVariableType(name, m_controlStack.top())) << endl;
+    pushOperand(m_symbolsTable.getVariableType(name, m_controlStack.top()));
+#endif
+  }
+}
+
+void SemanticChecker::pushFunctionType(const string& name,
+                                      const string& parameters)
+{
+  pushOperand(m_symbolsTable.getFunctionType(name, parameters));
+}
+
 bool SemanticChecker::isInFor() const
 {
   if (m_forLevel > 0)
@@ -230,5 +249,17 @@ void SemanticChecker::setErrorReporter(ErrorReporter* errorReporter)
 {
   m_errorReporter = errorReporter;
   m_symbolsTable.setErrorReporter(errorReporter);
+}
+
+void SemanticChecker::printTypesStack()
+{
+  cout << "::: Types stack :::::::::::::::::::::::::::::::::::::::::::" << endl;
+  cout << "::: Size: " << m_operations.size() << endl;
+  while (!m_operations.empty())
+  {
+    cout << m_operations.top() << ", ";
+    m_operations.pop();
+  }
+  cout << endl;
 }
 

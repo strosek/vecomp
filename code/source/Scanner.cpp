@@ -241,12 +241,12 @@ void Scanner::setFileReader(FileReader* fileReader)
 void Scanner::moveBackwards()
 {
 #ifdef DEBUG
-  if (m_currentIndex < m_tokensLexemes.size())
-  {
-    cout << "::: move back token to position: " << m_currentIndex << 
-        ", line: " << m_tokensLexemes.at(m_currentIndex).getLine() << ":  " << 
-        m_tokensLexemes.at(m_currentIndex).getLexeme() << endl;
-  }
+//  if (m_currentIndex < m_tokensLexemes.size())
+//  {
+//    cout << "::: move back token to position: " << m_currentIndex << 
+//        ", line: " << m_tokensLexemes.at(m_currentIndex).getLine() << ":  " << 
+//        m_tokensLexemes.at(m_currentIndex).getLexeme() << endl;
+//  Forward}
 #endif
 
   --m_currentIndex;
@@ -254,14 +254,14 @@ void Scanner::moveBackwards()
 
 void Scanner::moveForward()
 {
-#ifdef DEBUG
-  if (m_currentIndex < m_tokensLexemes.size())
-  {
-    cout << "::: advance token to position: " << m_currentIndex << ", line: " <<
-        m_tokensLexemes.at(m_currentIndex).getLine() << ":  " << 
-        m_tokensLexemes.at(m_currentIndex).getLexeme() << endl;
-  }
-#endif
+//#ifdef DEBUG
+//  if (m_currentIndex < m_tokensLexemes.size())
+//  {
+//    cout << "::: advance token to position: " << m_currentIndex << ", line: " <<
+//        m_tokensLexemes.at(m_currentIndex).getLine() << ":  " << 
+//        m_tokensLexemes.at(m_currentIndex).getLexeme() << endl;
+//  }
+//#endif
 
   ++m_currentIndex;
 }

@@ -27,6 +27,9 @@ public:
   SemanticChecker& operator=(const SemanticChecker& rhs);
 
   NativeType_t getExpressionType();
+  void         pushVariableType(const std::string& name);
+  void         pushFunctionType(const std::string& name,
+                                const std::string& parameters);
   bool         isInFor() const;
   bool         isInSwitch() const;
   bool         isMainPresent() const;
@@ -49,9 +52,11 @@ public:
   void         setReturnRequired(bool isRequired);
 
   void         printSymbolsTable() const;
+  void         printTypesStack();
   void         setErrorReporter(ErrorReporter* errorReporter);
 
 private:
+
   ErrorReporter *             m_errorReporter;
   SymbolsTable                m_symbolsTable;
   bool                        m_isMainPresent;

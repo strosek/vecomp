@@ -22,7 +22,8 @@ public:
   void         checkFunctionDeclarable(const std::string& name,
                                        const std::string& parameters);
   void         insert(const std::string& name, const SymbolData& data);
-  NativeType_t getType(const std::string& name, const std::string& scope);
+  NativeType_t getVariableType(const std::string& name,
+                               const std::string& scope);
   NativeType_t getFunctionType(const std::string& name,
                                const std::string& parameters);
   size_t       getDimensions(const std::string& name,

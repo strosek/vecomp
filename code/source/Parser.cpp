@@ -70,6 +70,7 @@ void Parser::parse()
 
 #ifdef DEBUG
   m_semanticChecker.printSymbolsTable();
+  m_semanticChecker.printTypesStack();
 #endif
 }
 
@@ -1116,12 +1117,27 @@ void Parser::term()
       m_scanner->moveBackwards();
       functionCall();
     }
+    else
+    {
+#ifdef DEBUG
+      if (m_scanner->getCurrentToken().getToken() == TOKEN_IDEN)
+      {
+        cout << "::: pushtype: " << m_scanner->getCurrentToken().getLexeme() << endl;
+        m_semanticChecker.pushVariableType(m_scanner->getCurrentToken().getLexeme());
+      }
+#endif
+    }
   }
   else if (isLiteral(m_currentToken.getToken()))
   {
+#ifdef DEBUG
+    cout << "::: pushtype literal: " << m_currentToken.getLexeme() << endl;
+    m_semanticChecker.pushOperand(SymbolData::getLiteralType(m_currentToken.getToken()));
+#endif
     advanceToken();
   }
-  else {
+  else
+  {
     m_errorReporter->writeSyntaxError("identificador o constante");
   }
 #ifdef DEBUG
