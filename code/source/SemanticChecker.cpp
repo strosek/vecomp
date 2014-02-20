@@ -71,15 +71,17 @@ void SemanticChecker::pushVariableType(const string& name)
     cout << "pushing type: " <<
         SymbolData::getTypeChar(
         m_symbolsTable.getVariableType(name, m_controlStack.top())) << endl;
-    pushOperand(m_symbolsTable.getVariableType(name, m_controlStack.top()));
 #endif
+    pushOperand(SymbolData::getTypeChar(
+        m_symbolsTable.getVariableType(name, m_controlStack.top())));
   }
 }
 
 void SemanticChecker::pushFunctionType(const string& name,
-                                      const string& parameters)
+                                       const string& parameters)
 {
-  pushOperand(m_symbolsTable.getFunctionType(name, parameters));
+  pushOperand(SymbolData::getTypeChar(
+      m_symbolsTable.getFunctionType(name, parameters)));
 }
 
 bool SemanticChecker::isInFor() const
@@ -257,7 +259,7 @@ void SemanticChecker::printTypesStack()
   cout << "::: Size: " << m_operations.size() << endl;
   while (!m_operations.empty())
   {
-    cout << m_operations.top() << ", ";
+    cout << m_operations.top();
     m_operations.pop();
   }
   cout << endl;
