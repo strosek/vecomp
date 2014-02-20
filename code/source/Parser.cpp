@@ -88,6 +88,11 @@ void Parser::andOperation()
     notOperation();
 
     ++iterations;
+
+    if (m_currentToken.getLexeme().compare("&&") == 0)
+    {
+      m_semanticChecker.pushOperator(OPERATOR_LOGIC);
+    }
   } while (m_currentToken.getLexeme().compare("&&") == 0 &&
            iterations < m_maxRuleIterations);
 
@@ -427,6 +432,8 @@ void Parser::exponent()
 
   if (m_currentToken.getLexeme().compare("^") == 0)
   {
+    m_semanticChecker.pushOperator(OPERATOR_ARITH);
+
     sign();
   }
 
@@ -449,6 +456,11 @@ void Parser::expression()
     andOperation();
 
     ++iterations;
+
+    if (m_currentToken.getLexeme().compare("||") == 0)
+    {
+      m_semanticChecker.pushOperator(OPERATOR_LOGIC);
+    }
   } while (m_currentToken.getLexeme().compare("||") == 0 &&
            iterations < m_maxRuleIterations);
 
@@ -689,6 +701,9 @@ void Parser::multiplication()
         m_currentToken.getLexeme().compare("%") == 0)
     {
       isOperatorFound = true;
+
+      m_semanticChecker.pushOperator(OPERATOR_ARITH);
+
       advanceToken();
     }
 
@@ -710,6 +725,9 @@ void Parser::notOperation()
   if (m_currentToken.getLexeme().compare("!") == 0)
   {
     checkLexeme("!");
+
+    m_semanticChecker.pushOperator(OPERATOR_NOT);
+
     relationalOperation();
   }
   relationalOperation();
@@ -902,6 +920,8 @@ void Parser::relationalOperation()
   sumOperation();
   if (m_currentToken.getToken() == TOKEN_RELOP)
   {
+    m_semanticChecker.pushOperator(OPERATOR_REL);
+
     advanceToken();
     sumOperation();
   }
@@ -1006,6 +1026,8 @@ void Parser::sign()
   {
     m_scanner->moveBackwards();
     checkLexeme("-");
+
+    m_semanticChecker.pushOperator(OPERATOR_MINUS);
   }
   term();
 
@@ -1074,6 +1096,16 @@ void Parser::sumOperation()
         m_currentToken.getLexeme().compare("-") == 0)
     {
       isOperatorFound = true;
+
+      if (m_currentToken.getLexeme().compare("+") == 0)
+      {
+        m_semanticChecker.pushOperator(OPERATOR_PLUS);
+      }
+      else
+      {
+        m_semanticChecker.pushOperator(OPERATOR_MINUS);
+      }
+
       advanceToken();
     }
 
