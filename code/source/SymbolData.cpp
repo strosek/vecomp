@@ -91,7 +91,7 @@ NativeType_t SymbolData::getLiteralType(TokenType_t token)
 
 NativeType_t SymbolData::getCharType(char typeChar)
 {
-  NativeType_t type = TYPE_VOID;
+  NativeType_t type = TYPE_INVALID;
 
   switch (typeChar)
   {
