@@ -68,12 +68,18 @@ void SemanticChecker::pushVariableType(const string& name)
   if (m_symbolsTable.exists(name))
   {
 #ifdef DEBUG
-    cout << "pushing type: " <<
+    cout << "push variable: " << name << ", type: " << 
         SymbolData::getTypeChar(
         m_symbolsTable.getVariableType(name, m_controlStack.top())) << endl;
 #endif
     pushOperand(SymbolData::getTypeChar(
         m_symbolsTable.getVariableType(name, m_controlStack.top())));
+  }
+  else
+  {
+#ifdef DEBUG
+    cout << "variable not found: " << name << endl;
+#endif
   }
 }
 
@@ -257,11 +263,14 @@ void SemanticChecker::printTypesStack()
 {
   cout << "::: Types stack :::::::::::::::::::::::::::::::::::::::::::" << endl;
   cout << "::: Size: " << m_operations.size() << endl;
+
+  string invertedStack;
   while (!m_operations.empty())
   {
-    cout << m_operations.top();
+    invertedStack.insert(invertedStack.begin(), m_operations.top());
     m_operations.pop();
   }
-  cout << endl;
+
+  cout << "::: Values: " << invertedStack << endl;
 }
 

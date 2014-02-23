@@ -150,9 +150,12 @@ char SymbolData::getTypeChar(NativeType_t type)
   case TYPE_BOOL :
     typeChar = TYPECHAR_BOOL;
     break;
+  case TYPE_INVALID :
+    typeChar = TYPECHAR_INVALID;
+    break;
   default :
 #ifdef DEBUG
-    cout << "error: invalid native type" << endl;
+    cout << "error: invalid native type: " << type << endl;
 #endif
     break;
   }
@@ -184,9 +187,11 @@ string SymbolData::getTypeString(NativeType_t type)
     typeString = TYPESTRING_BOOL;
     break;
   case TYPE_INVALID :
+    typeString = TYPESTRING_INVALID;
+    break;
   default :
 #ifdef DEBUG
-    cout << "error: invalid native data type" << endl;
+    cout << "error: invalid native type: " << type << endl;
 #endif
     break;
   }
@@ -242,7 +247,7 @@ void SymbolData::setIsConstant(bool isConstant)
 void SymbolData::reset()
 {
   m_name.clear();
-  m_type = TYPE_VOID;
+  m_type = TYPE_INVALID;
   m_dimensions = 0;
   m_line = 1;
   m_parameters.clear();

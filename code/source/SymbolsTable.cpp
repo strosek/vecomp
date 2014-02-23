@@ -159,7 +159,10 @@ void SymbolsTable::checkFunctionDeclarable(const string& name,
 NativeType_t SymbolsTable::getVariableType(const string& name,
                                            const string& scope)
 {
-  NativeType_t type = TYPE_VOID;
+#ifdef DEBUG
+  cout << "::: retrieving type of variable: " << name << endl;
+#endif
+  NativeType_t type = TYPE_INVALID;
 
   if (m_symbolsMap.find(name) != m_symbolsMap.end())
   {
@@ -173,8 +176,18 @@ NativeType_t SymbolsTable::getVariableType(const string& name,
       {
         isFound = true;
         type = it->second.getType();
+#ifdef DEBUG
+        cout << "::: found variable with type: " <<
+            SymbolData::getTypeString(type) << endl;
+#endif
       }
     }
+  }
+  else
+  {
+#ifdef DEBUG
+    cout << "::: variable not found" << endl;
+#endif
   }
 
   return type;

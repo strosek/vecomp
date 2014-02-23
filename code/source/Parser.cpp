@@ -588,6 +588,7 @@ void Parser::functionDeclaration()
 
   m_function.setName(m_scanner->getLastToken().getLexeme());
   m_function.setLine(m_scanner->getLastToken().getLine());
+  m_function.setType(TYPE_VOID);
   m_function.setIsFunction(true);
 
   if (m_scanner->getLastToken().getLexeme().compare("principal") == 0)
@@ -1151,15 +1152,9 @@ void Parser::term()
     }
     else
     {
-      if (m_scanner->getCurrentToken().getToken() == TOKEN_IDEN)
-      {
-#ifdef DEBUG
-        cout << "::: pushtype: " <<
-          m_scanner->getCurrentToken().getLexeme() << endl;
-#endif
-        m_semanticChecker.pushVariableType(
-            m_scanner->getCurrentToken().getLexeme());
-      }
+      m_scanner->moveBackwards();
+      m_semanticChecker.pushVariableType(m_scanner->getLastToken().getLexeme());
+      m_scanner->moveForward();
     }
   }
   else if (isLiteral(m_currentToken.getToken()))
@@ -1167,8 +1162,8 @@ void Parser::term()
 #ifdef DEBUG
     cout << "::: pushtype literal: " << m_currentToken.getLexeme() << endl;
 #endif
-    m_semanticChecker.pushOperand(
-        SymbolData::getLiteralType(m_currentToken.getToken()));
+    m_semanticChecker.pushOperand(SymbolData::getTypeChar(
+        SymbolData::getLiteralType(m_currentToken.getToken())));
     advanceToken();
   }
   else
