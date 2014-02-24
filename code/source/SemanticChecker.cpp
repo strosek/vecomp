@@ -223,6 +223,72 @@ void SemanticChecker::exitSwitch()
   --m_switchLevel;
 }
 
+void SemanticChecker::evaluateUnaryExpression()
+{
+  string expression;
+
+  const int MAX_OPERANDS = 2;
+  if (m_operations.size() >= MAX_OPERANDS)
+  {
+    int i = 0;
+    while (i < MAX_OPERANDS && !m_operations.empty())
+    {
+      expression.insert(expression.begin(), m_operations.top());
+      m_operations.pop();
+
+      ++i;
+    }
+#ifdef DEBUG
+  cout << "evaluating unary: " << expression << endl;
+#endif
+  }
+
+  if (m_validExpressions.find(expression) != m_validExpressions.end())
+  {
+    m_operations.push(m_validExpressions[expression]);
+  }
+  else
+  {
+    if (!expression.empty())
+    {
+      m_operations.push(TYPECHAR_INVALID);
+    }
+  }
+}
+
+void SemanticChecker::evaluateBinaryExpression()
+{
+  string expression;
+
+  const int MAX_OPERANDS = 3;
+  if (m_operations.size() >= MAX_OPERANDS)
+  {
+    int i = 0;
+    while (i < MAX_OPERANDS && !m_operations.empty())
+    {
+      expression.insert(expression.begin(), m_operations.top());
+      m_operations.pop();
+
+      ++i;
+    }
+#ifdef DEBUG
+  cout << "evaluating binary: " << expression << endl;
+#endif
+  }
+
+  if (m_validExpressions.find(expression) != m_validExpressions.end())
+  {
+    m_operations.push(m_validExpressions[expression]);
+  }
+  else
+  {
+    if (!expression.empty())
+    {
+      m_operations.push(TYPECHAR_INVALID);
+    }
+  }
+}
+
 void SemanticChecker::pushOperand(char op)
 {
   m_operations.push(op);
@@ -269,6 +335,12 @@ void SemanticChecker::printTypesStack()
   {
     invertedStack.insert(invertedStack.begin(), m_operations.top());
     m_operations.pop();
+  }
+
+  for (string::iterator it = invertedStack.begin();
+       it != invertedStack.end(); ++it)
+  {
+    m_operations.push(*it);
   }
 
   cout << "::: Values: " << invertedStack << endl;

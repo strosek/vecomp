@@ -96,6 +96,8 @@ void Parser::andOperation()
   } while (m_currentToken.getLexeme().compare("&&") == 0 &&
            iterations < m_maxRuleIterations);
 
+  m_semanticChecker.evaluateBinaryExpression();
+
 #ifdef DEBUG
   cout << "::: exit andOperation()" << endl;
 #endif
@@ -341,8 +343,8 @@ void Parser::constantsDeclaration()
       constant();
       advanceToken();
 #ifdef DEBUG
-    cout << "::: current lexeme (line " << __LINE__ << "): " <<
-        m_currentToken.getLexeme() << endl;
+      cout << "::: current lexeme (line " << __LINE__ << "): " <<
+          m_currentToken.getLexeme() << endl;
 #endif
       ++iterations;
     } while (m_currentToken.getToken() == TOKEN_NEWLINE &&
@@ -436,6 +438,8 @@ void Parser::exponent()
 
     sign();
   }
+
+  m_semanticChecker.evaluateBinaryExpression();
 
 #ifdef DEBUG
   cout << "::: exit exponent()" << endl;
@@ -710,6 +714,9 @@ void Parser::multiplication()
 
     ++iterations;
   } while (isOperatorFound && iterations < m_maxRuleIterations); 
+ 
+  m_semanticChecker.evaluateBinaryExpression();
+
 #ifdef DEBUG
   cout << "::: exit multiplication()" << endl;
 #endif
@@ -732,6 +739,9 @@ void Parser::notOperation()
     relationalOperation();
   }
   relationalOperation();
+
+  m_semanticChecker.evaluateUnaryExpression();
+
 #ifdef DEBUG
   cout << "::: exit notOperation()" << endl;
 #endif
@@ -927,6 +937,8 @@ void Parser::relationalOperation()
     sumOperation();
   }
 
+  m_semanticChecker.evaluateBinaryExpression();
+
 #ifdef DEBUG
   cout << "::: exit relationalOperation()" << endl;
 #endif
@@ -1027,10 +1039,14 @@ void Parser::sign()
   {
     m_scanner->moveBackwards();
     checkLexeme("-");
-
-    m_semanticChecker.pushOperator(OPERATOR_MINUS);
   }
   term();
+
+#ifdef DEBUG
+  m_semanticChecker.printTypesStack();
+#endif
+
+  m_semanticChecker.evaluateUnaryExpression();
 
 #ifdef DEBUG
   cout << "::: exit sign()" << endl;
@@ -1113,6 +1129,8 @@ void Parser::sumOperation()
     ++iterations;
   } while (isOperatorFound && iterations < m_maxRuleIterations); 
 
+  m_semanticChecker.evaluateBinaryExpression();
+
 #ifdef DEBUG
   cout << "::: exit sumOperation()" << endl;
 #endif
@@ -1166,7 +1184,7 @@ void Parser::term()
         SymbolData::getLiteralType(m_currentToken.getToken())));
     advanceToken();
   }
-  else
+  else if (m_currentToken.getLexeme().compare("-") != 0)
   {
     m_errorReporter->writeSyntaxError("identificador o constante");
   }

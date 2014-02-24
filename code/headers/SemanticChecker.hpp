@@ -39,6 +39,8 @@ public:
   void         checkDeclared(const SymbolData& data);
   void         checkImported(const std::string& import);
   void         checkReturnRequired();
+  void         evaluateUnaryExpression();
+  void         evaluateBinaryExpression();
   void         enterFor();
   void         enterSwitch();
   void         enterToScope(const std::string& scope);
