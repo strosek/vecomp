@@ -41,13 +41,34 @@ SemanticChecker::SemanticChecker() :
   m_validExpressions["iMf"] = 'f';
   m_validExpressions["iMi"] = 'i';
 
+  m_validExpressions["cAc"] = 'c';
+  m_validExpressions["cAf"] = 'f';
+  m_validExpressions["cAi"] = 'i';
+  m_validExpressions["fAc"] = 'f';
+  m_validExpressions["fAf"] = 'f';
+  m_validExpressions["fAi"] = 'f';
+  m_validExpressions["iAc"] = 'i';
+  m_validExpressions["iAf"] = 'f';
+  m_validExpressions["iAi"] = 'i';
+
+  m_validExpressions["cRc"] = 'c';
+  m_validExpressions["cRf"] = 'f';
+  m_validExpressions["cRi"] = 'i';
+  m_validExpressions["fRc"] = 'f';
+  m_validExpressions["fRf"] = 'f';
+  m_validExpressions["fRi"] = 'f';
+  m_validExpressions["iRc"] = 'i';
+  m_validExpressions["iRf"] = 'f';
+  m_validExpressions["iRi"] = 'i';
+
   m_validExpressions["sPs"] = 's';
 
-  m_validExpressions["bRb"] = 'b';
+  m_validExpressions["bLb"] = 'b';
 
   m_validExpressions["Mc"]  = 'c';
   m_validExpressions["Mf"]  = 'f';
   m_validExpressions["Mi"]  = 'i';
+
   m_validExpressions["Nb"]  = 'b';
 }
 

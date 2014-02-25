@@ -715,7 +715,10 @@ void Parser::multiplication()
     ++iterations;
   } while (isOperatorFound && iterations < m_maxRuleIterations); 
  
-  m_semanticChecker.evaluateBinaryExpression();
+  if (isOperatorFound)
+  {
+    m_semanticChecker.evaluateBinaryExpression();
+  }
 
 #ifdef DEBUG
   cout << "::: exit multiplication()" << endl;
@@ -730,9 +733,11 @@ void Parser::notOperation()
   if (m_errorReporter->getErrors() >= m_maxErrors)
     return;
 
+  bool isNotOperatorFound = false;
   if (m_currentToken.getLexeme().compare("!") == 0)
   {
     checkLexeme("!");
+    isNotOperatorFound = true;
 
     m_semanticChecker.pushOperator(OPERATOR_NOT);
 
@@ -740,7 +745,10 @@ void Parser::notOperation()
   }
   relationalOperation();
 
-  m_semanticChecker.evaluateUnaryExpression();
+  if (isNotOperatorFound)
+  {
+    m_semanticChecker.evaluateUnaryExpression();
+  }
 
 #ifdef DEBUG
   cout << "::: exit notOperation()" << endl;
@@ -1035,8 +1043,10 @@ void Parser::sign()
   if (m_errorReporter->getErrors() >= m_maxErrors)
     return;
 
+  bool isMinusOperatorFound = false;
   if (m_currentToken.getLexeme().compare("-") == 0)
   {
+    isMinusOperatorFound = true;
     m_scanner->moveBackwards();
     checkLexeme("-");
   }
@@ -1046,7 +1056,10 @@ void Parser::sign()
   m_semanticChecker.printTypesStack();
 #endif
 
-  m_semanticChecker.evaluateUnaryExpression();
+  if (isMinusOperatorFound)
+  {
+    m_semanticChecker.evaluateUnaryExpression();
+  }
 
 #ifdef DEBUG
   cout << "::: exit sign()" << endl;
@@ -1129,7 +1142,10 @@ void Parser::sumOperation()
     ++iterations;
   } while (isOperatorFound && iterations < m_maxRuleIterations); 
 
-  m_semanticChecker.evaluateBinaryExpression();
+  if (isOperatorFound)
+  {
+    m_semanticChecker.evaluateBinaryExpression();
+  }
 
 #ifdef DEBUG
   cout << "::: exit sumOperation()" << endl;
