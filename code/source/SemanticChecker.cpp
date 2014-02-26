@@ -170,6 +170,27 @@ void SemanticChecker::checkExpressionType(NativeType_t expectedType)
       message += "\"";
       m_errorReporter->writeErrorWithPosition(message);
     }
+    m_operations.pop();
+  }
+}
+
+
+void SemanticChecker::checkTypeMatches(const string& variable)
+{
+  NativeType_t varType = m_symbolsTable.getVariableType(variable,
+                                                        m_controlStack.top());
+
+  if (!m_operations.empty())
+  {
+    if (varType != SymbolData::getCharType(m_operations.top()))
+    {
+      string message = "tipo de expresion no esperado, se esperaba: \"";
+      message +=
+          SymbolData::getTypeString(varType);
+      message += "\"";
+      m_errorReporter->writeErrorWithPosition(message);
+    }
+    m_operations.pop();
   }
 }
 

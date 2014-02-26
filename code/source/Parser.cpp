@@ -143,9 +143,13 @@ void Parser::assign()
   if (m_errorReporter->getErrors() >= m_maxErrors)
     return;
 
+  string variable = m_scanner->getLastToken().getLexeme();
+
   checkToken(TOKEN_ASSIGNOP);
   advanceToken();
   expression();
+
+  m_semanticChecker.checkTypeMatches(variable);
 #ifdef DEBUG
   cout << "::: exit assign()" << endl;
 #endif
