@@ -37,9 +37,13 @@ public:
   void         addImport(const std::string& import);
   void         declare(SymbolData& data);
   void         checkExpressionType(NativeType_t expectedType);
+  void         checkExpressionType(NativeType_t expectedType,
+                                   const std::string& errorMessage);
   void         checkDeclared(const SymbolData& data);
   void         checkImported(const std::string& import);
   void         checkReturnRequired();
+  void         checkDimensionsMatch(const std::string& name,
+                                    unsigned int dimensions);
   void         evaluateUnaryExpression();
   void         evaluateBinaryExpression();
   void         enterFor();

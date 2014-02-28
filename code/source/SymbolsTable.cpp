@@ -17,8 +17,7 @@ bool SymbolsTable::exists(const string& name)
   return m_symbolsMap.find(name) != m_symbolsMap.end();
 }
 
-void SymbolsTable::checkDeclared(const string& name, const string& scope,
-                                 size_t dimensions, NativeType_t type)
+void SymbolsTable::checkDeclared(const string& name, const string& scope)
 {
   bool isFound = false;
 
@@ -26,7 +25,6 @@ void SymbolsTable::checkDeclared(const string& name, const string& scope,
   {
     m_searchRange = m_symbolsMap.equal_range(name);
     bool isScopeMatched = false;
-    bool isTypeMatched = false;
     multimap<string, SymbolData>::iterator it;
     for (it = m_searchRange.first;
          it != m_searchRange.second && !isFound; ++it)
@@ -35,44 +33,19 @@ void SymbolsTable::checkDeclared(const string& name, const string& scope,
       {
         isScopeMatched = true;
       }
-      if (it->second.getType() == type)
-      {
-        isTypeMatched = true;
-      }
 
-      if (isScopeMatched && isTypeMatched && !it->second.isFunction())
+      if (isScopeMatched && !it->second.isFunction())
       {
         isFound = true;
       }
     }
 
-    if (isFound)
-    {
-      if (it->second.getDimensions() < dimensions)
-      {
-        m_errorReporter->writeErrorWithPosition(
-            "faltan dimensiones en variable");
-      }
-      else if (it->second.getDimensions() > dimensions)
-      {
-        m_errorReporter->writeErrorWithPosition(
-            "exceso de dimensiones en variable");
-      }
-    }
-    else
+    if (!isFound)
     {
       if (!isScopeMatched)
       {
         m_errorReporter->writeErrorWithPosition(
             "variable no declarada con en este alcance");
-      }
-
-      if (!isTypeMatched)
-      {
-        string message = "variable no declarada con tipo: \"";
-        message += SymbolData::getTypeString(it->second.getType());
-        message += "\"";
-        m_errorReporter->writeErrorWithPosition(message);
       }
     }
   }

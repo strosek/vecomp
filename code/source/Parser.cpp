@@ -143,13 +143,18 @@ void Parser::assign()
   if (m_errorReporter->getErrors() >= m_maxErrors)
     return;
 
-  string variable = m_scanner->getLastToken().getLexeme();
+  m_scanner->moveForward();
 
   checkToken(TOKEN_ASSIGNOP);
   advanceToken();
   expression();
 
-  m_semanticChecker.checkTypeMatches(variable);
+  if (m_variables.size() > 0)
+  {
+    m_semanticChecker.checkTypeMatches(m_variables.front().getName());
+    m_variables.pop();
+  }
+
 #ifdef DEBUG
   cout << "::: exit assign()" << endl;
 #endif
@@ -257,13 +262,25 @@ void Parser::command()
       {
         m_scanner->moveBackwards();
 
+        string variable = m_scanner->getLastToken().getLexeme();
+
+        m_scanner->moveBackwards();
+        
+        m_semanticChecker.checkDimensionsMatch(variable, 0);
+
         assign();
       }
       else if (m_currentToken.getLexeme().compare("[") == 0)
       {
         m_scanner->moveBackwards();
 
-        dimension();
+        SymbolData variable;
+        variable.setName(m_scanner->getLastToken().getLexeme());
+        m_variables.push(variable);
+
+        dimensionUse();
+
+        m_scanner->moveBackwards();
         assign();
       }
       else if (m_currentToken.getLexeme().compare("(") == 0)
@@ -400,13 +417,17 @@ void Parser::dimension()
 
   unsigned int iterations = 0;
   size_t dimensions = 0;
-  do {
+  do
+  {
     ++dimensions;
     checkLexeme("[");
     advanceToken();
     expression();
-
     checkLexeme("]");
+
+    m_semanticChecker.checkExpressionType(TYPE_INTEGER,
+        "expresion en corchetes debe resultar en entero");
+
     advanceToken();
     if (m_currentToken.getLexeme().compare("[") == 0)
     {
@@ -423,6 +444,48 @@ void Parser::dimension()
 
 #ifdef DEBUG
   cout << "::: exit dimension()" << endl;
+#endif
+}
+
+void Parser::dimensionUse()
+{
+#ifdef DEBUG
+  cout << "::: entering dimensionUse()" << endl;
+#endif
+  if (m_errorReporter->getErrors() >= m_maxErrors)
+    return;
+
+  unsigned int iterations = 0;
+  string identifier;
+  size_t dimensions = 0;
+  do
+  {
+    identifier = m_scanner->getLastToken().getLexeme(); 
+
+    checkLexeme("[");
+    advanceToken();
+    expression();
+    checkLexeme("]");
+    ++dimensions;
+
+    m_semanticChecker.checkExpressionType(TYPE_INTEGER,
+        "expresion en corchetes debe resultar en entero");
+
+    advanceToken();
+    if (m_currentToken.getLexeme().compare("[") == 0)
+    {
+      m_scanner->moveBackwards();
+    }
+
+    ++iterations;
+  } while (m_currentToken.getLexeme().compare("[") == 0 &&
+           iterations < m_maxRuleIterations);
+m_semanticChecker.checkDimensionsMatch(identifier, dimensions);
+  
+  m_scanner->moveBackwards();
+
+#ifdef DEBUG
+  cout << "::: exit dimensionUse()" << endl;
 #endif
 }
 
@@ -1180,7 +1243,7 @@ void Parser::term()
     {
       m_scanner->moveBackwards();
 
-      dimension();
+      dimensionUse();
       advanceToken();
     }
     else if (m_currentToken.getLexeme().compare("(") == 0)

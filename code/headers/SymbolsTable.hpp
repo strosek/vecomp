@@ -13,8 +13,7 @@ public:
   SymbolsTable();
 
   bool         exists(const std::string& name);
-  void         checkDeclared(const std::string& name, const std::string& scope,
-                             size_t dimensions, NativeType_t type);
+  void         checkDeclared(const std::string& name, const std::string& scope);
   void         checkFunctionDeclared(const std::string& name,
                                      const std::string& parameters);
   void         checkDeclarable(const std::string& name,

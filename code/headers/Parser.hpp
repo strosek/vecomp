@@ -34,6 +34,7 @@ private:
   void constant();
   void constantsDeclaration();
   void dimension();
+  void dimensionUse();
   void exponent();
   void expression();
   void forStatement();

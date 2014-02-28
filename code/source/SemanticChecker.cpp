@@ -163,7 +163,7 @@ void SemanticChecker::checkExpressionType(NativeType_t expectedType)
 {
   if (!m_operations.empty())
   {
-    if (expectedType != m_operations.top())
+    if (SymbolData::getTypeChar(expectedType) != m_operations.top())
     {
       string message = "tipo de expresion no esperado, se esperaba: \"";
       message += SymbolData::getTypeString(expectedType);
@@ -174,6 +174,18 @@ void SemanticChecker::checkExpressionType(NativeType_t expectedType)
   }
 }
 
+void SemanticChecker::checkExpressionType(NativeType_t expectedType,
+                                          const string& errorMessage)
+{
+  if (!m_operations.empty())
+  {
+    if (SymbolData::getTypeChar(expectedType) != m_operations.top())
+    {
+      m_errorReporter->writeErrorWithPosition(errorMessage);
+    }
+    m_operations.pop();
+  }
+}
 
 void SemanticChecker::checkTypeMatches(const string& variable)
 {
@@ -194,6 +206,26 @@ void SemanticChecker::checkTypeMatches(const string& variable)
   }
 }
 
+void SemanticChecker::checkDimensionsMatch(const string& variable,
+                                           unsigned int dimensions)
+{
+  unsigned int declaredDimensions = m_symbolsTable.getDimensions(
+      variable, m_controlStack.top());
+#ifdef DEBUG
+  cout << "::: checking dimensions for: " << variable << " got: " <<
+      declaredDimensions << ", declared with: " << dimensions << endl;
+#endif
+
+  if (declaredDimensions > dimensions)
+  {
+    m_errorReporter->writeErrorWithPosition("faltan dimensiones");
+  }
+  else if (declaredDimensions < dimensions)
+  {
+    m_errorReporter->writeErrorWithPosition("exceso de dimensiones");
+  }
+}
+
 void SemanticChecker::checkDeclared(const SymbolData& data)
 {
   if (data.isFunction())
@@ -202,8 +234,7 @@ void SemanticChecker::checkDeclared(const SymbolData& data)
   }
   else
   {
-    m_symbolsTable.checkDeclared(data.getName(), data.getScope(),
-                                 data.getDimensions(), data.getType());
+    m_symbolsTable.checkDeclared(data.getName(), data.getScope());
   }
 }
 
@@ -295,6 +326,13 @@ void SemanticChecker::evaluateUnaryExpression()
     {
       m_operations.push(TYPECHAR_INVALID);
     }
+    string errorMessage = "conflicto de tipos en operacion: "; 
+    errorMessage += SymbolData::getTypeString(
+        SymbolData::getCharType(expression.at(0)));
+    errorMessage.push_back(expression.at(1));
+    errorMessage += SymbolData::getTypeString(
+        SymbolData::getCharType(expression.at(2)));
+    m_errorReporter->writeErrorWithPosition(errorMessage);
   }
 }
 
