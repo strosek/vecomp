@@ -1,7 +1,20 @@
 paquete principal
 
-funcion principal() {
-  var x[2] real;
+importar ("fmt")
 
-  x[123] = 23 * 40.123 + 234234;
+const (PI = 3.141592
+       MAX = 30)
+       
+funcion lafuncion(x,y real) {
+  fmt.Imprimenl("hello" + "hello2");
+}
+
+funcion principal() {
+  var a[4] entero;
+  var x[2] entero;
+  var y[9] real;
+
+  lafuncion(2.4, 123.2)
+
+  x[123] = a[9] + 2 * 02
 }

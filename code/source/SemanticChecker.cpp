@@ -75,11 +75,12 @@ SemanticChecker::SemanticChecker() :
 
 NativeType_t SemanticChecker::getExpressionType()
 {
-  NativeType_t type = TYPE_VOID;
+  NativeType_t type = TYPE_INVALID;
 
   if (!m_operations.empty())
   {
     type = SymbolData::getCharType(m_operations.top());
+    m_operations.pop();
   }
 
   return type;
@@ -256,9 +257,19 @@ void SemanticChecker::checkDeclared(const string& name)
 }
 
 void SemanticChecker::checkDeclared(const string& name,
-                                    const string& parameters)
+                                    unsigned int nParameters)
 {
-  m_symbolsTable.checkFunctionDeclared(name, parameters);
+  string arguments;
+  for (unsigned int i = 0; i < nParameters; ++i)
+  {
+    if (!m_operations.empty())
+    {
+      arguments.insert(arguments.begin(), m_operations.top());
+      m_operations.pop();
+    }
+  }
+
+  m_symbolsTable.checkFunctionDeclared(name, arguments);
 }
 
 void SemanticChecker::checkImported(const string& import)

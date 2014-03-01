@@ -41,8 +41,7 @@ public:
   void         checkExpressionType(NativeType_t expectedType,
                                    const std::string& errorMessage);
   void         checkDeclared(const std::string& name);
-  void         checkDeclared(const std::string& name,
-                             const std::string& parameters);
+  void         checkDeclared(const std::string& name, unsigned int nParameters);
   void         checkImported(const std::string& import);
   void         checkReturnRequired();
   void         checkDimensionsMatch(const std::string& name,

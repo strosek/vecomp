@@ -110,7 +110,6 @@ void Parser::argumentsList()
 #endif
 
   bool isOperatorFound = false;
-  string argumentTypes;
 
   unsigned int iterations = 0;
   do
@@ -127,6 +126,14 @@ void Parser::argumentsList()
 
     ++iterations;
   } while (isOperatorFound && iterations < m_maxRuleIterations);
+
+  unsigned int nParameters = iterations;
+  if (m_function.getName().compare("Imprime") != 0 &&
+      m_function.getName().compare("Lee") != 0)
+  {
+    m_semanticChecker.checkDeclared(m_function.getName(), nParameters);
+  }
+  m_function.reset();
 
   m_scanner->moveBackwards();
 
@@ -253,7 +260,6 @@ void Parser::command()
     }
     else
     {
-      // FIXME: this should not need the double forward movement.
       m_scanner->moveForward();
       ++m_nTokensProcessed;
       advanceToken();
@@ -293,6 +299,12 @@ void Parser::command()
       else if (m_currentToken.getLexeme().compare("(") == 0)
       {
         m_scanner->moveBackwards();
+
+#ifdef DEBUG
+        cout << "adding function name: " <<
+            m_scanner->getLastToken().getLexeme();
+#endif
+        m_function.setName(m_scanner->getLastToken().getLexeme());
 
         functionCall();
       }
@@ -566,11 +578,14 @@ void Parser::forStatement()
 
   if (m_currentToken.getLexeme().compare(";") != 0)
   {
+    m_scanner->moveBackwards();
+
     assign();
     unsigned int iterations = 0;
     while (m_currentToken.getLexeme().compare(",") == 0 &&
            iterations < m_maxRuleIterations)
     {
+      m_scanner->moveBackwards();
       assign();
       
       ++iterations;
@@ -644,6 +659,7 @@ void Parser::functionCall()
   }
   else
   {
+    m_semanticChecker.checkDeclared(m_function.getName(), 0);
     m_scanner->moveBackwards();
   }
 
@@ -908,10 +924,19 @@ void Parser::print()
   {
     m_errorReporter->writeSyntaxError("Imprime o Imprimenl");
   }
+
+  m_function.setName("Imprime");
   
   checkLexeme("(");
   advanceToken();
   argumentsList();
+  
+  if (m_semanticChecker.getExpressionType() == TYPE_INVALID)
+  {
+    m_errorReporter->writeErrorWithPosition(
+        "tipo invalido en expresion de argumento");
+  }
+
   checkLexeme(")");
 
 #ifdef DEBUG
@@ -1253,6 +1278,8 @@ void Parser::term()
     if (m_currentToken.getLexeme().compare("[") == 0)
     {
       m_scanner->moveBackwards();
+
+      m_semanticChecker.pushVariableType(m_scanner->getLastToken().getLexeme());
 
       m_semanticChecker.checkDeclared(m_scanner->getLastToken().getLexeme());
 

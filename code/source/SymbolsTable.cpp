@@ -58,6 +58,10 @@ void SymbolsTable::checkDeclared(const string& name, const string& scope)
 void SymbolsTable::checkFunctionDeclared(const string& name,
                                          const string& parameters)
 {
+#ifdef DEBUG
+  cout << "checking function declared: " << name << ", with params: " <<
+      parameters << endl;
+#endif
   if (exists(name))
   {
     bool isFound = false;
@@ -66,9 +70,16 @@ void SymbolsTable::checkFunctionDeclared(const string& name,
     for (multimap<string, SymbolData>::iterator it = m_searchRange.first;
          it != m_searchRange.second && !isFound; ++it)
     {
+#ifdef DEBUG
+      cout << "checking parameter list: " << it->second.getParameters() <<
+        ", is function: " << boolalpha << it->second.isFunction() << endl;
+#endif
       if (it->second.getParameters().compare(parameters) == 0 &&
           it->second.isFunction())
       {
+#ifdef DEBUG
+        cout << "function found" << endl;
+#endif
         isFound = true;
       }
       else if (it->second.isFunction())
@@ -81,6 +92,11 @@ void SymbolsTable::checkFunctionDeclared(const string& name,
     {
       m_errorReporter->writeErrorWithPosition(
           "funcion declarada con diferente lista de parametros");
+    }
+    else if (!isFound && !isFoundDifferent)
+    {
+      m_errorReporter->writeErrorWithPosition(
+          "identificador no es funcion");
     }
   }
   else

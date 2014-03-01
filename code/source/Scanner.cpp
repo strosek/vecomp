@@ -154,7 +154,7 @@ void Scanner::scan()
             break;
           default :
 #ifdef DEBUG
-            cerr << "vecomp: next state error while scanning" << endl;
+            cout << "vecomp: next state error while scanning" << endl;
 #endif
             break;
           }
