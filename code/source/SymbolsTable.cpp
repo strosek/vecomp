@@ -133,6 +133,48 @@ void SymbolsTable::checkFunctionDeclarable(const string& name,
   }
 }
 
+void SymbolsTable::checkModifiable(const string& name, const string& scope)
+{
+#ifdef DEBUG
+  cout << "::: checking modifiable: " << name << endl;
+#endif
+  if (exists(name))
+  {
+    bool isFound = false;
+
+    m_searchRange = m_symbolsMap.equal_range(name);
+    for (multimap<string, SymbolData>::iterator it = m_searchRange.first;
+         it != m_searchRange.second && !isFound; ++it)
+    {
+      if ( it->second.getScope().compare(scope) == 0 &&
+          !it->second.isFunction() && it->second.isConstant())
+      {
+        isFound = true;
+      }
+    }
+
+    if (!isFound)
+    {
+      for (multimap<string, SymbolData>::iterator it = m_searchRange.first;
+           it != m_searchRange.second && !isFound; ++it)
+      {
+        if ( it->second.getScope().compare("global") == 0 &&
+            !it->second.isFunction() && it->second.isConstant())
+        {
+          isFound = true;
+        }
+      }
+    }
+
+    if (isFound)
+    {
+      string errorMessage = "no se puede modificar constante: ";
+      errorMessage += name;
+      m_errorReporter->writeErrorWithPosition(errorMessage);
+    }
+  }
+}
+        
 NativeType_t SymbolsTable::getVariableType(const string& name,
                                            const string& scope)
 {

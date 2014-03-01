@@ -266,6 +266,8 @@ void Parser::command()
 
         m_scanner->moveBackwards();
         
+        m_semanticChecker.checkDeclared(variable);
+        m_semanticChecker.checkModifiable(variable);
         m_semanticChecker.checkDimensionsMatch(variable, 0);
 
         assign();
@@ -281,6 +283,11 @@ void Parser::command()
         dimensionUse();
 
         m_scanner->moveBackwards();
+
+        m_scanner->moveBackwards();
+        m_semanticChecker.checkModifiable(
+            m_scanner->getLastToken().getLexeme());
+        m_scanner->moveForward();
         assign();
       }
       else if (m_currentToken.getLexeme().compare("(") == 0)
@@ -1249,25 +1256,7 @@ void Parser::term()
 
       m_semanticChecker.checkDeclared(m_scanner->getLastToken().getLexeme());
 
-      if (m_currentToken.getLexeme().compare("[") == 0)
-      {
-#ifdef DEBUG
-        cout << "entered dimenuse condition" << endl;
-#endif
-        dimensionUse();
-      }
-      else
-      {
-#ifdef DEBUG
-        cout << "entered 0-dimen condition" << endl;
-#endif
-#ifdef DEBUG
-        cout << "checking dimensions for variable: " <<
-            m_scanner->getLastToken().getLexeme() << endl;
-#endif
-        m_semanticChecker.checkDimensionsMatch(
-            m_scanner->getLastToken().getLexeme(), 0);
-      }
+      dimensionUse();
 
       advanceToken();
     }
@@ -1280,6 +1269,13 @@ void Parser::term()
     {
       m_scanner->moveBackwards();
       m_semanticChecker.checkDeclared(m_scanner->getLastToken().getLexeme());
+
+#ifdef DEBUG
+      cout << "checking dimensions for : " <<
+          m_scanner->getLastToken().getLexeme() << endl;
+#endif
+      m_semanticChecker.checkDimensionsMatch(
+          m_scanner->getLastToken().getLexeme(), 0);
 
       m_semanticChecker.pushVariableType(m_scanner->getLastToken().getLexeme());
       m_scanner->moveForward();

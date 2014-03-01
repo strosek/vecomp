@@ -47,6 +47,7 @@ public:
   void         checkReturnRequired();
   void         checkDimensionsMatch(const std::string& name,
                                     unsigned int dimensions);
+  void         checkModifiable(const std::string& name);
   void         evaluateUnaryExpression();
   void         evaluateBinaryExpression();
   void         enterFor();

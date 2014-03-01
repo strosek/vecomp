@@ -20,6 +20,8 @@ public:
                                const std::string& scope);
   void         checkFunctionDeclarable(const std::string& name,
                                        const std::string& parameters);
+  void         checkModifiable(const std::string& name,
+                               const std::string& scope);
   void         insert(const std::string& name, const SymbolData& data);
   NativeType_t getVariableType(const std::string& name,
                                const std::string& scope);

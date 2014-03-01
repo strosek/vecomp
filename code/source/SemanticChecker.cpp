@@ -225,18 +225,29 @@ void SemanticChecker::checkDimensionsMatch(const string& variable,
   unsigned int declaredDimensions = m_symbolsTable.getDimensions(
       variable, m_controlStack.top());
 #ifdef DEBUG
-  cout << "::: checking dimensions for: " << variable << " got: " <<
-      declaredDimensions << ", declared with: " << dimensions << endl;
+    cout << "declared dimensions: " << declaredDimensions << endl;
 #endif
 
+  ostringstream messageBuilder;
   if (declaredDimensions > dimensions)
   {
-    m_errorReporter->writeErrorWithPosition("faltan dimensiones");
+    messageBuilder << "faltan dimensiones, variable declarada con: " <<
+      declaredDimensions;
+    messageBuilder.flush();
+    m_errorReporter->writeErrorWithPosition(messageBuilder.str());
   }
   else if (declaredDimensions < dimensions)
   {
-    m_errorReporter->writeErrorWithPosition("exceso de dimensiones");
+    messageBuilder << "exceso de dimensiones, variable declarada con: " <<
+      declaredDimensions;
+    messageBuilder.flush();
+    m_errorReporter->writeErrorWithPosition(messageBuilder.str());
   }
+}
+
+void SemanticChecker::checkModifiable(const std::string& name)
+{
+  m_symbolsTable.checkModifiable(name, m_controlStack.top());
 }
 
 void SemanticChecker::checkDeclared(const string& name)
@@ -324,27 +335,35 @@ void SemanticChecker::evaluateUnaryExpression()
       ++i;
     }
 #ifdef DEBUG
-  cout << "evaluating unary: " << expression << endl;
+    cout << "evaluating unary: " << expression << endl;
 #endif
-  }
 
-  if (m_validExpressions.find(expression) != m_validExpressions.end())
-  {
-    m_operations.push(m_validExpressions[expression]);
-  }
-  else
-  {
-    if (!expression.empty())
+    if (m_validExpressions.find(expression) != m_validExpressions.end())
     {
-      m_operations.push(TYPECHAR_INVALID);
+      m_operations.push(m_validExpressions[expression]);
     }
-    string errorMessage = "conflicto de tipos en operacion: "; 
-    errorMessage += SymbolData::getTypeString(
-        SymbolData::getCharType(expression.at(0)));
-    errorMessage.push_back(expression.at(1));
-    errorMessage += SymbolData::getTypeString(
-        SymbolData::getCharType(expression.at(2)));
-    m_errorReporter->writeErrorWithPosition(errorMessage);
+    else
+    {
+      if (!expression.empty())
+      {
+        m_operations.push(TYPECHAR_INVALID);
+      }
+
+      if (expression.size() >= 2)
+      {
+        ostringstream messageBuilder;
+        messageBuilder << "conflicto de tipos en operacion: " <<
+            expression.at(0) <<
+            SymbolData::getTypeString(
+            SymbolData::getCharType(expression.at(1)));
+        m_errorReporter->writeErrorWithPosition(messageBuilder.str());
+      }
+      else
+      {
+        m_errorReporter->writeErrorWithPosition(
+            "conflicto en tipos en operacion");
+      }
+    }
   }
 }
 
@@ -364,19 +383,35 @@ void SemanticChecker::evaluateBinaryExpression()
       ++i;
     }
 #ifdef DEBUG
-  cout << "evaluating binary: " << expression << endl;
+    cout << "evaluating binary: " << expression << endl;
 #endif
-  }
 
-  if (m_validExpressions.find(expression) != m_validExpressions.end())
-  {
-    m_operations.push(m_validExpressions[expression]);
-  }
-  else
-  {
-    if (!expression.empty())
+    if (m_validExpressions.find(expression) != m_validExpressions.end())
     {
-      m_operations.push(TYPECHAR_INVALID);
+      m_operations.push(m_validExpressions[expression]);
+    }
+    else
+    {
+      if (!expression.empty())
+      {
+        m_operations.push(TYPECHAR_INVALID);
+      }
+
+      if (expression.size() >= 2)
+      {
+        ostringstream messageBuilder;
+        messageBuilder << "conflicto de tipos en operacion: " <<
+            SymbolData::getTypeString(
+            SymbolData::getCharType(expression.at(0))) << expression.at(1) <<
+            SymbolData::getTypeString(
+            SymbolData::getCharType(expression.at(2)));
+        m_errorReporter->writeErrorWithPosition(messageBuilder.str());
+      }
+      else
+      {
+        m_errorReporter->writeErrorWithPosition(
+            "conflicto en tipos en operacion");
+      }
     }
   }
 }
