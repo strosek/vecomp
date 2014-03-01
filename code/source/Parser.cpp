@@ -151,7 +151,7 @@ void Parser::assign()
 
   if (m_variables.size() > 0)
   {
-    m_semanticChecker.checkTypeMatches(m_variables.front().getName());
+    m_semanticChecker.checkAssignType(m_variables.front().getName());
     m_variables.pop();
   }
 
@@ -480,7 +480,8 @@ void Parser::dimensionUse()
     ++iterations;
   } while (m_currentToken.getLexeme().compare("[") == 0 &&
            iterations < m_maxRuleIterations);
-m_semanticChecker.checkDimensionsMatch(identifier, dimensions);
+
+  m_semanticChecker.checkDimensionsMatch(identifier, dimensions);
   
   m_scanner->moveBackwards();
 
@@ -675,13 +676,14 @@ void Parser::functionDeclaration()
   returnType();
 
   m_semanticChecker.declare(m_function);
-  m_function.reset();
 
   block();
 
   m_semanticChecker.checkReturnRequired();
 
   m_semanticChecker.exitCurrentScope();
+
+  m_function.reset();
 #ifdef DEBUG
   cout << "::: exit functionDeclaration()" << endl;
 #endif
@@ -1036,6 +1038,8 @@ void Parser::returnExpression()
     m_semanticChecker.setReturnCalled(true);
 
     expression();
+
+    m_semanticChecker.checkReturnType(m_function.getType());
   }
 
 #ifdef DEBUG
@@ -1243,7 +1247,28 @@ void Parser::term()
     {
       m_scanner->moveBackwards();
 
-      dimensionUse();
+      m_semanticChecker.checkDeclared(m_scanner->getLastToken().getLexeme());
+
+      if (m_currentToken.getLexeme().compare("[") == 0)
+      {
+#ifdef DEBUG
+        cout << "entered dimenuse condition" << endl;
+#endif
+        dimensionUse();
+      }
+      else
+      {
+#ifdef DEBUG
+        cout << "entered 0-dimen condition" << endl;
+#endif
+#ifdef DEBUG
+        cout << "checking dimensions for variable: " <<
+            m_scanner->getLastToken().getLexeme() << endl;
+#endif
+        m_semanticChecker.checkDimensionsMatch(
+            m_scanner->getLastToken().getLexeme(), 0);
+      }
+
       advanceToken();
     }
     else if (m_currentToken.getLexeme().compare("(") == 0)
@@ -1254,6 +1279,8 @@ void Parser::term()
     else
     {
       m_scanner->moveBackwards();
+      m_semanticChecker.checkDeclared(m_scanner->getLastToken().getLexeme());
+
       m_semanticChecker.pushVariableType(m_scanner->getLastToken().getLexeme());
       m_scanner->moveForward();
     }

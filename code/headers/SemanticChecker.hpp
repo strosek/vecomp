@@ -27,7 +27,8 @@ public:
   SemanticChecker& operator=(const SemanticChecker& rhs);
 
   NativeType_t getExpressionType();
-  void         checkTypeMatches(const std::string& variable);
+  void         checkAssignType(const std::string& variable);
+  void         checkReturnType(NativeType_t type);
   void         pushVariableType(const std::string& name);
   void         pushFunctionType(const std::string& name,
                                 const std::string& parameters);
@@ -39,7 +40,9 @@ public:
   void         checkExpressionType(NativeType_t expectedType);
   void         checkExpressionType(NativeType_t expectedType,
                                    const std::string& errorMessage);
-  void         checkDeclared(const SymbolData& data);
+  void         checkDeclared(const std::string& name);
+  void         checkDeclared(const std::string& name,
+                             const std::string& parameters);
   void         checkImported(const std::string& import);
   void         checkReturnRequired();
   void         checkDimensionsMatch(const std::string& name,

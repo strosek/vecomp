@@ -19,34 +19,34 @@ bool SymbolsTable::exists(const string& name)
 
 void SymbolsTable::checkDeclared(const string& name, const string& scope)
 {
-  bool isFound = false;
-
+#ifdef DEBUG
+  cout << "checking declared: " << name << ", with scope: " << scope << endl;
+#endif
   if (exists(name))
   {
+    bool isFound = false;
+    bool isFoundFunction = false;
     m_searchRange = m_symbolsMap.equal_range(name);
-    bool isScopeMatched = false;
     multimap<string, SymbolData>::iterator it;
     for (it = m_searchRange.first;
          it != m_searchRange.second && !isFound; ++it)
     {
-      if (it->second.getScope().compare(scope) == 0)
-      {
-        isScopeMatched = true;
-      }
-
-      if (isScopeMatched && !it->second.isFunction())
+      if (!it->second.isFunction() &&
+          (it->second.getScope().compare(scope) == 0 ||
+           it->second.getScope().compare(scope) == 0))
       {
         isFound = true;
       }
+      else if (it->second.isFunction())
+      {
+        isFoundFunction = true;
+      }
     }
 
-    if (!isFound)
+    if (!isFound && isFoundFunction)
     {
-      if (!isScopeMatched)
-      {
-        m_errorReporter->writeErrorWithPosition(
-            "variable no declarada con en este alcance");
-      }
+      m_errorReporter->writeErrorWithPosition(
+          "variable no declarada, existe funcion con el mismo nombre");
     }
   }
   else
@@ -58,10 +58,10 @@ void SymbolsTable::checkDeclared(const string& name, const string& scope)
 void SymbolsTable::checkFunctionDeclared(const string& name,
                                          const string& parameters)
 {
-  bool isFound = false;
-
   if (exists(name))
   {
+    bool isFound = false;
+    bool isFoundDifferent = false;
     m_searchRange = m_symbolsMap.equal_range(name);
     for (multimap<string, SymbolData>::iterator it = m_searchRange.first;
          it != m_searchRange.second && !isFound; ++it)
@@ -71,9 +71,13 @@ void SymbolsTable::checkFunctionDeclared(const string& name,
       {
         isFound = true;
       }
+      else if (it->second.isFunction())
+      {
+        isFoundDifferent = true;
+      }
     }
-    
-    if (!isFound)
+
+    if (!isFound && isFoundDifferent)
     {
       m_errorReporter->writeErrorWithPosition(
           "funcion declarada con diferente lista de parametros");
@@ -153,6 +157,22 @@ NativeType_t SymbolsTable::getVariableType(const string& name,
         cout << "::: found variable with type: " <<
             SymbolData::getTypeString(type) << endl;
 #endif
+      }
+    }
+    if (!isFound)
+    {
+      for (multimap<string, SymbolData>::iterator it = m_searchRange.first;
+           it != m_searchRange.second && !isFound; ++it)
+      {
+        if (it->second.getScope().compare("global") == 0)
+        {
+          isFound = true;
+          type = it->second.getType();
+#ifdef DEBUG
+          cout << "::: found variable with type: " <<
+              SymbolData::getTypeString(type) << endl;
+#endif
+        }
       }
     }
   }

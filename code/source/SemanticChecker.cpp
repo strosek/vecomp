@@ -5,6 +5,7 @@
 #ifdef DEBUG
 # include <iostream>
 #endif
+#include <sstream>
 
 using namespace std;
 
@@ -187,7 +188,7 @@ void SemanticChecker::checkExpressionType(NativeType_t expectedType,
   }
 }
 
-void SemanticChecker::checkTypeMatches(const string& variable)
+void SemanticChecker::checkAssignType(const string& variable)
 {
   NativeType_t varType = m_symbolsTable.getVariableType(variable,
                                                         m_controlStack.top());
@@ -196,10 +197,22 @@ void SemanticChecker::checkTypeMatches(const string& variable)
   {
     if (varType != SymbolData::getCharType(m_operations.top()))
     {
-      string message = "tipo de expresion no esperado, se esperaba: \"";
-      message +=
-          SymbolData::getTypeString(varType);
-      message += "\"";
+      string message = "tipo invalido en asignacion, se esperaba: ";
+      message += SymbolData::getTypeString(varType);
+      m_errorReporter->writeErrorWithPosition(message);
+    }
+    m_operations.pop();
+  }
+}
+
+void SemanticChecker::checkReturnType(NativeType_t type)
+{
+  if (!m_operations.empty())
+  {
+    if (type != SymbolData::getCharType(m_operations.top()))
+    {
+      string message = "tipo invalido en regresa, se esperaba: ";
+      message += SymbolData::getTypeString(type);
       m_errorReporter->writeErrorWithPosition(message);
     }
     m_operations.pop();
@@ -226,16 +239,15 @@ void SemanticChecker::checkDimensionsMatch(const string& variable,
   }
 }
 
-void SemanticChecker::checkDeclared(const SymbolData& data)
+void SemanticChecker::checkDeclared(const string& name)
 {
-  if (data.isFunction())
-  {
-    m_symbolsTable.checkFunctionDeclared(data.getName(), data.getParameters());
-  }
-  else
-  {
-    m_symbolsTable.checkDeclared(data.getName(), data.getScope());
-  }
+  m_symbolsTable.checkDeclared(name, m_controlStack.top());
+}
+
+void SemanticChecker::checkDeclared(const string& name,
+                                    const string& parameters)
+{
+  m_symbolsTable.checkFunctionDeclared(name, parameters);
 }
 
 void SemanticChecker::checkImported(const string& import)
