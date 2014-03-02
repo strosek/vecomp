@@ -86,6 +86,21 @@ NativeType_t SemanticChecker::getExpressionType()
   return type;
 }
 
+string SemanticChecker::getCurrentArguments(unsigned int nParameters)
+{
+  string arguments;
+  for (unsigned int i = 0; i < nParameters; ++i)
+  {
+    if (!m_operations.empty())
+    {
+      arguments.insert(arguments.begin(), m_operations.top());
+      m_operations.pop();
+    }
+  }
+
+  return arguments;
+}
+
 void SemanticChecker::pushVariableType(const string& name)
 {
   if (m_symbolsTable.exists(name))
@@ -226,7 +241,8 @@ void SemanticChecker::checkDimensionsMatch(const string& variable,
   unsigned int declaredDimensions = m_symbolsTable.getDimensions(
       variable, m_controlStack.top());
 #ifdef DEBUG
-    cout << "declared dimensions: " << declaredDimensions << endl;
+    cout << "given dimensions: " << dimensions << "declared dimensions: " <<
+        declaredDimensions << endl;
 #endif
 
   ostringstream messageBuilder;
@@ -257,19 +273,9 @@ void SemanticChecker::checkDeclared(const string& name)
 }
 
 void SemanticChecker::checkDeclared(const string& name,
-                                    unsigned int nParameters)
+                                    const string& parameters)
 {
-  string arguments;
-  for (unsigned int i = 0; i < nParameters; ++i)
-  {
-    if (!m_operations.empty())
-    {
-      arguments.insert(arguments.begin(), m_operations.top());
-      m_operations.pop();
-    }
-  }
-
-  m_symbolsTable.checkFunctionDeclared(name, arguments);
+  m_symbolsTable.checkFunctionDeclared(name, parameters);
 }
 
 void SemanticChecker::checkImported(const string& import)

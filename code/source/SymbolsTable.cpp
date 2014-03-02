@@ -268,12 +268,11 @@ NativeType_t SymbolsTable::getFunctionType(const string& name,
   return type;
 }
 
-size_t SymbolsTable::getDimensions(const string& name,
-                                   const string& scope)
+size_t SymbolsTable::getDimensions(const string& name, const string& scope)
 {
   size_t dimensions = 0;
 
-  if (m_symbolsMap.find(name) != m_symbolsMap.end())
+  if (exists(name))
   {
     m_searchRange = m_symbolsMap.equal_range(name);
 
@@ -283,11 +282,31 @@ size_t SymbolsTable::getDimensions(const string& name,
     {
       if (it->second.getScope().compare(scope) == 0)
       {
+#ifdef DEBUG
+        cout << "found dimensioned variable: " << name << ", with scope: " <<
+            scope << ", dimensions: " << it->second.getDimensions() << endl;
+#endif
         isFound = true;
         dimensions = it->second.getDimensions();
       }
     }
+
+    if (!isFound)
+    {
+      for (multimap<string, SymbolData>::iterator it = m_searchRange.first;
+           it != m_searchRange.second && !isFound; ++it)
+      {
+        if (it->second.getScope().compare("global") == 0)
+        {
+          isFound = true;
+          dimensions = it->second.getDimensions();
+        }
+      }
+    }
   }
+#ifdef DEBUG
+    cout << "returning nDimensions: " << dimensions << endl;
+#endif
 
   return dimensions;
 }

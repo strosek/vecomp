@@ -214,7 +214,7 @@ void SymbolData::setLine(size_t line)
   m_line = line;
 }
 
-void SymbolData::setParameters(string& parameters)
+void SymbolData::setParameters(const string& parameters)
 {
   m_parameters = parameters;
 }

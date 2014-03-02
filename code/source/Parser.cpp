@@ -128,10 +128,12 @@ void Parser::argumentsList()
   } while (isOperatorFound && iterations < m_maxRuleIterations);
 
   unsigned int nParameters = iterations;
-  if (m_function.getName().compare("Imprime") != 0 &&
-      m_function.getName().compare("Lee") != 0)
+  string functionName = m_function.getName();
+  if (functionName.compare("Imprime") != 0 && functionName.compare("Lee") != 0)
   {
-    m_semanticChecker.checkDeclared(m_function.getName(), nParameters);
+    m_function.setParameters(
+        m_semanticChecker.getCurrentArguments(nParameters));
+    m_semanticChecker.checkDeclared(functionName, m_function.getParameters());
   }
   m_function.reset();
 
@@ -475,12 +477,10 @@ void Parser::dimensionUse()
     return;
 
   unsigned int iterations = 0;
-  string identifier;
+  string identifier = m_scanner->getLastToken().getLexeme(); 
   size_t dimensions = 0;
   do
   {
-    identifier = m_scanner->getLastToken().getLexeme(); 
-
     checkLexeme("[");
     advanceToken();
     expression();
@@ -659,7 +659,13 @@ void Parser::functionCall()
   }
   else
   {
-    m_semanticChecker.checkDeclared(m_function.getName(), 0);
+    m_semanticChecker.checkDeclared(m_function.getName(), "");
+
+    if (m_function.getType() != TYPE_VOID)
+    {
+      m_semanticChecker.pushFunctionType(m_function.getName(), "");
+    }
+
     m_scanner->moveBackwards();
   }
 

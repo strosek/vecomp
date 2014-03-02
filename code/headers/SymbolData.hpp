@@ -48,7 +48,7 @@ public:
   void setName(const std::string& name);
   void setDimensions(size_t dimensions);
   void setLine(size_t line);
-  void setParameters(std::string& parameters);
+  void setParameters(const std::string& parameters);
   void addParameter(NativeType_t parameter);
   void setScope(std::string& scope);
   void setType(NativeType_t type);
