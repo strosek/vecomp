@@ -48,10 +48,6 @@ NativeType_t SymbolData::getStringType(const std::string& typeString)
   {
     type = TYPE_VOID;
   }
-  else if (typeString.compare(TYPESTRING_INVALID) == 0)
-  {
-    type = TYPE_INVALID;
-  }
 
   return type;
 }

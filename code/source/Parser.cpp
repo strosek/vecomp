@@ -18,7 +18,7 @@ Parser::Parser() :
   m_maxRuleIterations(1000),
   m_nTokensProcessed(0),
   m_semanticChecker(),
-  m_function(),
+  m_functions(),
   m_variables()
 {
 }
@@ -128,14 +128,18 @@ void Parser::argumentsList()
   } while (isOperatorFound && iterations < m_maxRuleIterations);
 
   unsigned int nParameters = iterations;
-  string functionName = m_function.getName();
+  string functionName = m_functions.top().getName();
   if (functionName.compare("Imprime") != 0 && functionName.compare("Lee") != 0)
   {
-    m_function.setParameters(
+    m_functions.top().setParameters(
         m_semanticChecker.getCurrentArguments(nParameters));
-    m_semanticChecker.checkDeclared(functionName, m_function.getParameters());
+    m_semanticChecker.checkDeclared(functionName,
+                                    m_functions.top().getParameters());
   }
-  m_function.reset();
+#ifdef DEBUG
+  cout << "popping function data: " << m_functions.top().getName() << endl;
+#endif
+  m_functions.pop();
 
   m_scanner->moveBackwards();
 
@@ -270,13 +274,17 @@ void Parser::command()
       {
         m_scanner->moveBackwards();
 
-        string variable = m_scanner->getLastToken().getLexeme();
+        SymbolData variable;
+        variable.setName(m_scanner->getLastToken().getLexeme());
+        m_variables.push(variable);
+        
 
         m_scanner->moveBackwards();
         
-        m_semanticChecker.checkDeclared(variable);
-        m_semanticChecker.checkModifiable(variable);
-        m_semanticChecker.checkDimensionsMatch(variable, 0);
+        m_semanticChecker.checkDeclared(m_variables.front().getName());
+        m_semanticChecker.checkModifiable(m_variables.front().getName());
+        m_semanticChecker.checkDimensionsMatch(
+            m_variables.front().getName(), 0);
 
         assign();
       }
@@ -306,7 +314,9 @@ void Parser::command()
         cout << "adding function name: " <<
             m_scanner->getLastToken().getLexeme();
 #endif
-        m_function.setName(m_scanner->getLastToken().getLexeme());
+        SymbolData function;
+        m_functions.push(function);
+        m_functions.top().setName(m_scanner->getLastToken().getLexeme());
 
         functionCall();
       }
@@ -659,11 +669,11 @@ void Parser::functionCall()
   }
   else
   {
-    m_semanticChecker.checkDeclared(m_function.getName(), "");
+    m_semanticChecker.checkDeclared(m_functions.top().getName(), "");
 
-    if (m_function.getType() != TYPE_VOID)
+    if (m_functions.top().getType() != TYPE_VOID)
     {
-      m_semanticChecker.pushFunctionType(m_function.getName(), "");
+      m_semanticChecker.pushFunctionType(m_functions.top().getName(), "");
     }
 
     m_scanner->moveBackwards();
@@ -687,10 +697,12 @@ void Parser::functionDeclaration()
   checkLexeme("funcion");
   checkToken(TOKEN_IDEN);
 
-  m_function.setName(m_scanner->getLastToken().getLexeme());
-  m_function.setLine(m_scanner->getLastToken().getLine());
-  m_function.setType(TYPE_VOID);
-  m_function.setIsFunction(true);
+  SymbolData function;
+  m_functions.push(function);
+  m_functions.top().setName(m_scanner->getLastToken().getLexeme());
+  m_functions.top().setLine(m_scanner->getLastToken().getLine());
+  m_functions.top().setType(TYPE_VOID);
+  m_functions.top().setIsFunction(true);
 
   if (m_scanner->getLastToken().getLexeme().compare("principal") == 0)
   {
@@ -704,7 +716,7 @@ void Parser::functionDeclaration()
   checkLexeme(")");
   returnType();
 
-  m_semanticChecker.declare(m_function);
+  m_semanticChecker.declare(m_functions.top());
 
   block();
 
@@ -712,7 +724,10 @@ void Parser::functionDeclaration()
 
   m_semanticChecker.exitCurrentScope();
 
-  m_function.reset();
+#ifdef DEBUG
+  cout << "popping function data: " << m_functions.top().getName() << endl;
+#endif
+  m_functions.pop();
 #ifdef DEBUG
   cout << "::: exit functionDeclaration()" << endl;
 #endif
@@ -894,7 +909,7 @@ void Parser::parameterList()
         SymbolData::getStringType(m_scanner->getLastToken().getLexeme());
     for (unsigned int i = 0; i < nTypeParameters; ++i)
     {
-      m_function.addParameter(parameterType);
+      m_functions.top().addParameter(parameterType);
     }
 
     resolveVariablesType(parameterType);
@@ -931,7 +946,9 @@ void Parser::print()
     m_errorReporter->writeSyntaxError("Imprime o Imprimenl");
   }
 
-  m_function.setName("Imprime");
+  SymbolData function;
+  m_functions.push(function);
+  m_functions.top().setName("Imprime");
   
   checkLexeme("(");
   advanceToken();
@@ -1025,6 +1042,11 @@ void Parser::read()
 
   checkLexeme(".");
   checkLexeme("Lee");
+
+  SymbolData function;
+  m_functions.push(function);
+  m_functions.top().setName("Lee");
+
   checkLexeme("(");
   advanceToken();
   argumentsList();
@@ -1077,7 +1099,11 @@ void Parser::returnExpression()
 
     expression();
 
-    m_semanticChecker.checkReturnType(m_function.getType());
+#ifdef DEBUG
+    cout << "call checkReturnType with: " <<
+        SymbolData::getTypeString(m_functions.top().getType()) << endl;
+#endif
+    m_semanticChecker.checkReturnType(m_functions.top().getType());
   }
 
 #ifdef DEBUG
@@ -1127,8 +1153,11 @@ void Parser::returnType()
     {
       m_scanner->moveBackwards();
       checkNativeDataType();
-
-      m_function.setType(
+#ifdef DEBUG
+      cout << "setting function type: " <<
+          m_scanner->getLastToken().getLexeme() << endl;
+#endif
+      m_functions.top().setType(
           SymbolData::getStringType(m_scanner->getLastToken().getLexeme()));
     }
   }

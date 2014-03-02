@@ -80,6 +80,9 @@ NativeType_t SemanticChecker::getExpressionType()
   if (!m_operations.empty())
   {
     type = SymbolData::getCharType(m_operations.top());
+#ifdef DEBUG
+    cout << "popping from operations stack: " << m_operations.top() << endl;
+#endif
     m_operations.pop();
   }
 
@@ -94,6 +97,9 @@ string SemanticChecker::getCurrentArguments(unsigned int nParameters)
     if (!m_operations.empty())
     {
       arguments.insert(arguments.begin(), m_operations.top());
+#ifdef DEBUG
+    cout << "popping from operations stack: " << m_operations.top() << endl;
+#endif
       m_operations.pop();
     }
   }
@@ -187,6 +193,9 @@ void SemanticChecker::checkExpressionType(NativeType_t expectedType)
       message += "\"";
       m_errorReporter->writeErrorWithPosition(message);
     }
+#ifdef DEBUG
+    cout << "popping from operations stack: " << m_operations.top() << endl;
+#endif
     m_operations.pop();
   }
 }
@@ -200,6 +209,9 @@ void SemanticChecker::checkExpressionType(NativeType_t expectedType,
     {
       m_errorReporter->writeErrorWithPosition(errorMessage);
     }
+#ifdef DEBUG
+    cout << "popping from operations stack: " << m_operations.top() << endl;
+#endif
     m_operations.pop();
   }
 }
@@ -217,6 +229,9 @@ void SemanticChecker::checkAssignType(const string& variable)
       message += SymbolData::getTypeString(varType);
       m_errorReporter->writeErrorWithPosition(message);
     }
+#ifdef DEBUG
+    cout << "popping from operations stack: " << m_operations.top() << endl;
+#endif
     m_operations.pop();
   }
 }
@@ -231,6 +246,9 @@ void SemanticChecker::checkReturnType(NativeType_t type)
       message += SymbolData::getTypeString(type);
       m_errorReporter->writeErrorWithPosition(message);
     }
+#ifdef DEBUG
+    cout << "popping from operations stack: " << m_operations.top() << endl;
+#endif
     m_operations.pop();
   }
 }
@@ -347,6 +365,9 @@ void SemanticChecker::evaluateUnaryExpression()
     while (i < MAX_OPERANDS && !m_operations.empty())
     {
       expression.insert(expression.begin(), m_operations.top());
+#ifdef DEBUG
+    cout << "popping from operations stack: " << m_operations.top() << endl;
+#endif
       m_operations.pop();
 
       ++i;
@@ -395,6 +416,9 @@ void SemanticChecker::evaluateBinaryExpression()
     while (i < MAX_OPERANDS && !m_operations.empty())
     {
       expression.insert(expression.begin(), m_operations.top());
+#ifdef DEBUG
+    cout << "popping from operations stack: " << m_operations.top() << endl;
+#endif
       m_operations.pop();
 
       ++i;
@@ -478,6 +502,9 @@ void SemanticChecker::printTypesStack()
   while (!m_operations.empty())
   {
     invertedStack.insert(invertedStack.begin(), m_operations.top());
+#ifdef DEBUG
+    cout << "popping from operations stack: " << m_operations.top() << endl;
+#endif
     m_operations.pop();
   }
 

@@ -75,7 +75,7 @@ private:
   unsigned int           m_maxRuleIterations;
   size_t                 m_nTokensProcessed;
   SemanticChecker        m_semanticChecker;
-  SymbolData             m_function;
+  std::stack<SymbolData> m_functions;
   std::queue<SymbolData> m_variables;
 };
 

@@ -5,16 +5,18 @@ importar ("fmt")
 const (PI = 3.141592
        MAX = 30)
        
-funcion lafuncion(x,y real) {
+funcion lafuncion(xy entero) entero {
   fmt.Imprimenl("hello" + "hello2");
+  regresa 3;
 }
 
 funcion principal() {
-  var a[4] entero;
-  var x[2] entero;
-  var y[9] real;
+  var a[12] entero;
+  var x entero;
+  var y[9][2] real;
 
-  lafuncion(2.4, 123.2)
+  lafuncion(0x234)
 
-  x[123] = a[9] + 2 * 02
+
+  x = a[9] + 2 * 2
 }
