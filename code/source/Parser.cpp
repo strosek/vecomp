@@ -480,7 +480,7 @@ void Parser::dimension()
   } while (m_currentToken.getLexeme().compare("[") == 0 &&
            iterations < m_maxRuleIterations);
   
-  m_variables.front().setDimensions(dimensions);
+  m_variables.back().setDimensions(dimensions);
 
   m_scanner->moveBackwards();
 
