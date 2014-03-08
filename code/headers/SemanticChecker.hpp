@@ -27,6 +27,8 @@ public:
   SemanticChecker& operator=(const SemanticChecker& rhs);
 
   NativeType_t getExpressionType();
+  NativeType_t getFunctionType(const std::string& name,
+                               const std::string& parameters);
   std::string  getCurrentArguments(unsigned int nParameters);
   void         checkAssignType(const std::string& variable);
   void         checkReturnType(NativeType_t type);

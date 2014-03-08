@@ -83,20 +83,31 @@ void Parser::andOperation()
     return;
 
   unsigned int iterations = 0;
+  bool isOperatorFound = false;
+  bool isEvaluable = false;
   do
   {
     notOperation();
 
     ++iterations;
 
+    isOperatorFound = false;
+
     if (m_currentToken.getLexeme().compare("&&") == 0)
     {
+      isOperatorFound = true;
+      isEvaluable = false;
       m_semanticChecker.pushOperator(OPERATOR_LOGIC);
     }
-  } while (m_currentToken.getLexeme().compare("&&") == 0 &&
-           iterations < m_maxRuleIterations);
+  } while (isOperatorFound && iterations < m_maxRuleIterations);
 
-  m_semanticChecker.evaluateBinaryExpression();
+  if (isOperatorFound)
+  {
+#ifdef DEBUG
+    cout << "evaluating binary in andOperation()" << endl;
+#endif
+    m_semanticChecker.evaluateBinaryExpression();
+  }
 
 #ifdef DEBUG
   cout << "::: exit andOperation()" << endl;
@@ -136,10 +147,6 @@ void Parser::argumentsList()
     m_semanticChecker.checkDeclared(functionName,
                                     m_functions.top().getParameters());
   }
-#ifdef DEBUG
-  cout << "popping function data: " << m_functions.top().getName() << endl;
-#endif
-  m_functions.pop();
 
   m_scanner->moveBackwards();
 
@@ -529,14 +536,23 @@ void Parser::exponent()
 
   sign();
 
+  bool isOperatorFound = false;
   if (m_currentToken.getLexeme().compare("^") == 0)
   {
+    isOperatorFound = true;
+
     m_semanticChecker.pushOperator(OPERATOR_ARITH);
 
     sign();
   }
 
-  m_semanticChecker.evaluateBinaryExpression();
+  if (isOperatorFound)
+  {
+#ifdef DEBUG
+    cout << "evaluating binary in exponent()" << endl;
+#endif
+    m_semanticChecker.evaluateBinaryExpression();
+  }
 
 #ifdef DEBUG
   cout << "::: exit exponent()" << endl;
@@ -669,18 +685,34 @@ void Parser::functionCall()
   }
   else
   {
-    m_semanticChecker.checkDeclared(m_functions.top().getName(), "");
+    m_functions.top().setParameters("");
+    m_functions.top().setType(m_semanticChecker.getFunctionType(
+        m_functions.top().getName(), m_functions.top().getParameters()));
 
-    if (m_functions.top().getType() != TYPE_VOID)
-    {
-      m_semanticChecker.pushFunctionType(m_functions.top().getName(), "");
-    }
+    m_semanticChecker.checkDeclared(m_functions.top().getName(),
+                                    m_functions.top().getParameters());
 
     m_scanner->moveBackwards();
   }
 
+#ifdef DEBUG
+  cout << "pushing type: " << m_functions.top().getType() <<
+      ", of function: " << m_functions.top().getName() << endl;
+#endif
+  if (m_functions.top().getType() != TYPE_VOID)
+  {
+    m_semanticChecker.pushFunctionType(m_functions.top().getName(),
+                                       m_functions.top().getParameters());
+  }
+
   checkLexeme(")");
   advanceToken();
+
+#ifdef DEBUG
+  cout << "popping function data: " << m_functions.top().getName() << endl;
+#endif
+  m_functions.pop();
+
 #ifdef DEBUG
   cout << "::: exit functionCall()" << endl;
 #endif
@@ -745,6 +777,9 @@ void Parser::ifStatement()
 
   advanceToken();
   expression();
+
+  m_semanticChecker.checkExpressionType(TYPE_BOOL);
+
   block();
   ignoreNewLines();
 
@@ -809,6 +844,7 @@ void Parser::multiplication()
     return;
 
   bool isOperatorFound = false;
+  bool isEvaluable = false;
   unsigned int iterations = 0;
   do
   {
@@ -819,6 +855,10 @@ void Parser::multiplication()
         m_currentToken.getLexeme().compare("%") == 0)
     {
       isOperatorFound = true;
+      isEvaluable = true;
+#ifdef DEBUG
+      cout << "operator in multiplication() found" << endl;
+#endif
 
       m_semanticChecker.pushOperator(OPERATOR_ARITH);
 
@@ -828,8 +868,11 @@ void Parser::multiplication()
     ++iterations;
   } while (isOperatorFound && iterations < m_maxRuleIterations); 
  
-  if (isOperatorFound)
+  if (isEvaluable)
   {
+#ifdef DEBUG
+    cout << "evaluating binary in multiplication()" << endl;
+#endif
     m_semanticChecker.evaluateBinaryExpression();
   }
 
@@ -1066,15 +1109,25 @@ void Parser::relationalOperation()
     return;
 
   sumOperation();
+
+  bool isEvaluable = false;
   if (m_currentToken.getToken() == TOKEN_RELOP)
   {
+    isEvaluable = true;
+
     m_semanticChecker.pushOperator(OPERATOR_REL);
 
     advanceToken();
     sumOperation();
   }
 
-  m_semanticChecker.evaluateBinaryExpression();
+  if (isEvaluable)
+  {
+#ifdef DEBUG
+    cout << "evaluating binary in relationalOperation()" << endl;
+#endif
+    m_semanticChecker.evaluateBinaryExpression();
+  }
 
 #ifdef DEBUG
   cout << "::: exit relationalOperation()" << endl;
@@ -1255,6 +1308,7 @@ void Parser::sumOperation()
     return;
 
   bool isOperatorFound = false;
+  bool isEvaluable = false;
   unsigned int iterations = 0;
   do
   {
@@ -1264,6 +1318,7 @@ void Parser::sumOperation()
         m_currentToken.getLexeme().compare("-") == 0)
     {
       isOperatorFound = true;
+      isEvaluable = true;
 
       if (m_currentToken.getLexeme().compare("+") == 0)
       {
@@ -1280,8 +1335,11 @@ void Parser::sumOperation()
     ++iterations;
   } while (isOperatorFound && iterations < m_maxRuleIterations); 
 
-  if (isOperatorFound)
+  if (isEvaluable)
   {
+#ifdef DEBUG
+  cout << "evaluating binary in sumOperation()" << endl;
+#endif
     m_semanticChecker.evaluateBinaryExpression();
   }
 
@@ -1325,6 +1383,15 @@ void Parser::term()
     else if (m_currentToken.getLexeme().compare("(") == 0)
     {
       m_scanner->moveBackwards();
+
+      SymbolData function;
+#ifdef DEBUG
+      cout << "pushing function call: " <<
+          m_scanner->getLastToken().getLexeme() << endl;;
+#endif
+      function.setName(m_scanner->getLastToken().getLexeme());
+      m_functions.push(function);
+
       functionCall();
     }
     else

@@ -52,15 +52,15 @@ SemanticChecker::SemanticChecker() :
   m_validExpressions["iAf"] = 'f';
   m_validExpressions["iAi"] = 'i';
 
-  m_validExpressions["cRc"] = 'c';
-  m_validExpressions["cRf"] = 'f';
-  m_validExpressions["cRi"] = 'i';
-  m_validExpressions["fRc"] = 'f';
-  m_validExpressions["fRf"] = 'f';
-  m_validExpressions["fRi"] = 'f';
-  m_validExpressions["iRc"] = 'i';
-  m_validExpressions["iRf"] = 'f';
-  m_validExpressions["iRi"] = 'i';
+  m_validExpressions["cRc"] = 'b';
+  m_validExpressions["cRf"] = 'b';
+  m_validExpressions["cRi"] = 'b';
+  m_validExpressions["fRc"] = 'b';
+  m_validExpressions["fRf"] = 'b';
+  m_validExpressions["fRi"] = 'b';
+  m_validExpressions["iRc"] = 'b';
+  m_validExpressions["iRf"] = 'b';
+  m_validExpressions["iRi"] = 'b';
 
   m_validExpressions["sPs"] = 's';
 
@@ -87,6 +87,12 @@ NativeType_t SemanticChecker::getExpressionType()
   }
 
   return type;
+}
+
+NativeType_t SemanticChecker::getFunctionType(const string& name,
+                                              const string& parameters)
+{
+  return m_symbolsTable.getFunctionType(name, parameters);
 }
 
 string SemanticChecker::getCurrentArguments(unsigned int nParameters)
