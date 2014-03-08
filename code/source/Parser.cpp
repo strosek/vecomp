@@ -171,6 +171,10 @@ void Parser::assign()
 
   if (m_variables.size() > 0)
   {
+#ifdef DEBUG
+    cout << "checking assignType for variable: " << 
+        m_variables.front().getName() << endl;
+#endif
     m_semanticChecker.checkAssignType(m_variables.front().getName());
     m_variables.pop();
   }
@@ -606,12 +610,39 @@ void Parser::forStatement()
   {
     m_scanner->moveBackwards();
 
+    SymbolData variable;
+    variable.setName(m_scanner->getCurrentToken().getLexeme());
+    m_variables.push(variable);
+
+#ifdef DEBUG
+    cout << "checking declared in forexpr: " <<
+        m_variables.front().getName() << endl;
+#endif
+    m_semanticChecker.checkDeclared(m_variables.front().getName());
+    m_semanticChecker.checkModifiable(m_variables.front().getName());
+    m_semanticChecker.checkDimensionsMatch(
+        m_variables.front().getName(), 0);
+
     assign();
+
     unsigned int iterations = 0;
     while (m_currentToken.getLexeme().compare(",") == 0 &&
            iterations < m_maxRuleIterations)
     {
       m_scanner->moveBackwards();
+
+      variable.setName(m_scanner->getCurrentToken().getLexeme());
+      m_variables.push(variable);
+
+#ifdef DEBUG
+    cout << "checking declared in forexpr: " <<
+        m_variables.front().getName() << endl;
+#endif
+      m_semanticChecker.checkDeclared(m_variables.front().getName());
+      m_semanticChecker.checkModifiable(m_variables.front().getName());
+      m_semanticChecker.checkDimensionsMatch(
+          m_variables.front().getName(), 0);
+
       assign();
       
       ++iterations;
@@ -628,6 +659,9 @@ void Parser::forStatement()
   if (m_currentToken.getLexeme().compare(";") != 0)
   {
     expression();
+
+    m_semanticChecker.checkExpressionType(TYPE_BOOL,
+        "condicion en for debe ser de tipo logico");
   }
   else
   {
@@ -639,6 +673,21 @@ void Parser::forStatement()
   advanceToken();
   if (m_currentToken.getLexeme().compare("{") != 0)
   {
+    m_scanner->moveBackwards();
+
+    SymbolData variable;
+    variable.setName(m_scanner->getCurrentToken().getLexeme());
+    m_variables.push(variable);
+
+#ifdef DEBUG
+    cout << "checking declared in forexpr: " <<
+        m_variables.front().getName() << endl;
+#endif
+    m_semanticChecker.checkDeclared(m_variables.front().getName());
+    m_semanticChecker.checkModifiable(m_variables.front().getName());
+    m_semanticChecker.checkDimensionsMatch(
+        m_variables.front().getName(), 0);
+
     assign();
     unsigned int iterations = 0;
     while (m_currentToken.getLexeme().compare(",") == 0 &&
@@ -778,7 +827,8 @@ void Parser::ifStatement()
   advanceToken();
   expression();
 
-  m_semanticChecker.checkExpressionType(TYPE_BOOL);
+  m_semanticChecker.checkExpressionType(TYPE_BOOL,
+      "condicion en if debe ser de tipo logico");
 
   block();
   ignoreNewLines();
