@@ -1,0 +1,32 @@
+OPR 0, 	0	Fin de programa
+	1	Regresa
+	2	Suma
+	3	Resta
+	4	Multiplica
+	5	Division
+	6	Modulo
+	7	Exponente
+	8	Menos de Signo
+	9	<
+	10	>
+	11	<=
+	12	>=
+	13	!=
+	14	==
+	15	and
+	16	or
+	17	not
+	18	clear screen
+   Ide, 19	lee Ide
+	20	Imprime sin nl
+	21 	Imprime y nl
+
+LIT cte, 0  	Carga Cte en Pila
+LOD ide, 0	Carga Ide en Pila
+STO 0, Ide	Almacena en TabSim el valor de Ide (saca el valor de Pila)
+JMP 0, dir	Salta a dir (directo)
+JMP 0, _Ex	Salta a valor segun _Ex (indirecto)
+JMC cond, dir	Salto condicionalmente a dir
+JMC cond, _Ex	Salto condicionalmente a _Ex 
+CAL nomf, 0	Llamada a Subrutina nomf
+	

@@ -1,0 +1,64 @@
+n,I,I,0,0,P,E,0,0,fibo,#,
+i,V,E,0,0,#,
+j,V,E,0,0,#,
+a,V,E,0,0,#,
+s,V,A,0,0,#,
+n,P,E,0,0,#,
+fibo,F,E,1,0,#,
+_E0,I,I,14,0,#,
+_E2,I,I,19,0,#,
+_E3,I,I,25,0,#,
+_E1,I,I,29,0,#,
+_P,I,I,29,0,#,
+fmt,L,I,0,0,#,
+fmt,L,I,0,0,#,
+_E4,I,I,46,0,#,
+@
+1 STO 0, n
+2 LOD n, 0
+3 LIT 0, 0
+4 OPR 0, 14
+5 LOD n, 0
+6 LIT 1, 0
+7 OPR 0, 14
+8 OPR 0, 15
+9 JMC F, _E0
+10 LOD n, 0
+11 STO 0, fibo
+12 OPR 0, 1
+13 JMP 0, _E1
+14 LOD _E2, 0
+15 LOD n, 0
+16 LIT 1, 0
+17 OPR 0, 3
+18 CAL fibo, 0
+19 LOD fibo, 0
+20 LOD _E3, 0
+21 LOD n, 0
+22 LIT 2, 0
+23 OPR 0, 3
+24 CAL fibo, 0
+25 LOD fibo, 0
+26 OPR 0, 2
+27 STO 0, fibo
+28 OPR 0, 1
+29 LIT 10, 0
+30 STO 0, i
+31 LIT "Bienvenidos CUCEI 28/SEP/2013 ", 0
+32 OPR 0, 20
+33 LOD i, 0
+34 LIT 10, 0
+35 OPR 0, 2
+36 OPR 0, 21
+37 LIT "Fibonacci(", 0
+38 OPR 0, 20
+39 LOD i, 0
+40 OPR 0, 20
+41 LIT ")= ", 0
+42 OPR 0, 20
+43 LOD _E4, 0
+44 LOD i, 0
+45 CAL fibo, 0
+46 LOD fibo, 0
+47 OPR 0, 21
+48 OPR 0, 0
