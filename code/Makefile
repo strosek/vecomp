@@ -14,7 +14,7 @@ IDIR := headers
 ODIR := ../binaries/object
 
 # Object files
-_OBJ := main.o Parser.o SemanticChecker.o SymbolsTable.o SymbolData.o Scanner.o FileReader.o TokenLexeme.o ErrorReporter.o
+_OBJ := main.o CodeGenerator.o Parser.o SemanticChecker.o SymbolsTable.o SymbolData.o Scanner.o FileReader.o TokenLexeme.o ErrorReporter.o
 OBJ := $(_OBJ:%.o=$(ODIR)/%.o)
 
 # Binary file (executable)
