@@ -3,6 +3,11 @@
 #ifndef CODEGENERATOR_HPP
 #define CODEGENERATOR_HPP
 
+#include <string>
+#include <vector>
+
+#include "SymbolsTable.hpp"
+
 typedef enum
 {
   PL0 = 0,
@@ -32,7 +37,7 @@ typedef enum
   OPC_CLS,
   OPC_READ,
   OPC_PRINT,
-  OPC_PINTLN,
+  OPC_PRINTLN,
 } Pl0OperationCode_t;
 
 const std::string MNE_OPR = "OPR";
@@ -48,17 +53,16 @@ class CodeGenerator
 public:
   CodeGenerator(const std::string& outputFileName, OutputType_t outputType);
 
-  void writeClassFile();
+  void writeObjectFile();
   void translateSymbolsTable(const SymbolsTable& symbolsTable);
   void insertSymbol();
-  void generateOperation(const std::string& mnemo, const std::string op);
-  void generateOperation(const std::string& mnemo, const std::string op1,
-                         const std::string op2);
+  void generateOperation(const std::string& mnemo, const std::string& op1,
+                         const std::string& op2);
 private:
-  OutputType_t outputType;
-
-  std::ostringstream m_codeBuilder;
-  unsigned int       m_labelCounter;
+  OutputType_t             m_outputType;
+  std::string              m_outputFileName;
+  std::vector<int>         m_labels;
+  std::vector<std::string> m_operations;
 };
 
 #endif /* CODEGENERATOR_HPP */
