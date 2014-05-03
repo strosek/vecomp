@@ -14,6 +14,7 @@ Parser::Parser() :
   m_currentToken(),
   m_scanner(nullptr),
   m_errorReporter(nullptr),
+  m_codeGenerator(),
   m_maxErrors(5),
   m_maxRuleIterations(1000),
   m_nTokensProcessed(0),
@@ -32,6 +33,11 @@ void Parser::setErrorReporter(ErrorReporter* errorReporter)
 void Parser::setScanner(Scanner* scanner)
 {
   m_scanner = scanner;
+}
+
+void Parser::setOutputType(OutputType_t type)
+{
+  m_codeGenerator.setOutputType(type);
 }
 
 void Parser::parse()
@@ -66,6 +72,17 @@ void Parser::parse()
   {
     m_errorReporter->writeError(
         "codigo incompleto, cantidad de tokens incongruente");
+  }
+
+  if (m_errorReporter->getErrors() == 0)
+  {
+    m_codeGenerator.setOutputType(PL0);
+    m_codeGenerator.setOutputFileName("out.eje");
+#ifdef DEBUG
+    cout << "::: translating symbols ..." << endl;
+#endif
+    m_codeGenerator.translateSymbolsTable(m_semanticChecker.getSymbolsTable());
+    m_codeGenerator.writeObjectFile();
   }
 
 #ifdef DEBUG

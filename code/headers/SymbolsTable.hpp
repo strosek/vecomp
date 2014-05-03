@@ -33,6 +33,8 @@ public:
                                      const std::string& parameters);
   void         setErrorReporter(ErrorReporter* errorReporter);
 
+  std::multimap<std::string, SymbolData>& getSymbolsMap();
+
   friend std::ostream& operator<<(std::ostream& out,
                                   const SymbolsTable& symbolsTable);
 

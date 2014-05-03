@@ -69,6 +69,8 @@ public:
   void         printTypesStack();
   void         setErrorReporter(ErrorReporter* errorReporter);
 
+  SymbolsTable& getSymbolsTable();
+
 private:
 
   ErrorReporter *             m_errorReporter;

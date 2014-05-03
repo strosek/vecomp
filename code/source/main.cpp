@@ -4,6 +4,7 @@
 #include <cstdlib>
 #include <iostream>
 
+#include "../headers/CodeGenerator.hpp"
 #include "../headers/ErrorReporter.hpp"
 #include "../headers/FileReader.hpp"
 #include "../headers/Parser.hpp"

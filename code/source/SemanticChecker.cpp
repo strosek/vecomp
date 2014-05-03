@@ -523,3 +523,7 @@ void SemanticChecker::printTypesStack()
   cout << "::: Values: " << invertedStack << endl;
 }
 
+SymbolsTable& SemanticChecker::getSymbolsTable()
+{
+  return m_symbolsTable;
+}

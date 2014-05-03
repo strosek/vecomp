@@ -51,16 +51,20 @@ const std::string MNE_CAL = "CAL";
 class CodeGenerator
 {
 public:
-  CodeGenerator(const std::string& outputFileName, OutputType_t outputType);
+  CodeGenerator();
+  CodeGenerator(OutputType_t outputType);
 
   void writeObjectFile();
-  void translateSymbolsTable(const SymbolsTable& symbolsTable);
+  void setOutputType(OutputType_t type);
+  void setOutputFileName(const std::string& fileName);
+  void translateSymbolsTable(SymbolsTable& symbolsTable);
   void insertSymbol();
   void generateOperation(const std::string& mnemo, const std::string& op1,
                          const std::string& op2);
 private:
   OutputType_t             m_outputType;
   std::string              m_outputFileName;
+  std::vector<std::string> m_symbols;
   std::vector<int>         m_labels;
   std::vector<std::string> m_operations;
 };

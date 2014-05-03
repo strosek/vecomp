@@ -7,6 +7,7 @@
 #include <string>
 #include <utility>
 
+#include "CodeGenerator.hpp"
 #include "ErrorReporter.hpp"
 #include "Scanner.hpp"
 #include "SemanticChecker.hpp"
@@ -22,6 +23,7 @@ public:
 
   void setErrorReporter(ErrorReporter* errorReporter);
   void setScanner(Scanner* scanner);
+  void setOutputType(OutputType_t type);
 
   Parser& operator=(const Parser& rhs);
 private:
@@ -71,6 +73,7 @@ private:
   TokenLexeme            m_currentToken;
   Scanner*               m_scanner;
   ErrorReporter*         m_errorReporter;
+  CodeGenerator          m_codeGenerator;
   unsigned int           m_maxErrors;
   unsigned int           m_maxRuleIterations;
   size_t                 m_nTokensProcessed;

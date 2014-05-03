@@ -354,6 +354,11 @@ void SymbolsTable::setErrorReporter(ErrorReporter* errorReporter)
   m_errorReporter = errorReporter;
 }
 
+multimap<string, SymbolData>& SymbolsTable::getSymbolsMap()
+{
+  return m_symbolsMap;
+}
+
 ostream& operator<<(ostream& out, const SymbolsTable& symbolsTable)
 {
   static const size_t WIDTH_IDEN =   12;
