@@ -196,6 +196,7 @@ void Parser::assign()
         m_variables.front().getName() << endl;
 #endif
     m_semanticChecker.checkAssignType(m_variables.front().getName());
+    m_codeGenerator.addOperation(MNE_STO, "0", m_variables.front().getName());
     m_variables.pop();
   }
 
@@ -1137,7 +1138,7 @@ void Parser::program()
 
   m_semanticChecker.exitCurrentScope();
 
-  m_codeGenerator.addOperation("OPR", "0", "0");
+  m_codeGenerator.addOperation(MNE_OPR, "0", OPC_END);
 #ifdef DEBUG
   cout << "::: exit program()" << endl;
 #endif
@@ -1725,7 +1726,7 @@ void Parser::resolveVariablesType(NativeType_t type)
 #ifdef DEBUG
     cout << "::: size of m_variables: " << m_variables.size() << endl; 
     cout << "::: declaring variable: " << m_variables.front().getName() <<
-      " in line: " << m_variables.front().getLine() << endl;
+        " in line: " << m_variables.front().getLine() << endl;
 #endif
     m_semanticChecker.declare(m_variables.front());
     m_variables.pop();

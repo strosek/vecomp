@@ -106,6 +106,17 @@ void CodeGenerator::addOperation(const string& mnemo, const string& op1,
   m_operations.push_back(builder.str());
 }
 
+void CodeGenerator::addOperation(const string& mnemo, const string& op1,
+                                 int op2)
+{
+  ostringstream builder;
+
+  builder << mnemo << " " << op1 << ", " << op2;
+  builder.flush();
+
+  m_operations.push_back(builder.str());
+}
+
 void CodeGenerator::writeObjectFile()
 {
   ofstream outputFile(m_outputFileName);

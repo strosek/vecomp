@@ -62,6 +62,8 @@ public:
   void   addLabel();
   void   addOperation(const std::string& mnemo, const std::string& op1,
                       const std::string& op2);
+  void   addOperation(const std::string& mnemo, const std::string& op1,
+                      int op2);
 private:
   OutputType_t             m_outputType;
   std::string              m_outputFileName;
