@@ -5,12 +5,12 @@ importar ( "fmt"
 const (PI = 3.141592
        MAX = 30)
 
-var ( i, j, k, n, vector[MAX] entero
+var ( i, j, k, n, Vector[MAX] entero
       r, s, t real
       alfa, beta alfabetico
       log1, log2 logico ) 
 
-var matriz[MAX][MAX] entero
+var Matriz[MAX][MAX] entero
 //Factoriai Recursivo
 funcion  FacRec(n entero) entero {
    si  n < 2  { regresa 1 }
@@ -81,7 +81,7 @@ funcion OrdVec(k entero) {
 var Temp entero;
    desde i := 1; i < k ; i := i + 1 {
       desde j := i + 1; i <= k; j := j + 1 {
-         si vector[i] > vector[j] {
+         si Vector[i] > Vector[j] {
                 Temp := Vector[i];
                 Vector[i] := Vector[j];
                 Vector[j] := Temp;
@@ -92,7 +92,7 @@ var Temp entero;
 
 funcion ImpVec(k entero) {
    desde i:=1; i <= k; i := i + 1 {
-      fmt.Imprimenl("Vector[",i,"]= ", vector[i])
+      fmt.Imprimenl("Vector[",i,"]= ", Vector[i])
    }
 }
 
