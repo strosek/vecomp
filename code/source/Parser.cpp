@@ -78,7 +78,10 @@ void Parser::parse()
   {
     m_codeGenerator.setOutputType(PL0);
     m_codeGenerator.setOutputFileName("out.eje");
+
 #ifdef DEBUG
+    m_codeGenerator.addLabel();
+    m_codeGenerator.addLabel();
     cout << "::: translating symbols ..." << endl;
 #endif
     m_codeGenerator.translateSymbolsTable(m_semanticChecker.getSymbolsTable());
@@ -1133,6 +1136,8 @@ void Parser::program()
             iterations < m_maxRuleIterations);
 
   m_semanticChecker.exitCurrentScope();
+
+  m_codeGenerator.addOperation("OPR", "0", "0");
 #ifdef DEBUG
   cout << "::: exit program()" << endl;
 #endif

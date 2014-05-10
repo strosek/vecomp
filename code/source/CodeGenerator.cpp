@@ -15,6 +15,11 @@ CodeGenerator::CodeGenerator(OutputType_t outputType) :
 {
 }
 
+size_t CodeGenerator::getLastLabelNumber()
+{
+  return m_labels.size();
+}
+
 void CodeGenerator::setOutputType(OutputType_t type)
 {
   m_outputType = type;
@@ -85,8 +90,13 @@ void CodeGenerator::translateSymbolsTable(SymbolsTable& symbolsTable)
   }
 }
 
-void CodeGenerator::generateOperation(const string& mnemo, const string& op1,
-                                      const string& op2)
+void CodeGenerator::addLabel()
+{
+  m_labels.push_back(m_operations.size());
+}
+
+void CodeGenerator::addOperation(const string& mnemo, const string& op1,
+                                 const string& op2)
 {
   ostringstream builder;
 
@@ -117,7 +127,7 @@ void CodeGenerator::writeObjectFile()
   size_t nOperations = m_operations.size();
   for (size_t i = 0; i < nOperations; ++i)
   {
-    outputFile << m_operations.at(i) << endl;
+    outputFile << i + 1 << " " << m_operations.at(i) << endl;
   }
 }
 

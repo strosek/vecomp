@@ -54,13 +54,14 @@ public:
   CodeGenerator();
   CodeGenerator(OutputType_t outputType);
 
-  void writeObjectFile();
-  void setOutputType(OutputType_t type);
-  void setOutputFileName(const std::string& fileName);
-  void translateSymbolsTable(SymbolsTable& symbolsTable);
-  void insertSymbol();
-  void generateOperation(const std::string& mnemo, const std::string& op1,
-                         const std::string& op2);
+  void   writeObjectFile();
+  size_t getLastLabelNumber();
+  void   setOutputType(OutputType_t type);
+  void   setOutputFileName(const std::string& fileName);
+  void   translateSymbolsTable(SymbolsTable& symbolsTable);
+  void   addLabel();
+  void   addOperation(const std::string& mnemo, const std::string& op1,
+                      const std::string& op2);
 private:
   OutputType_t             m_outputType;
   std::string              m_outputFileName;
