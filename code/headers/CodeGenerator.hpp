@@ -4,6 +4,7 @@
 #define CODEGENERATOR_HPP
 
 #include <string>
+#include <stack>
 #include <vector>
 
 #include "SymbolsTable.hpp"
@@ -60,16 +61,20 @@ public:
   void   setOutputFileName(const std::string& fileName);
   void   translateSymbolsTable(SymbolsTable& symbolsTable);
   void   addLabel();
+  void   setLabelValue(size_t labelNo, int value);
   void   addOperation(const std::string& mnemo, const std::string& op1,
                       const std::string& op2);
   void   addOperation(const std::string& mnemo, const std::string& op1,
                       int op2);
+  void   addParameter(const std::string& parameter);
+  void   generateParameters();
 private:
   OutputType_t             m_outputType;
   std::string              m_outputFileName;
   std::vector<std::string> m_symbols;
   std::vector<int>         m_labels;
   std::vector<std::string> m_operations;
+  std::stack<std::string>  m_parametersStack;
 };
 
 #endif /* CODEGENERATOR_HPP */

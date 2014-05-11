@@ -6,12 +6,23 @@
 
 using namespace std;
 
-CodeGenerator::CodeGenerator()
+CodeGenerator::CodeGenerator() :
+  m_outputType(),
+  m_outputFileName(),
+  m_symbols(),
+  m_labels(),
+  m_operations(),
+  m_parametersStack()
 {
 }
 
 CodeGenerator::CodeGenerator(OutputType_t outputType) :
-  m_outputType(outputType)
+  m_outputType(outputType),
+  m_outputFileName(),
+  m_symbols(),
+  m_labels(),
+  m_operations(),
+  m_parametersStack()
 {
 }
 
@@ -95,6 +106,12 @@ void CodeGenerator::addLabel()
   m_labels.push_back(m_operations.size());
 }
 
+
+void CodeGenerator::setLabelValue(size_t labelNo, int value)
+{
+  m_labels.at(labelNo) = value;
+}
+
 void CodeGenerator::addOperation(const string& mnemo, const string& op1,
                                  const string& op2)
 {
@@ -115,6 +132,20 @@ void CodeGenerator::addOperation(const string& mnemo, const string& op1,
   builder.flush();
 
   m_operations.push_back(builder.str());
+}
+
+void CodeGenerator::addParameter(const string& parameter)
+{
+  m_parametersStack.push(parameter);
+}
+
+void CodeGenerator::generateParameters()
+{
+  while (!m_parametersStack.empty())
+  {
+    addOperation(MNE_STO, m_parametersStack.top(), "0");
+    m_parametersStack.pop();
+  }
 }
 
 void CodeGenerator::writeObjectFile()
