@@ -80,8 +80,6 @@ void Parser::parse()
     m_codeGenerator.setOutputFileName("out.eje");
 
 #ifdef DEBUG
-    m_codeGenerator.addLabel();
-    m_codeGenerator.addLabel();
     cout << "::: translating symbols ..." << endl;
 #endif
     m_codeGenerator.translateSymbolsTable(m_semanticChecker.getSymbolsTable());
@@ -196,7 +194,9 @@ void Parser::assign()
         m_variables.front().getName() << endl;
 #endif
     m_semanticChecker.checkAssignType(m_variables.front().getName());
+
     m_codeGenerator.addOperation(MNE_STO, "0", m_variables.front().getName());
+
     m_variables.pop();
   }
 
@@ -1009,6 +1009,8 @@ void Parser::parameterList()
       variable.setLine(m_scanner->getLastToken().getLine());
       m_variables.push(variable);
 
+      m_codeGenerator.addParameter(m_scanner->getLastToken().getLexeme());
+
       advanceToken();
 
       ++nTypeParameters;
@@ -1032,6 +1034,8 @@ void Parser::parameterList()
 
     ++iterations;
   }
+
+  m_codeGenerator.generateParameters();
 
   m_scanner->moveBackwards();
 #ifdef DEBUG
@@ -1090,6 +1094,8 @@ void Parser::program()
     return;
 
   m_semanticChecker.enterToScope("global");
+
+  ignoreNewLines();
 
   checkLexeme("paquete");
 
@@ -1490,6 +1496,23 @@ void Parser::term()
 #endif
     m_semanticChecker.pushOperand(SymbolData::getTypeChar(
         SymbolData::getLiteralType(m_currentToken.getToken())));
+
+    if (m_currentToken.getToken() != TOKEN_LOGICCONST)
+    {
+      m_codeGenerator.addOperation(MNE_LIT, m_currentToken.getLexeme(), "0");
+    }
+    else
+    {
+      if (m_currentToken.getLexeme() == "verdadero")
+      {
+        m_codeGenerator.addOperation(MNE_LIT, "V", "0");
+      }
+      else
+      {
+        m_codeGenerator.addOperation(MNE_LIT, "F", "0");
+      }
+    }
+
     advanceToken();
   }
   else if (m_currentToken.getLexeme().compare("-") != 0)
