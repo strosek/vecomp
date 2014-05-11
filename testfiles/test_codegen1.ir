@@ -1,0 +1,14 @@
+/* Programa de prueba */
+
+paquete principal
+
+importar ( "fmt" );
+
+funcion cosa( a, b, c entero d, e real) {
+	fmt.Imprimenl("cosa")
+}
+
+funcion principal() {
+	var x entero;
+	fmt.Imprimenl("cosa");
+}
