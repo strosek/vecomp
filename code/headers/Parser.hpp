@@ -81,6 +81,8 @@ private:
   std::stack<SymbolData> m_functions;
   std::queue<SymbolData> m_variables;
   bool                   m_shouldPrintArguments;
+  bool                   m_isFunctionCalledAsCommand;
+  bool                   m_isFunctionCalledAsArgument;
 };
 
 #endif /* PARSER_HPP */

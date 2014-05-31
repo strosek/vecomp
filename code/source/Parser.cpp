@@ -22,7 +22,9 @@ Parser::Parser() :
   m_semanticChecker(),
   m_functions(),
   m_variables(),
-  m_shouldPrintArguments(false)
+  m_shouldPrintArguments(false),
+  m_isFunctionCalledAsCommand(false),
+  m_isFunctionCalledAsArgument(false)
 {
 }
 
@@ -149,7 +151,9 @@ void Parser::argumentsList()
   {
     isOperatorFound = false;
 
+    m_isFunctionCalledAsArgument = true;
     expression();
+    m_isFunctionCalledAsArgument = false;
 
     if (m_shouldPrintArguments)
     {
@@ -361,7 +365,9 @@ void Parser::command()
         m_functions.push(function);
         m_functions.top().setName(m_scanner->getLastToken().getLexeme());
 
+        m_isFunctionCalledAsCommand = true;
         functionCall();
+        m_isFunctionCalledAsCommand = false;
       }
       else
       {
@@ -774,6 +780,27 @@ void Parser::functionCall()
     // FIXME: check that type != VOID when called from command() or expression()
     m_functions.top().setType(m_semanticChecker.getFunctionType(
         m_functions.top().getName(), m_functions.top().getParameters()));
+    
+#ifdef DEBUG
+    cout << ":: checking type of function called: type: " <<
+            m_functions.top().getType() << endl;
+#endif
+    if (m_isFunctionCalledAsCommand)
+    {
+      if (m_functions.top().getType() != TYPE_VOID)
+      {
+        m_errorReporter->writeErrorWithPosition(
+            "funcion con tipo llamada sin utilizar valor de regreso");
+      }
+    }
+    else if (m_isFunctionCalledAsArgument)
+    {
+      if (m_functions.top().getType() == TYPE_VOID)
+      {
+        m_errorReporter->writeErrorWithPosition(
+            "funcion sin tipo es llamada en expresion");
+      }
+    }
 
     m_semanticChecker.checkDeclared(m_functions.top().getName(),
                                     m_functions.top().getParameters());
@@ -1167,7 +1194,7 @@ void Parser::program()
   checkLexeme("paquete");
 
   checkLexeme("principal");
- 
+
   ignoreNewLines();
   unsigned int iterations = 0;
   do
@@ -1199,15 +1226,15 @@ void Parser::program()
 
 #ifdef DEBUG
     cout << "::: current lexeme (line " << __LINE__ << "): " <<
-        m_currentToken.getLexeme() << endl;
+      m_currentToken.getLexeme() << endl;
 #endif
 
     ++iterations;
   } while ((m_currentToken.getLexeme().compare("var") == 0       ||
-            m_currentToken.getLexeme().compare("importar")  == 0 ||
-            m_currentToken.getLexeme().compare("const")  == 0    ||
-            m_currentToken.getLexeme().compare("funcion")  == 0) &&
-            iterations < m_maxRuleIterations);
+        m_currentToken.getLexeme().compare("importar")  == 0 ||
+        m_currentToken.getLexeme().compare("const")  == 0    ||
+        m_currentToken.getLexeme().compare("funcion")  == 0) &&
+      iterations < m_maxRuleIterations);
 
   m_semanticChecker.exitCurrentScope();
 
@@ -1333,7 +1360,7 @@ void Parser::returnExpression()
 
 #ifdef DEBUG
     cout << "call checkReturnType with: " <<
-        SymbolData::getTypeString(m_functions.top().getType()) << endl;
+      SymbolData::getTypeString(m_functions.top().getType()) << endl;
 #endif
     m_semanticChecker.checkReturnType(m_functions.top().getType());
   }
@@ -1352,7 +1379,7 @@ void Parser::returnType()
 #endif
   if (m_errorReporter->getErrors() >= m_maxErrors)
     return;
-  
+
   advanceToken();
   if (m_currentToken.getLexeme().compare("{") != 0)
   {
@@ -1374,7 +1401,7 @@ void Parser::returnType()
 
           ++iterations;
         } while (m_currentToken.getLexeme().compare(",") == 0 &&
-                 iterations < m_maxRuleIterations);
+            iterations < m_maxRuleIterations);
         checkLexeme(")");
       }
       else
@@ -1389,7 +1416,7 @@ void Parser::returnType()
       checkNativeDataType();
 #ifdef DEBUG
       cout << "setting function type: " <<
-          m_scanner->getLastToken().getLexeme() << endl;
+        m_scanner->getLastToken().getLexeme() << endl;
 #endif
       m_functions.top().setType(
           SymbolData::getStringType(m_scanner->getLastToken().getLexeme()));
