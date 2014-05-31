@@ -1133,8 +1133,8 @@ void Parser::print()
   argumentsList();
   m_shouldPrintArguments = false;
 
-  // FIXME: do not allow void type neither.
-  if (m_semanticChecker.getExpressionType() == TYPE_INVALID)
+  NativeType_t expressionType = m_semanticChecker.getExpressionType();
+  if (expressionType == TYPE_INVALID || expressionType == TYPE_VOID)
   {
     m_errorReporter->writeErrorWithPosition(
         "tipo invalido en expresion de argumento");
