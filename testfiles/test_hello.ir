@@ -1,0 +1,9 @@
+// Hola mundo
+
+paquete principal
+
+importar ( "fmt" )
+
+funcion principal() {
+	fmt.Imprimenl("Hola mundo!")
+}
