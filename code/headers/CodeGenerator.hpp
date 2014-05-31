@@ -57,6 +57,7 @@ public:
 
   void   writeObjectFile();
   size_t getLastLabelNumber();
+  size_t getLastOperationNumber();
   void   setOutputType(OutputType_t type);
   void   setOutputFileName(const std::string& fileName);
   void   translateSymbolsTable(SymbolsTable& symbolsTable);

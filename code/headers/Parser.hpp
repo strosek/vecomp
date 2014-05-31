@@ -80,6 +80,7 @@ private:
   SemanticChecker        m_semanticChecker;
   std::stack<SymbolData> m_functions;
   std::queue<SymbolData> m_variables;
+  bool                   m_shouldPrintArguments;
 };
 
 #endif /* PARSER_HPP */

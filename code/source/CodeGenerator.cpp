@@ -31,6 +31,11 @@ size_t CodeGenerator::getLastLabelNumber()
   return m_labels.size();
 }
 
+size_t CodeGenerator::getLastOperationNumber()
+{
+  return m_operations.size();
+}
+
 void CodeGenerator::setOutputType(OutputType_t type)
 {
   m_outputType = type;
@@ -109,7 +114,7 @@ void CodeGenerator::addLabel()
 
 void CodeGenerator::setLabelValue(size_t labelNo, int value)
 {
-  m_labels.at(labelNo) = value;
+  m_labels.at(labelNo - 1) = value;
 }
 
 void CodeGenerator::addOperation(const string& mnemo, const string& op1,

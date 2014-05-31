@@ -4,6 +4,7 @@
 #include "../headers/Parser.hpp"
 
 #include <cstdlib>
+#include <sstream>
 #ifdef DEBUG
 # include <iostream>
 #endif
@@ -20,7 +21,8 @@ Parser::Parser() :
   m_nTokensProcessed(0),
   m_semanticChecker(),
   m_functions(),
-  m_variables()
+  m_variables(),
+  m_shouldPrintArguments(false)
 {
 }
 
@@ -116,7 +118,8 @@ void Parser::andOperation()
       isOperatorFound = true;
       isEvaluable = false;
       m_semanticChecker.pushOperator(OPERATOR_LOGIC);
-      // TODO: add OPR 0,15
+
+      m_codeGenerator.addOperation(MNE_OPR, "0", OPC_AND);
     }
   } while (isOperatorFound && iterations < m_maxRuleIterations);
 
@@ -146,9 +149,13 @@ void Parser::argumentsList()
   {
     isOperatorFound = false;
 
-    // TODO: if coming from printer function, add print opcode
-    //m_codeGenerator.addOperation(MNE_OPR, "0", "20");
     expression();
+
+    if (m_shouldPrintArguments)
+    {
+      m_codeGenerator.addOperation(MNE_OPR, "0", "20");
+    }
+
 
     advanceToken();
     if (m_currentToken.getLexeme().compare(",") == 0)
@@ -606,7 +613,8 @@ void Parser::expression()
     if (m_currentToken.getLexeme().compare("||") == 0)
     {
       m_semanticChecker.pushOperator(OPERATOR_LOGIC);
-      // TODO: OPR 0,16
+
+      m_codeGenerator.addOperation(MNE_OPR, "0", OPC_OR);
     }
   } while (m_currentToken.getLexeme().compare("||") == 0 &&
            iterations < m_maxRuleIterations);
@@ -855,8 +863,13 @@ void Parser::ifStatement()
 
   advanceToken();
   expression();
-  // TODO: add new label
-  //       add JMC F,label
+
+  m_codeGenerator.addLabel();
+  ostringstream labelNameBuilder;
+  size_t exLabelNo = m_codeGenerator.getLastLabelNumber();
+  labelNameBuilder << "_E" << m_codeGenerator.getLastLabelNumber();
+
+  m_codeGenerator.addOperation(MNE_JMC, "F", labelNameBuilder.str());
 
   m_semanticChecker.checkExpressionType(TYPE_BOOL,
       "condicion en if debe ser de tipo logico");
@@ -868,15 +881,20 @@ void Parser::ifStatement()
   {
     checkLexeme("sino");
 
-    // TODO: add new label
-    // resove value of previous label
+    m_codeGenerator.addLabel();
+    size_t eyLabelNo = m_codeGenerator.getLastLabelNumber();
+    m_codeGenerator.setLabelValue(exLabelNo,
+                                  m_codeGenerator.getLastOperationNumber() + 1);
 
     block();
-    // TODO: resolve value of last label
+
+    m_codeGenerator.setLabelValue(eyLabelNo,
+                                  m_codeGenerator.getLastOperationNumber() + 1);
   }
   else
   {
-    // TODO: resolve value of if{} label
+    m_codeGenerator.setLabelValue(exLabelNo,
+                                  m_codeGenerator.getLastOperationNumber() + 1);
   }
 
 #ifdef DEBUG
@@ -952,7 +970,18 @@ void Parser::multiplication()
 
       m_semanticChecker.pushOperator(OPERATOR_ARITH);
 
-      // TODO: add OPR 0, 4-6 for each operator.
+      if (m_currentToken.getLexeme().compare("*") == 0)
+      {
+        m_codeGenerator.addOperation(MNE_OPR, "0", OPC_MULT);
+      }
+      else if (m_currentToken.getLexeme().compare("/") == 0)
+      {
+        m_codeGenerator.addOperation(MNE_OPR, "0", OPC_DIV);
+      }
+      else if (m_currentToken.getLexeme().compare("%") == 0)
+      {
+        m_codeGenerator.addOperation(MNE_OPR, "0", OPC_MOD);
+      }
 
       advanceToken();
     }
@@ -995,8 +1024,9 @@ void Parser::notOperation()
 
   if (isNotOperatorFound)
   {
-    // TODO: add OPR 0,17
     m_semanticChecker.evaluateUnaryExpression();
+
+    m_codeGenerator.addOperation(MNE_OPR, "0", OPC_NOT);
   }
 
 #ifdef DEBUG
@@ -1098,7 +1128,10 @@ void Parser::print()
   
   checkLexeme("(");
   advanceToken();
+
+  m_shouldPrintArguments = true;
   argumentsList();
+  m_shouldPrintArguments = false;
 
   // FIXME: do not allow void type neither.
   if (m_semanticChecker.getExpressionType() == TYPE_INVALID)
@@ -1229,14 +1262,40 @@ void Parser::relationalOperation()
   bool isEvaluable = false;
   if (m_currentToken.getToken() == TOKEN_RELOP)
   {
+
     isEvaluable = true;
 
     m_semanticChecker.pushOperator(OPERATOR_REL);
 
+    string lexeme = m_currentToken.getLexeme();
+
     advanceToken();
     sumOperation();
 
-    // TODO: add OPR 0,9-14, save operator before sum
+    if (lexeme.compare("<") == 0)
+    {
+      m_codeGenerator.addOperation(MNE_OPR, "0", OPC_LT);
+    }
+    else if (lexeme.compare(">") == 0)
+    {
+      m_codeGenerator.addOperation(MNE_OPR, "0", OPC_GT);
+    }
+    else if (lexeme.compare("<=") == 0)
+    {
+      m_codeGenerator.addOperation(MNE_OPR, "0", OPC_LE);
+    }
+    else if (lexeme.compare(">=") == 0)
+    {
+      m_codeGenerator.addOperation(MNE_OPR, "0", OPC_GE);
+    }
+    else if (lexeme.compare("!=") == 0)
+    {
+      m_codeGenerator.addOperation(MNE_OPR, "0", OPC_DIF);
+    }
+    else if (lexeme.compare("==") == 0)
+    {
+      m_codeGenerator.addOperation(MNE_OPR, "0", OPC_EQ);
+    }
   }
 
   if (isEvaluable)
@@ -1270,7 +1329,7 @@ void Parser::returnExpression()
 
     expression();
 
-    // TODO: add STO 0, functionName
+    m_codeGenerator.addOperation(MNE_STO, "0", m_functions.top().getName());
 
 #ifdef DEBUG
     cout << "call checkReturnType with: " <<
@@ -1279,7 +1338,7 @@ void Parser::returnExpression()
     m_semanticChecker.checkReturnType(m_functions.top().getType());
   }
 
-  // TODO: add STO 0,1
+  m_codeGenerator.addOperation(MNE_STO, "0", "1");
 
 #ifdef DEBUG
   cout << "::: exit returnExpression()" << endl;
@@ -1363,7 +1422,7 @@ void Parser::sign()
     m_scanner->moveBackwards();
     checkLexeme("-");
 
-    // TODO: add OPR 0, 8
+    m_codeGenerator.addOperation(MNE_OPR, "0", OPC_MINUS);
   }
   term();
 
@@ -1447,12 +1506,14 @@ void Parser::sumOperation()
       if (m_currentToken.getLexeme().compare("+") == 0)
       {
         m_semanticChecker.pushOperator(OPERATOR_PLUS);
-        // TODO: add OPR 0,2
+
+        m_codeGenerator.addOperation(MNE_OPR, "0", OPC_ADD);
       }
       else
       {
         m_semanticChecker.pushOperator(OPERATOR_MINUS);
-        // TODO: add OPR 0,2
+
+        m_codeGenerator.addOperation(MNE_OPR, "0", OPC_SUBS);
       }
 
       advanceToken();
@@ -1482,6 +1543,8 @@ void Parser::term()
   if (m_errorReporter->getErrors() >= m_maxErrors)
     return;
 
+  string identifier;
+
 #ifdef DEBUG
   cout << "checking term with lexeme: " << m_currentToken.getLexeme() << endl;
 #endif
@@ -1493,6 +1556,8 @@ void Parser::term()
   }
   else if (m_currentToken.getToken() == TOKEN_IDEN)
   {
+    identifier = m_currentToken.getLexeme();
+
     advanceToken();
     if (m_currentToken.getLexeme().compare("[") == 0)
     {
@@ -1518,10 +1583,17 @@ void Parser::term()
       function.setName(m_scanner->getLastToken().getLexeme());
       m_functions.push(function);
 
-      // TODO: insert new label, LOD, callfunction and then CAL, followed by
-      // the setting of the label value
+      m_codeGenerator.addLabel();
+      ostringstream labelNameBuilder;
+      size_t exLabelNo = m_codeGenerator.getLastLabelNumber();
+      labelNameBuilder << "_E" << exLabelNo;
+      m_codeGenerator.addOperation(MNE_LOD, labelNameBuilder.str(), "0");
 
       functionCall();
+
+      m_codeGenerator.addOperation(MNE_LOD, function.getName(), "0");
+      m_codeGenerator.setLabelValue(exLabelNo,
+          m_codeGenerator.getLastOperationNumber() + 1);
     }
     else
     {
@@ -1539,7 +1611,7 @@ void Parser::term()
       m_scanner->moveForward();
     }
 
-    // TODO: add a LOD, ide, 0
+    m_codeGenerator.addOperation(MNE_LOD, identifier, "0");
   }
   else if (isLiteral(m_currentToken.getToken()))
   {
