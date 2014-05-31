@@ -777,35 +777,35 @@ void Parser::functionCall()
   {
     m_functions.top().setParameters("");
 
-    // FIXME: check that type != VOID when called from command() or expression()
-    m_functions.top().setType(m_semanticChecker.getFunctionType(
-        m_functions.top().getName(), m_functions.top().getParameters()));
-    
-#ifdef DEBUG
-    cout << ":: checking type of function called: type: " <<
-            m_functions.top().getType() << endl;
-#endif
-    if (m_isFunctionCalledAsCommand)
-    {
-      if (m_functions.top().getType() != TYPE_VOID)
-      {
-        m_errorReporter->writeErrorWithPosition(
-            "funcion con tipo llamada sin utilizar valor de regreso");
-      }
-    }
-    else if (m_isFunctionCalledAsArgument)
-    {
-      if (m_functions.top().getType() == TYPE_VOID)
-      {
-        m_errorReporter->writeErrorWithPosition(
-            "funcion sin tipo es llamada en expresion");
-      }
-    }
 
     m_semanticChecker.checkDeclared(m_functions.top().getName(),
                                     m_functions.top().getParameters());
 
     m_scanner->moveBackwards();
+  }
+
+  m_functions.top().setType(m_semanticChecker.getFunctionType(
+      m_functions.top().getName(), m_functions.top().getParameters()));
+  
+#ifdef DEBUG
+  cout << ":: checking type of function called: type: " <<
+          m_functions.top().getType() << endl;
+#endif
+  if (m_isFunctionCalledAsCommand)
+  {
+    if (m_functions.top().getType() != TYPE_VOID)
+    {
+      m_errorReporter->writeErrorWithPosition(
+          "funcion con tipo llamada sin utilizar valor de regreso");
+    }
+  }
+  else if (m_isFunctionCalledAsArgument)
+  {
+    if (m_functions.top().getType() == TYPE_VOID)
+    {
+      m_errorReporter->writeErrorWithPosition(
+          "funcion sin tipo es llamada en expresion");
+    }
   }
 
 #ifdef DEBUG
