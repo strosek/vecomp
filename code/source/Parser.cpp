@@ -116,6 +116,7 @@ void Parser::andOperation()
       isOperatorFound = true;
       isEvaluable = false;
       m_semanticChecker.pushOperator(OPERATOR_LOGIC);
+      // TODO: add OPR 0,15
     }
   } while (isOperatorFound && iterations < m_maxRuleIterations);
 
@@ -144,6 +145,9 @@ void Parser::argumentsList()
   do
   {
     isOperatorFound = false;
+
+    // TODO: if coming from printer function, add print opcode
+    //m_codeGenerator.addOperation(MNE_OPR, "0", "20");
     expression();
 
     advanceToken();
@@ -602,12 +606,14 @@ void Parser::expression()
     if (m_currentToken.getLexeme().compare("||") == 0)
     {
       m_semanticChecker.pushOperator(OPERATOR_LOGIC);
+      // TODO: OPR 0,16
     }
   } while (m_currentToken.getLexeme().compare("||") == 0 &&
            iterations < m_maxRuleIterations);
 
   m_scanner->moveBackwards();
 
+  // FIXME: when exit expression, check that type is not void
 #ifdef DEBUG
   cout << "::: exit expression()" << endl;
 #endif
@@ -756,6 +762,8 @@ void Parser::functionCall()
   else
   {
     m_functions.top().setParameters("");
+
+    // FIXME: check that type != VOID when called from command() or expression()
     m_functions.top().setType(m_semanticChecker.getFunctionType(
         m_functions.top().getName(), m_functions.top().getParameters()));
 
@@ -847,6 +855,8 @@ void Parser::ifStatement()
 
   advanceToken();
   expression();
+  // TODO: add new label
+  //       add JMC F,label
 
   m_semanticChecker.checkExpressionType(TYPE_BOOL,
       "condicion en if debe ser de tipo logico");
@@ -857,7 +867,16 @@ void Parser::ifStatement()
   if (m_currentToken.getLexeme().compare("sino") == 0)
   {
     checkLexeme("sino");
+
+    // TODO: add new label
+    // resove value of previous label
+
     block();
+    // TODO: resolve value of last label
+  }
+  else
+  {
+    // TODO: resolve value of if{} label
   }
 
 #ifdef DEBUG
@@ -933,6 +952,8 @@ void Parser::multiplication()
 
       m_semanticChecker.pushOperator(OPERATOR_ARITH);
 
+      // TODO: add OPR 0, 4-6 for each operator.
+
       advanceToken();
     }
 
@@ -974,6 +995,7 @@ void Parser::notOperation()
 
   if (isNotOperatorFound)
   {
+    // TODO: add OPR 0,17
     m_semanticChecker.evaluateUnaryExpression();
   }
 
@@ -1064,6 +1086,12 @@ void Parser::print()
     m_errorReporter->writeSyntaxError("Imprime o Imprimenl");
   }
 
+  bool shouldPrintNewLine = false;
+  if (m_currentToken.getLexeme().compare("Imprimenl") == 0)
+  {
+    shouldPrintNewLine = true;
+  }
+
   SymbolData function;
   m_functions.push(function);
   m_functions.top().setName("Imprime");
@@ -1071,11 +1099,17 @@ void Parser::print()
   checkLexeme("(");
   advanceToken();
   argumentsList();
-  
+
+  // FIXME: do not allow void type neither.
   if (m_semanticChecker.getExpressionType() == TYPE_INVALID)
   {
     m_errorReporter->writeErrorWithPosition(
         "tipo invalido en expresion de argumento");
+  }
+
+  if (shouldPrintNewLine)
+  {
+    m_codeGenerator.addOperation(MNE_OPR, "0", OPC_PRINTLN);
   }
 
   checkLexeme(")");
@@ -1144,7 +1178,10 @@ void Parser::program()
 
   m_semanticChecker.exitCurrentScope();
 
-  m_codeGenerator.addOperation(MNE_OPR, "0", OPC_END);
+  if (m_semanticChecker.isMainPresent())
+  {
+    m_codeGenerator.addOperation(MNE_OPR, "0", OPC_END);
+  }
 #ifdef DEBUG
   cout << "::: exit program()" << endl;
 #endif
@@ -1198,6 +1235,8 @@ void Parser::relationalOperation()
 
     advanceToken();
     sumOperation();
+
+    // TODO: add OPR 0,9-14, save operator before sum
   }
 
   if (isEvaluable)
@@ -1231,12 +1270,16 @@ void Parser::returnExpression()
 
     expression();
 
+    // TODO: add STO 0, functionName
+
 #ifdef DEBUG
     cout << "call checkReturnType with: " <<
         SymbolData::getTypeString(m_functions.top().getType()) << endl;
 #endif
     m_semanticChecker.checkReturnType(m_functions.top().getType());
   }
+
+  // TODO: add STO 0,1
 
 #ifdef DEBUG
   cout << "::: exit returnExpression()" << endl;
@@ -1319,6 +1362,8 @@ void Parser::sign()
     isMinusOperatorFound = true;
     m_scanner->moveBackwards();
     checkLexeme("-");
+
+    // TODO: add OPR 0, 8
   }
   term();
 
@@ -1402,10 +1447,12 @@ void Parser::sumOperation()
       if (m_currentToken.getLexeme().compare("+") == 0)
       {
         m_semanticChecker.pushOperator(OPERATOR_PLUS);
+        // TODO: add OPR 0,2
       }
       else
       {
         m_semanticChecker.pushOperator(OPERATOR_MINUS);
+        // TODO: add OPR 0,2
       }
 
       advanceToken();
@@ -1471,6 +1518,9 @@ void Parser::term()
       function.setName(m_scanner->getLastToken().getLexeme());
       m_functions.push(function);
 
+      // TODO: insert new label, LOD, callfunction and then CAL, followed by
+      // the setting of the label value
+
       functionCall();
     }
     else
@@ -1488,6 +1538,8 @@ void Parser::term()
       m_semanticChecker.pushVariableType(m_scanner->getLastToken().getLexeme());
       m_scanner->moveForward();
     }
+
+    // TODO: add a LOD, ide, 0
   }
   else if (isLiteral(m_currentToken.getToken()))
   {
