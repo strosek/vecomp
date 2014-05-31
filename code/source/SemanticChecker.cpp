@@ -318,7 +318,7 @@ void SemanticChecker::checkReturnRequired()
   if (m_isReturnRequired && !m_isReturnCalled)
   {
     m_errorReporter->writeErrorWithPosition(
-        "funcion con tipo no llama a regresa");
+        "funcion con tipo no llama a regresa con tipo");
   }
   else if (!m_isReturnRequired && m_isReturnCalled)
   {
