@@ -2,6 +2,7 @@
 #include <fstream>
 #include <cstdlib>
 #include <stack>
+#include <sstream>
 #include <cstring>
 using namespace std;
 
@@ -758,20 +759,23 @@ void ife() {
     if(lex != "else") {
         block();
     }
+
+    ostringstream codnBuilder;
     if(lex == "else") {
         ne = convertInt(conE++);
         ne = "_E"+ ne;
         Ey = ne;
         char s[12];
         genCod("JMP", "0", Ey);
-        insTabSim(Ex, "I", "I", string(ltoa(codn, s, 10)), "0" );
+        codnBuilder << codn;
+        insTabSim(Ex, "I", "I", codnBuilder.str(), "0" );
         lex = lexico();
         block();
-        insTabSim(Ey, "I", "I", string(ltoa(codn, s, 10)), "0" );
+        insTabSim(Ey, "I", "I", codnBuilder.str(), "0" );
     }
     else {
         char s[12];
-        insTabSim(Ex, "I", "I", string(ltoa(codn, s, 10)), "0" );
+        insTabSim(Ex, "I", "I", codnBuilder.str(), "0" );
     }
 }
 
@@ -847,7 +851,9 @@ void funcs() {
          if(lex == "main") {
             banMain = true;
             char *s = new char(20);
-            insTabSim("_P", "I", "I", string(ltoa(codn, s, 10)), "0");
+            ostringstream codnBuilder;
+            codnBuilder << codn;
+            insTabSim("_P", "I", "I", codnBuilder.str(), "0");
          }
          else {
             nomf = lex;
@@ -871,7 +877,9 @@ void funcs() {
          else {
                 char s[5];
                 tipo();
-                insTabSim(nomf, "F", tvar, string(ltoa(linf, s, 10)), "0");
+                ostringstream linfBuilder;
+                linfBuilder << linf;
+                insTabSim(nomf, "F", tvar, linfBuilder.str(), "0");
                 block();
          }
     } while (lex == "func" );
