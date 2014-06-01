@@ -62,6 +62,7 @@ public:
   void   setOutputFileName(const std::string& fileName);
   void   translateSymbolsTable(SymbolsTable& symbolsTable);
   void   addLabel();
+  void   addMainLabel();
   void   setLabelValue(size_t labelNo, int value);
   void   addOperation(const std::string& mnemo, const std::string& op1,
                       const std::string& op2);
@@ -76,6 +77,7 @@ private:
   std::vector<int>         m_labels;
   std::vector<std::string> m_operations;
   std::stack<std::string>  m_parametersStack;
+  size_t                   m_mainLabelNo;
 };
 
 #endif /* CODEGENERATOR_HPP */

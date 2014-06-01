@@ -12,7 +12,8 @@ CodeGenerator::CodeGenerator() :
   m_symbols(),
   m_labels(),
   m_operations(),
-  m_parametersStack()
+  m_parametersStack(),
+  m_mainLabelNo(1)
 {
 }
 
@@ -22,7 +23,8 @@ CodeGenerator::CodeGenerator(OutputType_t outputType) :
   m_symbols(),
   m_labels(),
   m_operations(),
-  m_parametersStack()
+  m_parametersStack(),
+  m_mainLabelNo(1)
 {
 }
 
@@ -111,6 +113,11 @@ void CodeGenerator::addLabel()
   m_labels.push_back(m_operations.size());
 }
 
+void CodeGenerator::addMainLabel()
+{
+  m_labels.push_back(m_operations.size());
+  m_mainLabelNo = getLastLabelNumber();
+}
 
 void CodeGenerator::setLabelValue(size_t labelNo, int value)
 {
@@ -166,7 +173,15 @@ void CodeGenerator::writeObjectFile()
   size_t nLabels = m_labels.size();
   for (size_t i = 0; i < nLabels; ++i)
   {
-    outputFile << "_E" << i << ",I,I," << m_labels.at(i) << ",0,#," << endl;
+    if (i != m_mainLabelNo)
+    {
+      outputFile << "_E" << i;
+    }
+    else
+    {
+      outputFile << "_P";
+    }
+    outputFile << ",I,I," << m_labels.at(i) << ",0,#," << endl;
   }
 
   outputFile << "@" << endl;

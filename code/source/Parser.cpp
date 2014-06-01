@@ -852,6 +852,7 @@ void Parser::functionDeclaration()
   if (m_scanner->getLastToken().getLexeme().compare("principal") == 0)
   {
     m_semanticChecker.setMainPresent(true);
+    m_codeGenerator.addMainLabel();
   }
 
   m_semanticChecker.enterToScope(m_scanner->getLastToken().getLexeme());
