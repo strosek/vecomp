@@ -155,9 +155,10 @@ void Parser::argumentsList()
     expression();
     m_isFunctionCalledAsArgument = false;
 
-    if (m_shouldPrintArguments)
+    if (m_shouldPrintArguments &&
+        m_scanner->getCurrentToken().getLexeme().compare(")") != 0)
     {
-      m_codeGenerator.addOperation(MNE_OPR, "0", "20");
+      m_codeGenerator.addOperation(MNE_OPR, "0", OPC_PRINT);
     }
 
 

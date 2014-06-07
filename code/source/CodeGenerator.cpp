@@ -115,7 +115,14 @@ void CodeGenerator::addLabel()
 
 void CodeGenerator::addMainLabel()
 {
-  m_labels.push_back(m_operations.size());
+  if (m_operations.size() == 0)
+  {
+    m_labels.push_back(1);
+  }
+  else
+  {
+    m_labels.push_back(m_operations.size());
+  }
   m_mainLabelNo = getLastLabelNumber();
 }
 
@@ -165,14 +172,17 @@ void CodeGenerator::writeObjectFile()
   ofstream outputFile(m_outputFileName);
 
   size_t nSymbols = m_symbols.size();
-  for (size_t i = 0UL; i < nSymbols; ++i)
+  for (size_t i = 1UL; i <= nSymbols; ++i)
   {
-    outputFile << m_symbols.at(i) << endl;
+    outputFile << m_symbols.at(i - 1) << endl;
   }
  
   size_t nLabels = m_labels.size();
-  for (size_t i = 0; i < nLabels; ++i)
+  for (size_t i = 1UL; i <= nLabels; ++i)
   {
+#ifdef DEBUG
+    cout << "::: mainlabel: " << m_mainLabelNo << " i: " << i << endl;
+#endif
     if (i != m_mainLabelNo)
     {
       outputFile << "_E" << i;
@@ -181,7 +191,7 @@ void CodeGenerator::writeObjectFile()
     {
       outputFile << "_P";
     }
-    outputFile << ",I,I," << m_labels.at(i) << ",0,#," << endl;
+    outputFile << ",I,I," << m_labels.at(i - 1) << ",0,#," << endl;
   }
 
   outputFile << "@" << endl;
